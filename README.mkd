@@ -1,0 +1,6 @@
+## Nucleotid.es log server
+
+This repository is a Docker container providing the nucleotid.es API for
+logging completetion of events during benchmarking. This service provides an
+append-only database to which nucleotid.es events can be recorded and then
+listed. The API is listed in detail in API.mkd.
