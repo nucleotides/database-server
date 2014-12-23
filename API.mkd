@@ -1,0 +1,57 @@
+## /events/
+
+### POST /events/
+
+Add a new event to the database. Each POST request MUST contain the following
+fields:
+
+  * **benchmark_id**: The benchmark's alphanumeric identifier. Each benchmark
+    has a unique identifier created from a digest of its fields.
+
+  * **benchmark_type_code**: The code identifying the type of benchmark.
+
+      **0000**: A genome assembler benchmark. Evaluating the assembly of a set
+      of paired illumina 2x150 reads.
+
+  * **state_code**: The outcome code of the event. This may have one of the
+    following values:
+
+      **0000**: This event completed successfully.
+
+      **0001**: This event failed to complete due to the container failing with
+      an error.
+
+      **0002**: This event failed to complete due to the container finishing
+      without error but not producing any data.
+
+  * **event_type_code**: The code for the type of event. This can have the
+    following values:
+
+      **0000**: Run a container on a test dataset.
+
+      **0001**: Evaluate generated data and generate a set of metrics.
+
+Each POST request MAY also contain the following fields. They MUST both be used
+in conjunction.
+
+  * **log_file_s3_url**: The S3 url for a file containing a log of the event.
+
+  * **log_file_digest**: The SHA256 digest of the log file.
+
+Each POST request MAY also contain the following fields. They MUST both be used
+in conjunction.
+
+  * **event_file_s3_url**: The S3 url for a file containing data specific to
+    this event.
+
+  * **event_file_digest**: The SHA256 digest of the event file.
+
+### GET /events/:id
+
+Returns a JSON document containing the above fields and also the additional
+fields:
+
+  * **id**: The timestamp of this event as milliseconds since 00:00:00
+    Coordinated Universal Time (UTC). This is used as the unique identifier for
+    this event. (Assuming no two events are created at exactly the same
+    millisecond.)
