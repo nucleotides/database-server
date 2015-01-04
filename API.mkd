@@ -11,7 +11,7 @@ fields:
   * **benchmark_type_code**: The code identifying the type of benchmark.
 
       **0000**: A genome assembler benchmark. Evaluating the assembly of a set
-      of paired illumina 2x150 reads.
+      of paired Illumina 2x150 reads.
 
   * **state_code**: The outcome code of the event. This may have one of the
     following values:
@@ -27,7 +27,7 @@ fields:
   * **event_type_code**: The code for the type of event. This can have the
     following values:
 
-      **0000**: Run a container on a test dataset.
+      **0000**: Run a container on a test data set.
 
       **0001**: Evaluate generated data and generate a set of metrics.
 
@@ -46,12 +46,67 @@ in conjunction.
 
   * **event_file_digest**: The SHA256 digest of the event file.
 
-### GET /events/:id
 
-Returns a JSON document containing the above fields and also the additional
-fields:
 
-  * **id**: The timestamp of this event as milliseconds since 00:00:00
-    Coordinated Universal Time (UTC). This is used as the unique identifier for
-    this event. (Assuming no two events are created at exactly the same
-    millisecond.)
+### GET /events/show/:id
+
+Returns a single event as JSON document.
+
+#### Resource URL
+
+http://api.nucleotides/1.0/events/show.json
+
+#### Parameters
+
+  * **id**
+
+    **Required**: The unique ID of this event. This is the time stamp of this
+    event in milliseconds since 00:00:00 Coordinated Universal Time (UTC). This
+    is unique for this event. (Assuming no two events are created at exactly
+    the same millisecond.)
+
+#### Example request
+
+http://api.nucleotides/1.0/events/show.json?id=1234
+
+
+
+### GET /events/lookup
+
+Returns a list of up to 100 events as a JSON document.
+
+#### Resource URL
+
+http://api.nucleotides/1.0/events/show.json
+
+#### Parameters
+
+  * **benchmark_id**
+
+    **Optional**: A comma separated list of benchmark IDs. Returns a list of
+    all the events related to these benchmarks.
+
+  * **max_id**:
+
+    **Optional**: The event ID, inclusive, to end pagination of the events
+    list. Used to fetch multiple pages of events in separate requests.
+
+  * **benchmark_type_id**:
+
+    **Optional**: The code identifying the type of benchmark. Selects for only
+    the events for this kind of benchmark.
+
+  * **state_code**:
+
+    **Optional**: A comma separated list of state_codes. Limit the returned
+    events to this code.
+
+  * **event_type_code**:
+
+    **Optional**: Limit the returned events to this type.
+
+#### Example request
+
+http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
+
+
