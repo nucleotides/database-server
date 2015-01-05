@@ -1,6 +1,10 @@
 (ns event-api.core-test
-  (:require [clojure.test   :refer :all]
-            [ring.mock.request :as mock]
-            [event-api.core    :as event]))
+  (:require [clojure.test      :refer :all]
+            [ring.mock.request]
+            [event-api.core]))
 
-(deftest events)
+(defn request [method url]
+  (event-api.core/api (ring.mock.request/request method url)))
+
+(deftest events
+  (is (= (:status (request :get "/events")) 200)))
