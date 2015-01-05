@@ -2,49 +2,77 @@
 
 ### POST /events/
 
-Add a new event to the database. Each POST request MUST contain the following
-fields:
+Add a new event to the database.
 
-  * **benchmark_id**: The benchmark's alphanumeric identifier. Each benchmark
-    has a unique identifier created from a digest of its fields.
+#### Resource URL
 
-  * **benchmark_type_code**: The code identifying the type of benchmark.
+http://api.nucleotides/1.0/events/update.json
 
-      **0000**: A genome assembler benchmark. Evaluating the assembly of a set
-      of paired Illumina 2x150 reads.
+#### Parameters
 
-  * **state_code**: The outcome code of the event. This may have one of the
+  * **benchmark_id**
+
+    **Required**: The benchmark's alphanumeric identifier. Each benchmark has a
+    unique identifier created from a digest of its fields.
+
+  * **benchmark_type_code**
+
+    **Required**: The code identifying the type of benchmark. Allowed values
+    are:
+
+      * **0000**: A genome assembler benchmark. Evaluating the assembly of a
+        set of paired Illumina 2x150 reads.
+
+  * **state_code**
+
+    **Required**: The outcome code of the event. This may have one of the
     following values:
 
-      **0000**: This event completed successfully.
+      * **0000**: This event completed successfully.
 
-      **0001**: This event failed to complete due to the container failing with
-      an error.
+      * **0001**: This event failed to complete due to the container failing
+        with an error.
 
-      **0002**: This event failed to complete due to the container finishing
-      without error but not producing any data.
+      * **0002**: This event failed to complete due to the container finishing
+        without error but not producing any data.
 
-  * **event_type_code**: The code for the type of event. This can have the
-    following values:
+  * **event_type_code**
 
-      **0000**: Run a container on a test data set.
+    **Required**: The code for the type of event. This can have the following
+    values:
 
-      **0001**: Evaluate generated data and generate a set of metrics.
+      * **0000**: Run a container on a test data set.
 
-Each POST request MAY also contain the following fields. They MUST both be used
-in conjunction.
+      * **0001**: Evaluate generated data and generate a set of metrics.
 
-  * **log_file_s3_url**: The S3 url for a file containing a log of the event.
+  * **log_file_s3_url**
 
-  * **log_file_digest**: The SHA256 digest of the log file.
+    **Optional**: The S3 url for a file containing a log of the event.
 
-Each POST request MAY also contain the following fields. They MUST both be used
-in conjunction.
+  * **log_file_digest**
 
-  * **event_file_s3_url**: The S3 url for a file containing data specific to
-    this event.
+    **Optional**: The SHA256 digest of the log file.
 
-  * **event_file_digest**: The SHA256 digest of the event file.
+  * **event_file_s3_url**
+
+    **Optional**: The S3 url for a file containing data specific to this event.
+
+  * **event_file_digest**
+
+    **Optional**: The SHA256 digest of the event file.
+
+#### Example request
+
+POST http://api.nucleotides/1.0/events/update.json?benchmark_id=afd0&benchmark_type_code=0000&state_code=0000&event_type_code=0000
+
+#### Example response
+
+    {"id"                  : "243145735212777472",
+     "created_at"          : "Wed Sep 05 00:37:15 +0000 2012",
+     "benchmark_id"        : "afd0...",
+     "benchmark_type_code" : "0000",
+     "state_code"          : "0000",
+     "event_type_code"     : "0000"}
 
 
 
@@ -67,7 +95,15 @@ http://api.nucleotides/1.0/events/show.json
 
 #### Example request
 
-http://api.nucleotides/1.0/events/show.json?id=1234
+GET http://api.nucleotides/1.0/events/show.json?id=1234
+
+#### Example response
+
+    {"benchmark_id"        : "afd0...",
+     "benchmark_type_code" : "0000",
+     "state_code"          : "0000",
+     "event_type_code"     : "0000"}
+
 
 
 
@@ -107,6 +143,6 @@ http://api.nucleotides/1.0/events/show.json
 
 #### Example request
 
-http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
+GET http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
 
 
