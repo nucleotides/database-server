@@ -1,5 +1,5 @@
 (defproject event-api "current"
-  :description "FIXME: write description"
+  :description "REST API for recording nucleotid.es benchmarking events."
 
   :dependencies [[org.clojure/clojure     "1.6.0"]
                  [ring/ring-jetty-adapter "1.3.1"]
