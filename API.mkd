@@ -99,11 +99,12 @@ GET http://api.nucleotides/1.0/events/show.json?id=1234
 
 #### Example response
 
-    {"benchmark_id"        : "afd0...",
+    {"id"                  : "243145735212777472",
+     "created_at"          : "Wed Sep 05 00:37:15 +0000 2012",
+     "benchmark_id"        : "afd0...",
      "benchmark_type_code" : "0000",
      "state_code"          : "0000",
      "event_type_code"     : "0000"}
-
 
 
 
