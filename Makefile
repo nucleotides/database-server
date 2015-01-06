@@ -1,5 +1,9 @@
 name   := target
 
+bootstrap:
+	docker pull clojure
+	lein deps
+
 .image: Dockerfile project.clj
 	docker build --tag=$(name) .
 	touch $@
