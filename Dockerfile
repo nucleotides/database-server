@@ -1,4 +1,5 @@
 FROM clojure
-COPY /src/event-api /event-api
+COPY . /event-api
 WORKDIR /event-api
-CMD ["lein", "ring", "server"]
+RUN lein ring uberjar
+CMD ["java", "-jar", "target/event-api-current-standalone.jar"]
