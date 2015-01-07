@@ -3,7 +3,7 @@
 This repository is a Docker container providing the nucleotid.es API for
 logging completetion of events during benchmarking. This service provides an
 append-only database to which nucleotid.es events can be recorded and then
-listed. The API is listed in detail in API.mkd.
+listed. The API is listed in detail in [API.mkd][].
 
 ## Testing the service
 
@@ -16,3 +16,4 @@ service is tested as follows:
     $./script/feature$
 
 [compojure]: https://github.com/weavejester/compojure
+[API.mkd]: https://github.com/nucleotides/event-api/blob/master/API.mk://github.com/nucleotides/event-api/blob/master/API.mkd
