@@ -1,6 +1,12 @@
 name   := target
 
-bootstrap:
+feature: Gemfile.lock .image
+	bundle exec cucumber $(ARGS)
+
+Gemfile.lock: Gemfile
+	bundle install
+
+bootstrap: Gemfile.lock
 	docker pull clojure
 	lein deps
 
