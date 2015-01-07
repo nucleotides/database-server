@@ -4,7 +4,7 @@ IMAGE="target"
 
 Before do
   @container_id = start_container IMAGE
-  sleep 4 # Allow the server to start
+  sleep 5 # Allow the server to start
 end
 
 After do
