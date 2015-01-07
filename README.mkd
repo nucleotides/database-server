@@ -1,6 +1,16 @@
-## Nucleotid.es log server
+## Nucleotid.es event API server
 
 This repository is a Docker container providing the nucleotid.es API for
 logging completetion of events during benchmarking. This service provides an
 append-only database to which nucleotid.es events can be recorded and then
 listed. The API is listed in detail in API.mkd.
+
+## Testing the service
+
+The service is built using [compojure][] inside a clojure Docker container. The
+service is tested as follows:
+
+  * Ensure clojure unit tests pass using $./script/test$
+  * Ensure the service builds a docker image using $./script/build$
+
+[compojure]: https://github.com/weavejester/compojure
