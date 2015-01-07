@@ -12,5 +12,7 @@ service is tested as follows:
 
   * Ensure clojure unit tests pass using $./script/test$
   * Ensure the service builds a docker image using $./script/build$
+  * Ensure the a running container of the service passes feature tests using
+    $./script/feature$
 
 [compojure]: https://github.com/weavejester/compojure
