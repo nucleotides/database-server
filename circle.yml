@@ -6,3 +6,6 @@ machine:
 test:
   pre:
     - docker pull clojure
+  override:
+    - ./script/test
+    - ./script/build
