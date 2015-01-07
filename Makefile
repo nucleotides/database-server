@@ -1,6 +1,9 @@
 name   := target
 
-bootstrap:
+Gemfile.lock: Gemfile
+	bundle install
+
+bootstrap: Gemfile.lock
 	docker pull clojure
 	lein deps
 
