@@ -1,5 +1,8 @@
 name   := target
 
+feature: Gemfile.lock .image
+	bundle exec cucumber $(ARGS)
+
 Gemfile.lock: Gemfile
 	bundle install
 
