@@ -1,5 +1,5 @@
 (ns event-api.core
-  (:require [compojure.core         :refer [GET POST defroutes]]
+  (:require [compojure.core         :refer [GET POST routes]]
             [clojure.set            :refer [superset?]]
             [ring.middleware.params :refer [wrap-params]]))
 
@@ -17,7 +17,7 @@
       {:status 202}
       {:status 422})))
 
-(defroutes routes
-  (POST "/events" [] post-event))
-
-(def api (wrap-params routes))
+(def api
+  (wrap-params
+    (routes
+      (POST "/events" [] post-event))))
