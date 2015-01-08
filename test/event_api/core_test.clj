@@ -3,8 +3,12 @@
             [ring.mock.request]
             [event-api.core]))
 
-(defn request [method url]
-  (event-api.core/api (ring.mock.request/request method url)))
+(defn request [method url params]
+  (event-api.core/api (ring.mock.request/request method url params)))
+
+(defn test-request [r status-code]
+  (let [response (apply request r)]
+    (is (= (:status response) status-code))))
 
 (deftest events
-  (is (= (:status (request :get "/events")) 200)))
+  (test-request [:post "/events" {}] 422))
