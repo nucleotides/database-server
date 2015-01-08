@@ -16,3 +16,6 @@ def docker_address
   end
 end
 
+def docker_url
+  "http://#{docker_address}:8080"
+end

@@ -1,7 +1,10 @@
 require 'rspec'
 
-When(/^I fetch the file '(.*)'$/) do |file|
+When(/^I post to url "(.*?)" with the data:$/) do |endpoint, data_string|
   require 'curl'
-  url = "http://#{docker_address}:8080/#{file}"
-  @response = Curl.get(url)
+  @response = Curl.post(docker_url + endpoint)
+end
+
+Then(/^the returned HTTP status code should be "(.*?)"$/) do |code|
+  expect(@response.status.split.first).to eq(code)
 end
