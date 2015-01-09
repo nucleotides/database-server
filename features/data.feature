@@ -24,3 +24,4 @@ Feature: Sending and fetching data from the event API server
     }
     """
     Then the returned HTTP status code should be "202"
+     And the returned body should match "/^\d{16}$/"
