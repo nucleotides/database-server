@@ -7,7 +7,8 @@ test:
   pre:
     - docker pull clojure
     - make .aws_credentials
+    - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
   override:
     - ./script/test
     - ./script/build
-    - ./script/feature
+    - ./script/feature '--format json --out $$CIRCLE_TEST_REPORTS/cucumber/tests.cucumber --format pretty'
