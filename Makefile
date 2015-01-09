@@ -1,12 +1,23 @@
-name   := target
+name        := target
+credentials := .aws_credentials
 
 feature: Gemfile.lock .dev_container
 	bundle exec cucumber $(ARGS)
 
-Gemfile.lock: Gemfile
-	bundle install
+.dev_container: .image
+	docker run \
+	  --publish=8080:8080 \
+	  --detach=true \
+	  --env="AWS_ACCESS_KEY=$(shell grep AWS_ACCESS_KEY $(credentials) | cut -f 2 -d =)" \
+	  --env="AWS_SECRET_KEY=$(shell grep AWS_SECRET_KEY $(credentials) | cut -f 2 -d =)" \
+	  --env="SDB_DOMAIN=event-dev" \
+	  $(name) > $@
 
-bootstrap: Gemfile.lock
+kill:
+	docker kill $(shell cat .dev_container)
+	rm -f .dev_container
+
+bootstrap: Gemfile.lock .aws_credentials
 	docker pull clojure
 	lein deps
 
@@ -14,12 +25,11 @@ bootstrap: Gemfile.lock
 	docker build --tag=$(name) .
 	touch $@
 
-.dev_container: .image
-	docker run --publish=8080:8080 --detach=true $(name) > $@
+$(credentials): ./script/create_aws_credentials
+	$< $@
 
-kill:
-	docker kill $(shell cat .dev_container)
-	rm -f .dev_container
+Gemfile.lock: Gemfile
+	bundle install
 
 clean:
-	rm -f image
+	rm -f .image $(credentials)
