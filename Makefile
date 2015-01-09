@@ -1,4 +1,5 @@
-name   := target
+name        := target
+credentials := .aws_credentials
 
 feature: Gemfile.lock .dev_container
 	bundle exec cucumber $(ARGS)
@@ -16,7 +17,7 @@ kill:
 	docker kill $(shell cat .dev_container)
 	rm -f .dev_container
 
-bootstrap: Gemfile.lock
+bootstrap: Gemfile.lock .aws_credentials
 	docker pull clojure
 	lein deps
 
@@ -24,8 +25,11 @@ bootstrap: Gemfile.lock
 	docker build --tag=$(name) .
 	touch $@
 
+$(credentials): ./script/create_aws_credentials
+	$< $@
+
 Gemfile.lock: Gemfile
 	bundle install
 
 clean:
-	rm -f image
+	rm -f .image $(credentials)
