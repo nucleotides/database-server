@@ -14,7 +14,7 @@
                           "event_type_code"}
         request-params  (set (keys (:params request)))]
     (if (superset? request-params required-params)
-      {:status 202}
+      {:status 202 :body (str (System/nanoTime))}
       {:status 422})))
 
 (def api
