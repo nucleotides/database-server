@@ -1,6 +1,6 @@
 name   := target
 
-feature: Gemfile.lock .image
+feature: Gemfile.lock .dev_container
 	bundle exec cucumber $(ARGS)
 
 Gemfile.lock: Gemfile
@@ -14,8 +14,12 @@ bootstrap: Gemfile.lock
 	docker build --tag=$(name) .
 	touch $@
 
-headless: .image
-	docker run --publish=8080:8080 --detach=false $(name)
+.dev_container: .image
+	docker run --publish=8080:8080 --detach=true $(name) > $@
+
+kill:
+	docker kill $(shell cat .dev_container)
+	rm -f .dev_container
 
 clean:
 	rm -f image
