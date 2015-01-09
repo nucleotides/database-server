@@ -8,8 +8,8 @@ feature: Gemfile.lock .dev_container
 	docker run \
 	  --publish=8080:8080 \
 	  --detach=true \
-	  --env="AWS_ACCESS_KEY=${AWS_ACCESS_KEY}" \
-	  --env="AWS_SECRET_KEY=${AWS_SECRET_KEY}" \
+	  --env="AWS_ACCESS_KEY=$(shell grep AWS_ACCESS_KEY $(credentials) | cut -f 2 -d =)" \
+	  --env="AWS_SECRET_KEY=$(shell grep AWS_SECRET_KEY $(credentials) | cut -f 2 -d =)" \
 	  --env="SDB_DOMAIN=event-dev" \
 	  $(name) > $@
 
