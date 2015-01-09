@@ -36,7 +36,7 @@ Feature: Sending and fetching data from the event API server
       "event_type_code"    : "0000"
     }
     """
-    When I get the url "/events" with the event id
+    When I get the url "/events/show.json" with the event id
     Then the returned HTTP status code should be "200"
      And the returned body should be a valid JSON document
      And the returned JSON document should include the keys:
