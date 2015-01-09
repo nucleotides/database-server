@@ -10,3 +10,4 @@ pom.xml.asc
 
 .image
 Gemfile.lock
+.aws_credentials
