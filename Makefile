@@ -1,7 +1,7 @@
 name        := target
 credentials := .aws_credentials
 
-feature: Gemfile.lock .dev_container
+feature: Gemfile.lock .dev_container $(credentials)
 	bundle exec cucumber $(ARGS)
 
 .dev_container: .image

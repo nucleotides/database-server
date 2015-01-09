@@ -6,6 +6,7 @@ machine:
 test:
   pre:
     - docker pull clojure
+    - make .aws_credentials
   override:
     - ./script/test
     - ./script/build
