@@ -21,7 +21,7 @@ bootstrap: Gemfile.lock .aws_credentials
 	docker pull clojure
 	lein deps
 
-.image: Dockerfile project.clj
+.image: Dockerfile project.clj $(shell find src -name "*.clj")
 	docker build --tag=$(name) .
 	touch $@
 

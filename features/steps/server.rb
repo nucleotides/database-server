@@ -10,3 +10,7 @@ end
 Then(/^the returned HTTP status code should be "(.*?)"$/) do |code|
   expect(@response.status.split.first).to eq(code)
 end
+
+Then(/^the returned body should match "(.*?)"$/) do |re|
+  expect(@response.body.strip).to match(re)
+end
