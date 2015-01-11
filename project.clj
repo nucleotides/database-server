@@ -3,7 +3,8 @@
 
   :dependencies [[org.clojure/clojure     "1.6.0"]
                  [ring/ring-jetty-adapter "1.3.1"]
-                 [compojure               "1.3.1"]]
+                 [compojure               "1.3.1"]
+                 [com.cemerick/rummage    "1.0.1"]]
   :plugins      [[lein-ring "0.8.13"]]
 
   :ring     {:handler event-api.core/api :port 8080}
