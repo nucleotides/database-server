@@ -20,3 +20,6 @@
 (defn valid-event? [request]
   (let [request-keys (set (keys request))]
     (superset? request-keys required-event-keys)))
+
+(defn generate-event-id []
+  (str (System/nanoTime)))

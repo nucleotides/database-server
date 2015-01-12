@@ -18,3 +18,5 @@
                                   "status_code"         "0000"
                                   "event_type_code"     "0000"}))))
 
+(deftest generate-event-id
+  (is (re-matches #"^\d+$" (db/generate-event-id))))
