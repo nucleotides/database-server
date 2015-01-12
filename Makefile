@@ -4,6 +4,9 @@ credentials := .aws_credentials
 fetch_cred  = $(shell grep $(1) $(credentials) | cut -f 2 -d =) \
 
 feature: Gemfile.lock .dev_container
+	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
+	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
+	AWS_SDB_DOMAIN="event-dev" \
 	bundle exec cucumber $(ARGS)
 
 .dev_container: .image $(credentials)
