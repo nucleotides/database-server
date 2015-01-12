@@ -1,6 +1,7 @@
 (ns event-api.core-test
   (:require [clojure.test       :refer :all]
             [compojure.handler  :refer [site]]
+            [clojure.data.json  :as json]
             [ring.mock.request  :as mock]
             [cemerick.rummage   :as sdb]
             [event-api.database :as db]
@@ -39,4 +40,13 @@
         (is (= 422 (:status (f {:benchmark_id "abcd"})))))
 
       (testing "with valid paramters"
-        (is (= 202 (:status (f valid-event-map))))))))
+        (is (= 202 (:status (f valid-event-map)))))))
+
+  (testing "GET /events/show.json"
+    (let [f #(request :get (str "/events/show.json?id=" %1) %2)]
+
+      (testing "with a valid event ID"
+        (let [eid (db/create-event client domain
+                                   (db/create-event-map valid-event-map))]
+          (is (= 200 (:status (f eid {}))))
+          (is (contains? (json/read-str (:body (f eid {}))) "benchmark_id")))))))
