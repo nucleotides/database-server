@@ -8,6 +8,7 @@ When(/^I post to url "(.*?)" with the data:$/) do |endpoint, data_string|
 end
 
 When(/^I get the url "(.*?)" with the event id$/) do |endpoint|
+  sleep 1 #Allow data to be posted
   @event_id = @response.body.strip
   url = "#{docker_url}#{endpoint}?id=#{@event_id}"
   @response = Curl.get(url)
@@ -26,14 +27,14 @@ Then(/^the returned body should be a valid JSON document$/) do
 end
 
 Then(/^the returned JSON document should include the keys:$/) do |table|
-  table.each do |row|
-    expect(@document).to include?(table['key'])
+  table.hashes.each do |row|
+    expect(@document.keys).to include(row['key'])
   end
 end
 
 Then(/^the returned JSON document should include the key\-value pairs:$/) do |table|
-  table.each do |row|
-    expect(@document).to include?(table['key'])
-    expect(@document[table['key']]).to eq(table['value'])
+  table.hashes.each do |row|
+    expect(@document.keys).to include(row['key'])
+    expect(@document[row['key']]).to eq(row['value'])
   end
 end
