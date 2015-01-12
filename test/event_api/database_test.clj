@@ -1,6 +1,13 @@
 (ns event-api.database-test
   (:require [clojure.test :refer :all]
+            [cemerick.rummage   :as sdb]
             [event-api.database :as db]))
+
+(def valid-request
+  {"benchmark_id"        "abcd"
+   "benchmark_type_code" "0000"
+   "status_code"         "0000"
+   "event_type_code"     "0000"})
 
 
 (deftest valid-event?
@@ -13,10 +20,9 @@
                                    "event_type_code"     "0000"})))))
 
    (testing "an event hash with all required values"
-    (is (= true (db/valid-event? {"benchmark_id"        "abcd"
-                                  "benchmark_type_code" "0000"
-                                  "status_code"         "0000"
-                                  "event_type_code"     "0000"}))))
+    (is (= true (db/valid-event? valid-request))))
 
-(deftest generate-event-id
-  (is (re-matches #"^\d+$" (db/generate-event-id))))
+(deftest create-event-map
+  (let [m (db/create-event-map valid-request)]
+    (is (re-matches #"^\d+$" (::sdb/id m))
+    (every? #(is (contains? m %)) (keys valid-request)))))

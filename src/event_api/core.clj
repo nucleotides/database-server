@@ -8,13 +8,12 @@
   valid otherwise return appropriate HTTP error
   code otherwise."
   [request client domain]
-  (let [eid    (db/generate-event-id)
-        params (:params request)]
+  (let [params (:params request)]
     (if (db/valid-event? params)
-      (do
-        ((db/create-event client domain eid params)
-        {:status 202 :body eid})
-      {:status 422}))))
+      {:status 202
+       :body (db/create-event client domain (db/create-event-map params))}
+      {:status 422})))
+
 
 (def api
   (wrap-params

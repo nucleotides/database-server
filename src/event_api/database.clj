@@ -21,9 +21,12 @@
   (let [request-keys (set (keys request))]
     (superset? request-keys required-event-keys)))
 
-(defn generate-event-id []
-  (str (System/nanoTime)))
+(defn create-event-map [request-params]
+  (let [event (select-keys request-params required-event-keys)]
+    (assoc event ::sdb/id (str (System/nanoTime)))))
 
-(defn create-event [client domain event-id request-params]
-  (let [event (select-keys required-event-keys request-params)]
-    (sdb/put-attrs client domain (assoc event ::sdb/id event-id))))
+
+(defn create-event [client domain event]
+  (do
+    (sdb/put-attrs client domain event)
+    (::sdb/id event)))
