@@ -1,7 +1,8 @@
 (ns event-api.database
   (:require [cemerick.rummage          :as sdb]
             [cemerick.rummage.encoding :as enc]
-            [clojure.set               :refer [superset?]])
+            [clojure.set               :refer [superset?]]
+            [clojure.walk              :refer [keywordize-keys]])
   (:import  [com.amazonaws.services.simpledb AmazonSimpleDBClient]
             [com.amazonaws.auth              BasicAWSCredentials]))
 
@@ -23,7 +24,7 @@
 
 (defn create-event-map [request-params]
   (let [event (select-keys request-params required-event-keys)]
-    (assoc event ::sdb/id (str (System/nanoTime)))))
+    (assoc (keywordize-keys event) ::sdb/id (str (System/nanoTime)))))
 
 
 (defn create-event [client domain event]

@@ -25,4 +25,4 @@
 (deftest create-event-map
   (let [m (db/create-event-map valid-request)]
     (is (re-matches #"^\d+$" (::sdb/id m))
-    (every? #(is (contains? m %)) (keys valid-request)))))
+    (every? #(is (contains? m (keyword %))) (keys valid-request)))))
