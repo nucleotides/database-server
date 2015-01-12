@@ -18,6 +18,12 @@ feature: Gemfile.lock .dev_container
 	  --env="AWS_SDB_DOMAIN=event-dev" \
 	  $(name) > $@
 
+.sdb_container: .sdb_image
+	docker run \
+	  --publish=8081:8080 \
+	  --detach=true \
+	  sdb > $@
+
 
 repl: $(credentials)
 	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
@@ -28,12 +34,16 @@ kill:
 	docker kill $(shell cat .dev_container)
 	rm -f .dev_container
 
-bootstrap: Gemfile.lock $(credentials)
+bootstrap: Gemfile.lock $(credentials) .sdb_container
 	docker pull clojure
 	lein deps
 
 .image: Dockerfile project.clj $(shell find src -name "*.clj")
 	docker build --tag=$(name) .
+	touch $@
+
+.sdb_image: images/simpledb-dev/Dockerfile
+	docker build --tag=sdb $(dir $<)
 	touch $@
 
 $(credentials): ./script/create_aws_credentials
