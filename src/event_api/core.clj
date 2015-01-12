@@ -1,7 +1,7 @@
 (ns event-api.core
   (:require [compojure.core         :refer [GET POST routes]]
-            [clojure.set            :refer [superset?]]
-            [ring.middleware.params :refer [wrap-params]]))
+            [ring.middleware.params :refer [wrap-params]]
+            [event-api.database     :as db]))
 
 (defn post-event
   "Process a post event request. Return 202 if
