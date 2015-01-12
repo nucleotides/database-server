@@ -8,7 +8,8 @@
             [event-api.core     :as app]))
 
 (def domain "dev")
-(def client (db/create-client "dummy" "dummy" "http://192.168.59.103:8081"))
+(def host (if (System/getenv "CI") "localhost" "http://192.168.59.103"))
+(def client (db/create-client "dummy" "dummy" (str host ":8081")))
 
 (defn sdb-domain-fixture [f]
   (do
