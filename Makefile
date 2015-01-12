@@ -15,7 +15,7 @@ feature: Gemfile.lock .dev_container
 	  --detach=true \
 	  --env="AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)" \
 	  --env="AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)"\
-	  --env="SDB_DOMAIN=event-dev" \
+	  --env="AWS_SDB_DOMAIN=event-dev" \
 	  $(name) > $@
 
 
