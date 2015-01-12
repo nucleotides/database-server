@@ -9,7 +9,7 @@
   :plugins      [[lein-ring "0.9.0"]]
 
 
-  :ring     {:handler event-api.core/api :port 8080}
+  :main event-api.core
 
   :profiles {
     :dev     {:dependencies [[ring-mock "0.1.5"]]}
