@@ -18,7 +18,8 @@
 (defn api [client domain]
   (wrap-params
     (routes
-      (POST "/events" [] (partial server/post-event client domain)))))
+      (GET  "/events/show.json" [] (partial server/get-event  client domain))
+      (POST "/events"           [] (partial server/post-event client domain)))))
 
 (defn -main [& args]
   (let [client (apply db/create-client (get-credentials))

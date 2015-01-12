@@ -33,3 +33,6 @@
   (do
     (sdb/put-attrs client domain event)
     (::sdb/id event)))
+
+(defn read-event [client domain event-id]
+  (sdb/get-attrs client domain event-id))

@@ -2,6 +2,7 @@
   :description "REST API for recording nucleotid.es benchmarking events."
 
   :dependencies [[org.clojure/clojure        "1.6.0"]
+                 [org.clojure/data.json      "0.2.5"]
                  [ring/ring-jetty-adapter    "1.3.1"]
                  [compojure                  "1.3.1"]
                  [com.cemerick/rummage       "1.0.1"]
