@@ -7,7 +7,7 @@ test:
   pre:
     - docker pull clojure
     - make .aws_credentials
-      make .sdb_container
+    - make .sdb_container
     - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
   override:
     - ./script/test
