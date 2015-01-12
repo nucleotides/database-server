@@ -1,5 +1,6 @@
 (ns event-api.database
-  (:require [cemerick.rummage :as sdb])
+  (:require [cemerick.rummage          :as sdb]
+            [cemerick.rummage.encoding :as enc])
   (:import  [com.amazonaws.services.simpledb AmazonSimpleDBClient]
             [com.amazonaws.auth              BasicAWSCredentials]))
 
@@ -7,4 +8,4 @@
   (let [client (new AmazonSimpleDBClient
                     (new BasicAWSCredentials access-key secret-key))]
     (.setEndpoint client endpoint)
-    {:client client}))
+    (assoc enc/keyword-strings :client client)))
