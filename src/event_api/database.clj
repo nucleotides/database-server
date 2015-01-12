@@ -18,9 +18,11 @@
     (.setEndpoint client endpoint)
     (assoc enc/keyword-strings :client client)))
 
+(defn missing-parameters [request]
+  (set (filter #(not (contains? request %)) required-event-keys)))
+
 (defn valid-event? [request]
-  (let [request-keys (set (keys request))]
-    (superset? request-keys required-event-keys)))
+  (empty? (missing-parameters request)))
 
 (defn create-event-map [request-params]
   (let [event (select-keys request-params required-event-keys)]

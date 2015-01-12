@@ -10,6 +10,7 @@
    "event_type_code"     "0000"})
 
 
+
 (deftest valid-event?
 
   (testing "an event hash with missing values"
@@ -21,6 +22,27 @@
 
    (testing "an event hash with all required values"
     (is (= true (db/valid-event? valid-request))))
+
+
+
+(deftest missing-paramters
+
+  (testing "an event hash with missing values"
+    (is (= #{"benchmark_id" "benchmark_type_code" "status_code" "event_type_code"}
+           (db/missing-parameters {})))
+
+    (is (= #{"benchmark_type_code" "status_code" "event_type_code"}
+           (db/missing-parameters {"benchmark_id" "0000"})))
+
+    (is (= #{"status_code" "event_type_code"}
+           (db/missing-parameters {"benchmark_id" "0000", "benchmark_type_code" "0000"}))
+
+    (is (= #{}
+           (db/missing-parameters {"benchmark_id"        "abced",
+                                   "benchmark_type_code" "0000"
+                                   "event_type_code"     "0000"
+                                   "status_code"         "0000"}))))))
+
 
 (deftest create-event-map
   (let [m (db/create-event-map valid-request)]

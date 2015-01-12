@@ -1,5 +1,6 @@
 (ns event-api.server
-  (:require [event-api.database :as db]))
+  (:require [clojure.string     :as st]
+            [event-api.database :as db]))
 
 (defn post-event
   "Process a post event request. Return 202 if
@@ -10,6 +11,7 @@
     (if (db/valid-event? params)
       {:status 202
        :body (db/create-event client domain (db/create-event-map params))}
-      {:status 422})))
+      {:status 422
+       :body (str "Missing parameters: " (st/join ", " (db/missing-parameters params)))})))
 
 

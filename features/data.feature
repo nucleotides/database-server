@@ -6,6 +6,7 @@ Feature: Sending and fetching data from the event API server
     <data>
     """
     Then the returned HTTP status code should be "422"
+     And the returned body should match "^Missing parameters: .+"
 
     Examples:
       | data                                                                                |
