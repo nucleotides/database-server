@@ -7,15 +7,14 @@
   "Process a post event request. Return 202 if
   valid otherwise return appropriate HTTP error
   code otherwise."
-  [request]
-  (let [required-params #{"benchmark_id"
-                          "benchmark_type_code"
-                          "status_code"
-                          "event_type_code"}
-        request-params  (set (keys (:params request)))]
-    (if (superset? request-params required-params)
-      {:status 202 :body (str (System/nanoTime))}
-      {:status 422})))
+  [request client domain]
+  (let [eid    (db/generate-event-id)
+        params (:params request)]
+    (if (db/valid-event? params)
+      (do
+        ((db/create-event client domain eid params)
+        {:status 202 :body eid})
+      {:status 422}))))
 
 (def api
   (wrap-params

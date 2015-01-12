@@ -23,3 +23,7 @@
 
 (defn generate-event-id []
   (str (System/nanoTime)))
+
+(defn create-event [client domain event-id request-params]
+  (let [event (select-keys required-event-keys request-params)]
+    (sdb/put-attrs client domain (assoc event ::sdb/id event-id))))
