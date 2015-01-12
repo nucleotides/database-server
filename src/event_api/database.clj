@@ -7,10 +7,10 @@
             [com.amazonaws.auth              BasicAWSCredentials]))
 
 (def required-event-keys
-  #{"benchmark_id"
-    "benchmark_type_code"
-    "status_code"
-    "event_type_code"})
+  #{:benchmark_id
+    :benchmark_type_code
+    :status_code
+    :event_type_code})
 
 (defn create-client [access-key secret-key endpoint]
   (let [client (new AmazonSimpleDBClient
