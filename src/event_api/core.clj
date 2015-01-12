@@ -15,6 +15,12 @@
       {:status 422})))
 
 
+(defn client []
+  (db/create-client
+    (System/getenv "AWS_ACCESS_KEY")
+    (System/getenv "AWS_SECRET_KEY")
+    "https://sdb.us-west-1.amazonaws.com"))
+
 (def api
   (wrap-params
     (routes
