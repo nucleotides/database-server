@@ -44,13 +44,31 @@
                                    :status_code         "0000"}))))))
 
 
+
 (deftest create-event-map
-  (let [m (db/create-event-map valid-request)]
-    (do
-      (every? #(is (contains? m (keyword %))) (keys valid-request))
+  (let [is-valid-map (fn [m]
+                       (do
+                         (every? #(is (contains? m (keyword %))) (keys valid-request))
+                         (is (contains? m :created_at))
+                         (is (re-matches #"^\d+T\d+\.\d+Z$" (:created_at m)))
+                         (is (contains? m ::sdb/id))
+                         (is (re-matches #"^\d+$" (::sdb/id m)))))]
 
-      (is (contains? m :created_at))
-      (is (re-matches #"^\d+T\d+\.\d+Z$" (:created_at m)))
+    (testing "with a minimum event request"
+      (is-valid-map (db/create-event-map valid-request)))
 
-      (is (contains? m ::sdb/id))
-      (is (re-matches #"^\d+$" (::sdb/id m))))))
+    (testing "with an event request containing a log file"
+      (let [m (->> {:log_file_digest "ade5...", :log_file_s3_url "s3://url"}
+                   (merge valid-request)
+                   (db/create-event-map))]
+        (is-valid-map m)
+        (is (contains? m :log_file_digest))
+        (is (contains? m :log_file_s3_url))))
+
+    (testing "with an event request containing a log file"
+      (let [m (->> {:event_file_digest "ade5...", :event_file_s3_url "s3://url"}
+                   (merge valid-request)
+                   (db/create-event-map))]
+        (is-valid-map m)
+        (is (contains? m :event_file_s3_url))
+        (is (contains? m :event_file_digest))))))
