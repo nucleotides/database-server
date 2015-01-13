@@ -65,8 +65,8 @@ Feature: Sending and fetching data from the event API server
       "benchmark_type_code": "0000",
       "status_code"        : "0000",
       "event_type_code"    : "0000",
-      "<field_1>"          : "value_1",
-      "<field_2>"          : "value_2"
+      "<field_1>"          : "<value_1>",
+      "<field_2>"          : "<value_2>"
     }
     """
     When I get the url "/events/show.json" with the event id
