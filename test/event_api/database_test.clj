@@ -46,5 +46,11 @@
 
 (deftest create-event-map
   (let [m (db/create-event-map valid-request)]
-    (is (re-matches #"^\d+$" (::sdb/id m))
-    (every? #(is (contains? m (keyword %))) (keys valid-request)))))
+    (do
+      (every? #(is (contains? m (keyword %))) (keys valid-request))
+
+      (is (contains? m :created_at))
+      (is (re-matches #"^\d+T\d+\.\d+Z$" (:created_at m)))
+
+      (is (contains? m ::sdb/id))
+      (is (re-matches #"^\d+$" (::sdb/id m))))))
