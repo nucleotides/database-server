@@ -1,21 +1,56 @@
-name   := target
+name        := target
+credentials := .aws_credentials
 
-feature: Gemfile.lock .image
+fetch_cred  = $(shell grep $(1) $(credentials) | cut -f 2 -d = | tr -d ' ') \
+
+feature: Gemfile.lock .dev_container
+	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
+	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
+	AWS_SDB_DOMAIN="event-dev" \
 	bundle exec cucumber $(ARGS)
+
+.dev_container: .image $(credentials)
+	docker run \
+	  --publish=8080:8080 \
+	  --detach=true \
+	  --env="AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)" \
+	  --env="AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)"\
+	  --env="AWS_SDB_DOMAIN=event-dev" \
+	  $(name) > $@
+
+.sdb_container: .sdb_image
+	docker run \
+	  --publish=8081:8080 \
+	  --detach=true \
+	  sdb > $@
+
+
+repl: $(credentials)
+	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
+	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
+	lein repl
+
+kill:
+	docker kill $(shell cat .dev_container)
+	rm -f .dev_container
+
+bootstrap: Gemfile.lock $(credentials) .sdb_container
+	docker pull clojure
+	lein deps
+
+.image: Dockerfile project.clj $(shell find src -name "*.clj")
+	docker build --tag=$(name) .
+	touch $@
+
+.sdb_image: images/simpledb-dev/Dockerfile
+	docker build --tag=sdb $(dir $<)
+	touch $@
+
+$(credentials): ./script/create_aws_credentials
+	$< $@
 
 Gemfile.lock: Gemfile
 	bundle install
 
-bootstrap: Gemfile.lock
-	docker pull clojure
-	lein deps
-
-.image: Dockerfile project.clj
-	docker build --tag=$(name) .
-	touch $@
-
-headless: .image
-	docker run --publish=8080:8080 --detach=false $(name)
-
 clean:
-	rm -f image
+	rm -f .image $(credentials)

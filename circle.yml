@@ -3,10 +3,13 @@ machine:
   services:
     - docker
 
+dependencies:
+  override:
+    - ./script/bootstrap
+    - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
+
 test:
-  pre:
-    - docker pull clojure
   override:
     - ./script/test
     - ./script/build
-    - ./script/feature
+    - ./script/feature '--format json --out $$CIRCLE_TEST_REPORTS/cucumber/tests.cucumber --format pretty'
