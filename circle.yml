@@ -3,12 +3,12 @@ machine:
   services:
     - docker
 
-test:
-  pre:
-    - docker pull clojure
-    - make .aws_credentials
-    - make .sdb_container
+dependencies:
+  override:
+    - ./script/bootstrap
     - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
+
+test:
   override:
     - ./script/test
     - ./script/build
