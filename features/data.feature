@@ -40,10 +40,10 @@ Feature: Sending and fetching data from the event API server
     When I get the url "/events/show.json" with the event id
     Then the returned HTTP status code should be "200"
      And the returned body should be a valid JSON document
-     And the returned JSON document should include the keys:
-       | key        |
-       | id         |
-       | created_at |
+     And the returned JSON document should match the key-value pairs:
+       | key        | value           |
+       | id         | ^\d+$           |
+       | created_at | ^\d+T\d+\.\d+Z$ |
      And the returned JSON document should include the key-value pairs:
        | key                 | value   |
        | benchmark_id        | af0d438 |

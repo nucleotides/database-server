@@ -26,9 +26,10 @@ Then(/^the returned body should be a valid JSON document$/) do
   expect{@document = JSON.parse(@response.body)}.to_not raise_error
 end
 
-Then(/^the returned JSON document should include the keys:$/) do |table|
+Then(/^the returned JSON document should match the key-value pairs:$/) do |table|
   table.hashes.each do |row|
     expect(@document.keys).to include(row['key'])
+    expect(@document[row['key']]).to match(Regexp.compile(row['value']))
   end
 end
 
