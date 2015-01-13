@@ -50,4 +50,5 @@
         (let [eid (db/create-event client domain
                                    (db/create-event-map valid-event-map))]
           (is (= 200 (:status (f eid {}))))
+          (is (contains? (json/read-str (:body (f eid {}))) "created_at"))
           (is (contains? (json/read-str (:body (f eid {}))) "benchmark_id")))))))

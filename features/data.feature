@@ -43,6 +43,7 @@ Feature: Sending and fetching data from the event API server
      And the returned JSON document should include the keys:
        | key        |
        | id         |
+       | created_at |
      And the returned JSON document should include the key-value pairs:
        | key                 | value   |
        | benchmark_id        | af0d438 |
