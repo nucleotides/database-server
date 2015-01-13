@@ -4,7 +4,7 @@
             [clj-time.core             :as ctime]
             [clj-time.coerce           :as coerce]
             [clj-time.format           :as fmt]
-            [clojure.set               :refer [superset?]]
+            [clojure.set               :refer [superset? union]]
             [clojure.walk              :refer [keywordize-keys]])
   (:import  [com.amazonaws.services.simpledb AmazonSimpleDBClient]
             [com.amazonaws.auth              BasicAWSCredentials]))
@@ -14,6 +14,13 @@
     :benchmark_type_code
     :status_code
     :event_type_code})
+
+(def optional-event-keys
+  #{:log_file_s3_url
+    :log_file_digest
+    :event_file_s3_url
+    :event_file_digest})
+
 
 (defn create-client [access-key secret-key endpoint]
   (let [client (new AmazonSimpleDBClient
@@ -29,7 +36,7 @@
 
 (defn create-event-map [request-params]
   (let [event-time (ctime/now)]
-    (-> (select-keys request-params required-event-keys)
+    (-> (select-keys request-params (union required-event-keys optional-event-keys))
         (keywordize-keys)
         (assoc ::sdb/id    (str (coerce/to-long event-time)))
         (assoc :created_at (fmt/unparse (fmt/formatters :basic-date-time) event-time)))))

@@ -41,7 +41,32 @@
         (is (= 422 (:status (f {:benchmark_id "abcd"})))))
 
       (testing "with valid paramters"
-        (is (= 202 (:status (f valid-event-map)))))))
+        (let [response (f valid-event-map)]
+          (is (= 202 (:status response)))
+          (is (re-matches #"^\d+$" (:body response)))
+          (is (not (empty? (db/read-event client domain (:body response)))))))
+
+      (testing "with log file parameters"
+        (let [response (f (merge valid-event-map
+                                 {:log_file_digest "ade5...", :log_file_s3_url "s3://url"}))]
+          (is (= 202 (:status response)))
+          (is (re-matches #"^\d+$" (:body response)))
+          (let [db-entry (db/read-event client domain (:body response))]
+            (is (not (empty? db-entry)))
+            (is (contains? db-entry :log_file_digest))
+            (is (contains? db-entry :log_file_s3_url)))))
+
+      (testing "with event file parameters"
+        (let [response (f (merge valid-event-map
+                                 {:event_file_digest "ade5...", :event_file_s3_url "s3://url"}))]
+          (is (= 202 (:status response)))
+          (is (re-matches #"^\d+$" (:body response)))
+          (let [db-entry (db/read-event client domain (:body response))]
+            (is (not (empty? db-entry)))
+            (is (contains? db-entry :event_file_digest))
+            (is (contains? db-entry :event_file_s3_url)))))))
+
+
 
   (testing "GET /events/show.json"
     (let [f #(request :get (str "/events/show.json?id=" %1) %2)]
