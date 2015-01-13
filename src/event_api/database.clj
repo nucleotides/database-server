@@ -1,6 +1,9 @@
 (ns event-api.database
   (:require [cemerick.rummage          :as sdb]
             [cemerick.rummage.encoding :as enc]
+            [clj-time.core             :as ctime]
+            [clj-time.coerce           :as coerce]
+            [clj-time.format           :as fmt]
             [clojure.set               :refer [superset?]]
             [clojure.walk              :refer [keywordize-keys]])
   (:import  [com.amazonaws.services.simpledb AmazonSimpleDBClient]
@@ -25,9 +28,11 @@
   (empty? (missing-parameters request)))
 
 (defn create-event-map [request-params]
-  (let [event (select-keys request-params required-event-keys)]
-    (assoc (keywordize-keys event) ::sdb/id (str (System/nanoTime)))))
-
+  (let [event-time (ctime/now)]
+    (-> (select-keys request-params required-event-keys)
+        (keywordize-keys)
+        (assoc ::sdb/id    (str (coerce/to-long event-time)))
+        (assoc :created_at (fmt/unparse (fmt/formatters :basic-date-time) event-time)))))
 
 (defn create-event [client domain event]
   (do
