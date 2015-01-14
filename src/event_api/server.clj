@@ -27,3 +27,11 @@
        :body   (->> (:id params)
                     (db/read-event client domain)
                     (json/write-str))}))
+
+(defn lookup
+  "Return events as a JSON document for the
+  given query. Return an empty JSON document if
+  no events match query."
+  [client domain request]
+  {:status 200
+   :body   (json/write-str [])})

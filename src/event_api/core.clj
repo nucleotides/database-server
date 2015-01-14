@@ -20,6 +20,7 @@
     (wrap-params
       (routes
         (GET  "/events/show.json"   [] (route server/show))
+        (GET  "/events/lookup.json" [] (route server/lookup))
         (POST "/events"             [] (route server/update))))))
 
 (defn -main [& args]
