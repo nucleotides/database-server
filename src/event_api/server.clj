@@ -13,7 +13,9 @@
       {:status 202
        :body   (db/create-event client domain (db/create-event-map params))}
       {:status 422
-       :body   (str "Missing parameters: " (st/join ", " (db/missing-parameters params)))})))
+       :body   (->> (db/missing-parameters params)
+                    (st/join ", " )
+                    (str "Missing parameters: "))})))
 
 (defn show
   "Return event matching the given ID. Return
@@ -22,4 +24,6 @@
   [client domain request]
    (let [params (:params request)]
       {:status 200
-       :body   (json/write-str (db/read-event client domain (:id params)))}))
+       :body   (->> (:id params)
+                    (db/read-event client domain)
+                    (json/write-str))}))
