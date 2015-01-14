@@ -3,7 +3,7 @@
             [clojure.data.json  :as json]
             [event-api.database :as db]))
 
-(defn post-event
+(defn update
   "Process a post event request. Return 202 if
   valid otherwise return appropriate HTTP error
   code otherwise."
@@ -15,7 +15,7 @@
       {:status 422
        :body   (str "Missing parameters: " (st/join ", " (db/missing-parameters params)))})))
 
-(defn get-event
+(defn show
   "Return event matching the given ID. Return
   200 if event exists in database otherwise
   return 404."

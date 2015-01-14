@@ -16,10 +16,11 @@
    (System/getenv "AWS_SDB_DOMAIN"))
 
 (defn api [client domain]
-  (wrap-params
-    (routes
-      (GET  "/events/show.json" [] (partial server/get-event  client domain))
-      (POST "/events"           [] (partial server/post-event client domain)))))
+  (let [route #(partial % client domain)]
+    (wrap-params
+      (routes
+        (GET  "/events/show.json"   [] (route server/show))
+        (POST "/events"             [] (route server/update))))))
 
 (defn -main [& args]
   (let [client (apply db/create-client (get-credentials))
