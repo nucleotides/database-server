@@ -33,10 +33,6 @@ Then(/^the returned body should be a valid JSON document$/) do
   expect{@document = JSON.parse(@response.body)}.to_not raise_error
 end
 
-Then(/^the JSON document should contain "(.*?)" entries$/) do |length|
-  expect(@document.length).to eq(length.to_i)
-end
-
 Then(/^the returned JSON document should match the key-value pairs:$/) do |table|
   table.hashes.each do |row|
     expect(@document.keys).to include(row['key'])
@@ -51,10 +47,16 @@ Then(/^the returned JSON document should include the key\-value pairs:$/) do |ta
   end
 end
 
-Then(/^the JSON document entry "(.*?)" should include the key\-value pairs$/) do |index, table|
-  entry = @document[index.to_i]
+Then(/^the JSON document should include include the events:$/) do |table|
   table.hashes.each do |row|
-    expect(entry.keys).to include(row['key'])
-    expect(entry[row['key']]).to eq(row['value'])
+    entries = @document.select{|i| i["benchmark_id"] == row['benchmark_id']}
+    expect(entries).to_not be_empty
+  end
+end
+
+Then(/^the JSON document should not include include the events:$/) do |table|
+  table.hashes.each do |row|
+    entries = @document.select{|i| i["benchmark_id"] == row['benchmark_id']}
+    expect(entries).to be_empty
   end
 end

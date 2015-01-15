@@ -6,10 +6,10 @@ module HTTP
   end
 
   def self.get(endpoint, query = {})
-    base = docker_url + endpoint
+    url = docker_url + endpoint
     if not query.empty?
-      url = query.inject(base + "?") do |string, (k,v)|
-        string + k.to_str + '=' + v.to_str
+      url = query.inject(url + "?") do |string, (k,v)|
+        string + k.to_s + '=' + v.to_s
       end
     end
     Curl.get(url)
