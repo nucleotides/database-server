@@ -34,4 +34,7 @@
   no events match query."
   [client domain request]
   {:status 200
-   :body   (json/write-str [])})
+   :body   (->> (:query-params request)
+                (db/build-query domain)
+                (db/query-event client)
+                (json/write-str))})

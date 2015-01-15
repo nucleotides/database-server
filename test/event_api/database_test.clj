@@ -72,3 +72,14 @@
         (is-valid-map m)
         (is (contains? m :event_file_s3_url))
         (is (contains? m :event_file_digest))))))
+
+
+(deftest build-query
+
+  (testing "with no query parameters"
+    (is (= (db/build-query "events" {})
+           '{select * from events})))
+
+  (testing "with a non-id query parameter"
+    (is (= (db/build-query "events" {"benchmark_type_code" "value"})
+           '{select * from events where (and (= :benchmark_type_code "value"))}))))
