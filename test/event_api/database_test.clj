@@ -82,4 +82,8 @@
 
   (testing "with a non-id query parameter"
     (is (= (db/build-query "events" {"benchmark_type_code" "value"})
-           '{select * from events where (and (= :benchmark_type_code "value"))}))))
+           '{select * from events where (and (= :benchmark_type_code "value"))})))
+
+  (testing "with max_id query parameter"
+    (is (= (db/build-query "events" {"max_id" "100"})
+           '{select * from events where (and (<= ::sdb/id "100"))}))))
