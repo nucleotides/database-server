@@ -1,7 +1,7 @@
 name        := target
 credentials := .aws_credentials
 
-fetch_cred  = $(shell grep $(1) $(credentials) | cut -f 2 -d = | tr -d ' ') \
+fetch_cred  = $$(./script/get_credential $(credentials) $(1))
 
 feature: Gemfile.lock .dev_container
 	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
