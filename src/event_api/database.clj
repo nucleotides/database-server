@@ -41,6 +41,17 @@
         (assoc ::sdb/id    (str (coerce/to-long event-time)))
         (assoc :created_at (fmt/unparse (fmt/formatters :basic-date-time) event-time)))))
 
+(defn normalise-query-params [params]
+  (->> (keywordize-keys params)
+       (map (fn [[k v]] (list '= k v)))
+       (flatten)))
+
+(defn build-query [domain params]
+  (let [base (merge {'select '* 'from (symbol domain)})]
+    (if (not (empty? params))
+      (merge base {'where (list 'and (normalise-query-params params))})
+      base)))
+
 (defn create-event [client domain event]
   (do
     (sdb/put-attrs client domain event)
@@ -48,3 +59,8 @@
 
 (defn read-event [client domain event-id]
   (sdb/get-attrs client domain event-id))
+
+(defn query-event [client query]
+  (sdb/query client query))
+
+

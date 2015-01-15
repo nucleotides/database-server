@@ -30,7 +30,6 @@
    :status_code         "0000"
    :event_type_code     "0000"})
 
-
 (deftest app
 
   (testing "POST /events"
@@ -76,4 +75,16 @@
                                    (db/create-event-map valid-event-map))]
           (is (= 200 (:status (f eid {}))))
           (is (contains? (json/read-str (:body (f eid {}))) "created_at"))
-          (is (contains? (json/read-str (:body (f eid {}))) "benchmark_id")))))))
+          (is (contains? (json/read-str (:body (f eid {}))) "benchmark_id"))))))
+
+  (testing "GET /events/lookup.json"
+    (let [f #(request :get (str "/events/lookup.json?" %) {})]
+
+      (testing "with an benchmark_type_code matching one entry"
+        (let [eid      (db/create-event client domain
+                                   (db/create-event-map valid-event-map))
+              response (f "benchmark_type_code=0000")]
+
+          (is (= 200 (:status response)))
+          (is (contains? (->> (:body response) (json/read-str) (first)) "created_at"))
+          (is (contains? (->> (:body response) (json/read-str) (first)) "benchmark_id")))))))

@@ -3,7 +3,7 @@
             [clojure.data.json  :as json]
             [event-api.database :as db]))
 
-(defn post-event
+(defn update
   "Process a post event request. Return 202 if
   valid otherwise return appropriate HTTP error
   code otherwise."
@@ -13,13 +13,28 @@
       {:status 202
        :body   (db/create-event client domain (db/create-event-map params))}
       {:status 422
-       :body   (str "Missing parameters: " (st/join ", " (db/missing-parameters params)))})))
+       :body   (->> (db/missing-parameters params)
+                    (st/join ", " )
+                    (str "Missing parameters: "))})))
 
-(defn get-event
+(defn show
   "Return event matching the given ID. Return
   200 if event exists in database otherwise
   return 404."
   [client domain request]
    (let [params (:params request)]
       {:status 200
-       :body   (json/write-str (db/read-event client domain (:id params)))}))
+       :body   (->> (:id params)
+                    (db/read-event client domain)
+                    (json/write-str))}))
+
+(defn lookup
+  "Return events as a JSON document for the
+  given query. Return an empty JSON document if
+  no events match query."
+  [client domain request]
+  {:status 200
+   :body   (->> (:query-params request)
+                (db/build-query domain)
+                (db/query-event client)
+                (json/write-str))})
