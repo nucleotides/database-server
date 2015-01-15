@@ -30,6 +30,12 @@ repl: $(credentials)
 	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
 	lein repl
 
+irb: $(credentials)
+	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
+	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
+	AWS_SDB_DOMAIN=event-dev \
+	bundle exec irb
+
 kill:
 	docker kill $(shell cat .dev_container)
 	rm -f .dev_container
