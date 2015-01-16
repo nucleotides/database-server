@@ -7,6 +7,7 @@ feature: Gemfile.lock .dev_container
 	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
 	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
 	AWS_SDB_DOMAIN="event-dev" \
+	AWS_REGION="us-west-1" \
 	bundle exec cucumber $(ARGS)
 
 .dev_container: .image $(credentials)
@@ -16,6 +17,7 @@ feature: Gemfile.lock .dev_container
 	  --env="AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)" \
 	  --env="AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)"\
 	  --env="AWS_SDB_DOMAIN=event-dev" \
+	  --env="AWS_REGION=us-west-1" \
 	  $(name) > $@
 
 .sdb_container: .sdb_image
