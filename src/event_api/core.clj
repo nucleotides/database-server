@@ -27,4 +27,4 @@
 (defn -main [& args]
   (let [client (apply db/create-client (get-credentials))
         domain (get-domain)]
-    (run-jetty (site (api client domain)) {:port 8080})))
+    (run-jetty (site (api client domain)) {:port 80})))

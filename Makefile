@@ -11,7 +11,7 @@ feature: Gemfile.lock .dev_container
 
 .dev_container: .image $(credentials)
 	docker run \
-	  --publish=8080:8080 \
+	  --publish=80:80 \
 	  --detach=true \
 	  --env="AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)" \
 	  --env="AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)"\
