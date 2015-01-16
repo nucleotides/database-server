@@ -1,5 +1,8 @@
 require 'bundler/setup'
 
+# Allow `lein trampoline run` to complete
+sleep 5
+
 Before do
   # Ensure a clean database at start of features
   $clean ||= false

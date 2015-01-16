@@ -12,10 +12,12 @@ Given(/^I post to url "(.*?)" with the records:$/) do |endpoint, table|
   table.hashes.each do |row|
     @response = HTTP.post(endpoint, row)
   end
+  sleep 1 # Allow data to be posted
 end
 
 Given(/^I post to url "(.*?)" with the data:$/) do |endpoint, data_string|
   @response = HTTP.post(endpoint, JSON.parse(data_string))
+  sleep 1 # Allow data to be posted
 end
 
 Given(/^I save the last event id$/) do
@@ -23,12 +25,10 @@ Given(/^I save the last event id$/) do
 end
 
 When(/^I get the url "(.*?)"$/) do |endpoint|
-  sleep 1 #Allow data to be posted
   @response = HTTP.get(endpoint)
 end
 
 When(/^I get the url "(.*?)" with the event id$/) do |endpoint|
-  sleep 1 #Allow data to be posted
   @response = HTTP.get(endpoint, {id: @response.body.strip})
 end
 
