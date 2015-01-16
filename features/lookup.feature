@@ -1,7 +1,7 @@
 Feature: Fetching specific records by querying the database
 
   Scenario Outline: Querying data using different parameters
-    Given I post to url "/events" with the records:
+    Given I post to url "/events/update" with the records:
       | benchmark_id | benchmark_type_code | status_code | event_type_code |
       | query_id_1   | 0000                | 0000        | 0000            |
       | query_id_2   | 0001                | 0000        | 0000            |
@@ -28,7 +28,7 @@ Feature: Fetching specific records by querying the database
 
 
   Scenario: Querying and paging records using max_id
-    Given I post to url "/events" with the records:
+    Given I post to url "/events/update" with the records:
       | benchmark_id | benchmark_type_code | status_code | event_type_code |
       | page_id_1    | 0000                | 0000        | 0000            |
       | page_id_2    | 0001                | 0000        | 0000            |

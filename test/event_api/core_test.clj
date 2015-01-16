@@ -33,7 +33,7 @@
 (deftest app
 
   (testing "POST /events"
-    (let [f #(request :post "/events" %)]
+    (let [f #(request :post "/events/update" %)]
 
       (testing "with invalid parameters"
         (is (= 422 (:status (f {}))))
