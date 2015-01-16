@@ -44,7 +44,7 @@ kill:
 	rm -f .dev_container
 
 bootstrap: Gemfile.lock $(credentials) .sdb_container
-	docker pull clojure
+	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
 .image: Dockerfile project.clj $(shell find src -name "*.clj")
