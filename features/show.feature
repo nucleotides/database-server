@@ -1,7 +1,7 @@
 Feature: Featching single event records from the database
 
   Scenario: Sending a GET request to "/events/show.json" with a valid ID
-    Given I post to url "/events" with the data:
+    Given I post to url "/events/update" with the data:
     """
     {
       "benchmark_id"       : "af0d438",
@@ -25,7 +25,7 @@ Feature: Featching single event records from the database
        | event_type_code     | 0000    |
 
   Scenario Outline: Sending a GET request to "/events/show.json" with for optional data
-    Given I post to url "/events" with the data:
+    Given I post to url "/events/update" with the data:
     """
     {
       "benchmark_id"       : "af0d438",

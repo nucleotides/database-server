@@ -20,7 +20,7 @@
   (let [route #(partial % client domain)]
     (-> (routes (GET  "/events/show.json"   [] (route server/show))
                 (GET  "/events/lookup.json" [] (route server/lookup))
-                (POST "/events"             [] (route server/update)))
+                (POST "/events/update"      [] (route server/update)))
         (wrap-with-logger)
         (wrap-params))))
 

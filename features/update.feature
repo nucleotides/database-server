@@ -1,7 +1,7 @@
 Feature: Creating records in event database
 
   Scenario Outline: Sending an event post request with missing form-data
-    When I post to url "/events" with the data:
+    When I post to url "/events/update" with the data:
     """
     <data>
     """
@@ -15,7 +15,7 @@ Feature: Creating records in event database
       | {"benchmark_id" : "af0d438", "benchmark_type_code": "0000", "status_code" : "0000"} |
 
   Scenario Outline: Sending an event post request with valid form-data
-    When I post to url "/events" with the data:
+    When I post to url "/events/update" with the data:
     """
     { <params>
       "benchmark_id"       : "af0d438",
