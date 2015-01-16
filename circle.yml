@@ -4,7 +4,12 @@ machine:
     - docker
 
 dependencies:
+  cache_directories:
+    - "vendor/bundle"
+    - "vendor/maven"
+    - "vendor/docker"
   override:
+    - ./script/cache_docker
     - ./script/bootstrap
     - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
 

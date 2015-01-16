@@ -1,7 +1,7 @@
 Feature: Fetching specific records by querying the database
 
   Scenario Outline: Querying data using different parameters
-    Given I post to url "/events/update" with the records:
+    Given the database contains the records:
       | benchmark_id | benchmark_type_code | status_code | event_type_code |
       | query_id_1   | 0000                | 0000        | 0000            |
       | query_id_2   | 0001                | 0000        | 0000            |

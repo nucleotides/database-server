@@ -1,0 +1,5 @@
+.[A-Za-z]*
+vendor/bundle
+vendor/docker
+test
+feature

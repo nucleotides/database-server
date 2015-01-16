@@ -36,6 +36,7 @@ irb: $(credentials)
 	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
 	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
 	AWS_SDB_DOMAIN=event-dev \
+	AWS_REGION="us-west-1" \
 	bundle exec irb
 
 kill:
@@ -43,7 +44,7 @@ kill:
 	rm -f .dev_container
 
 bootstrap: Gemfile.lock $(credentials) .sdb_container
-	docker pull clojure
+	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
 .image: Dockerfile project.clj $(shell find src -name "*.clj")
@@ -58,7 +59,7 @@ $(credentials): ./script/create_aws_credentials
 	$< $@
 
 Gemfile.lock: Gemfile
-	bundle install
+	bundle install --path vendor/bundle
 
 clean:
 	rm -f .image $(credentials)

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o xtrace
+
+IMAGE=$(head -n 1 Dockerfile | cut -f 2 -d ' ')
+FILE="vendor/docker/${IMAGE}.tar"
+
+if [[ -e ${FILE} ]]; then
+  docker load -i ${FILE}
+else
+  docker pull ${IMAGE}
+  mkdir -p $(dirname ${FILE})
+  docker save ${IMAGE} > ${FILE}
+fi
