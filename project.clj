@@ -11,6 +11,7 @@
                  [com.amazonaws/aws-java-sdk "1.3.21.1"]]
   :plugins      [[lein-ring "0.9.0"]]
 
+  :local-repo  "vendor/maven"
 
   :main event-api.core
 

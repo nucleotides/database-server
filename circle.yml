@@ -6,6 +6,7 @@ machine:
 dependencies:
   cache_directories:
     - "vendor/bundle"
+    - "vendor/maven"
   override:
     - ./script/bootstrap
     - mkdir -p $CIRCLE_TEST_REPORTS/cucumber
