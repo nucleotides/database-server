@@ -1,12 +1,12 @@
 ## /events/
 
-### POST /events/
+### POST /events/update
 
 Add a new event to the database.
 
 #### Resource URL
 
-http://api.nucleotides/1.0/events/update.json
+http://api.nucleotides/1.0/events/update
 
 #### Parameters
 
@@ -63,7 +63,7 @@ http://api.nucleotides/1.0/events/update.json
 
 #### Example request
 
-POST http://api.nucleotides/1.0/events/update.json?benchmark_id=afd0&benchmark_type_code=0000&state_code=0000&event_type_code=0000
+POST http://api.nucleotides/1.0/events/update?benchmark_id=afd0&benchmark_type_code=0000&state_code=0000&event_type_code=0000
 
 #### Example response
 
