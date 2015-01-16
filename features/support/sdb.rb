@@ -16,4 +16,9 @@ module SDB
     client.delete_domain(ENV['AWS_SDB_DOMAIN'])
   end
 
+  def self.refresh
+    self.destroy
+    self.create
+  end
+
 end
