@@ -58,7 +58,7 @@ $(credentials): ./script/create_aws_credentials
 	$< $@
 
 Gemfile.lock: Gemfile
-	bundle install
+	bundle install --path vendor/bundle
 
 clean:
 	rm -f .image $(credentials)

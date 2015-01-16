@@ -12,3 +12,5 @@ Gemfile.lock
 .aws_credentials
 .*image
 .*_container
+vendor
+.bundle
