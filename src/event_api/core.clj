@@ -5,16 +5,27 @@
             [ring.middleware.params :refer [wrap-params]]
             [ring.middleware.logger :refer [wrap-with-logger]]
             [ring.adapter.jetty     :refer [run-jetty]]
+            [clojure.tools.logging  :as log]
             [event-api.database     :as db]
             [event-api.server       :as server]))
 
-(defn get-credentials []
-  [(System/getenv "AWS_ACCESS_KEY")
-   (System/getenv "AWS_SECRET_KEY")
-   "https://sdb.us-west-1.amazonaws.com"])
+(def environment-vars
+   ["AWS_ACCESS_KEY" "AWS_SECRET_KEY" "AWS_SDB_DOMAIN" "AWS_REGION"])
 
-(defn get-domain []
-   (System/getenv "AWS_SDB_DOMAIN"))
+
+(defn get-env-var [v]
+  (let [value (System/getenv v)]
+    (if (nil? value)
+      (do
+        (log/fatal (str "Unbound environment variable: " v))
+        (System/exit 1))
+      (do
+        (log/info (str "Using environment variable: " v "=" value))
+        value))))
+
+(defn get-region-endpoint [v]
+  (str "https://sdb." v ".amazonaws.com"))
+
 
 (defn api [client domain]
   (let [route #(partial % client domain)]
@@ -25,6 +36,6 @@
         (wrap-params))))
 
 (defn -main [& args]
-  (let [client (apply db/create-client (get-credentials))
-        domain (get-domain)]
+  (let [[access-key secret-key domain region] (map get-env-var environment-vars)
+        client (db/create-client access-key secret-key (get-region-endpoint region))]
     (run-jetty (site (api client domain)) {:port 80})))
