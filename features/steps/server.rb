@@ -1,6 +1,13 @@
 require 'rspec'
 require 'json'
 
+Given(/^the database contains the records:$/) do |table|
+  records = table.map_headers(&:to_sym).hashes.each_with_index.map do |r, index|
+    [index.to_s, r]
+  end
+  SDB.add_records(Hash[records])
+end
+
 Given(/^I post to url "(.*?)" with the records:$/) do |endpoint, table|
   table.hashes.each do |row|
     @response = HTTP.post(endpoint, row)
