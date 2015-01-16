@@ -9,5 +9,5 @@ def docker_address
 end
 
 def docker_url
-  "http://#{docker_address}:8080"
+  "http://#{docker_address}:80"
 end
