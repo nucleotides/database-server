@@ -36,6 +36,7 @@ irb: $(credentials)
 	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
 	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
 	AWS_SDB_DOMAIN=event-dev \
+	AWS_REGION="us-west-1" \
 	bundle exec irb
 
 kill:
