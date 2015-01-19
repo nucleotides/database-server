@@ -17,11 +17,8 @@ http://api.nucleotides/1.0/events/update
 
   * **benchmark_type_code**
 
-    **Required**: The code identifying the type of benchmark. Allowed values
-    are:
-
-      * **0000**: A genome assembler benchmark. Evaluating the assembly of a
-        set of paired Illumina 2x150 reads.
+    **Required**: The code identifying the type of benchmark. The list of
+    possible benchmarks are defined in the [nucleotides benchmark list][bench].
 
   * **state_code**
 
@@ -41,9 +38,14 @@ http://api.nucleotides/1.0/events/update
     **Required**: The code for the type of event. This can have the following
     values:
 
-      * **0000**: Run a container on a test data set.
+      * **0000**: Started testing container reference data set.
 
-      * **0001**: Evaluate generated data and generate a set of metrics.
+      * **0001**: Testing container has finished.
+
+      * **0002**: Started evaluation container with testing container generated
+        data.
+
+      * **0003**: Evaluation container has finished.
 
   * **log_file_s3_url**
 
@@ -148,3 +150,4 @@ http://api.nucleotides/1.0/events/show.json
 GET http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
 
 
+[bench]: https://github.com/nucleotides/nucleotides-data/blob/master/benchmark_type.yml
