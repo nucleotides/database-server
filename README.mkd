@@ -16,4 +16,4 @@ service is tested as follows:
     $./script/feature$
 
 [compojure]: https://github.com/weavejester/compojure
-[API.mkd]: https://github.com/nucleotides/event-api/blob/master/API.mk://github.com/nucleotides/event-api/blob/master/API.mkd
+[API.mkd]: https://github.com/nucleotides/event-api/blob/master/API.mkd
