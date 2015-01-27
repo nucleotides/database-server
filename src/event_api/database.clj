@@ -19,7 +19,9 @@
   #{:log_file_s3_url
     :log_file_digest
     :event_file_s3_url
-    :event_file_digest})
+    :event_file_digest
+    :cgroup_file_s3_url
+    :cgroup_file_digest})
 
 
 (defn create-client [access-key secret-key endpoint]

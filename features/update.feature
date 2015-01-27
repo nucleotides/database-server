@@ -28,7 +28,8 @@ Feature: Creating records in event database
      And the returned body should match "^\d+$"
 
     Examples:
-      | params                                                        |
-      |                                                               |
-      | "log_file_s3_url" : "url", "log_file_digest" : "ade5...",     |
-      | "event_file_s3_url" : "url", "event_file_digest" : "ade5...", |
+      | params                                                          |
+      |                                                                 |
+      | "log_file_s3_url" : "url", "log_file_digest" : "ade5...",       |
+      | "event_file_s3_url" : "url", "event_file_digest" : "ade5...",   |
+      | "cgroup_file_s3_url" : "url", "cgroup_file_digest" : "ade5...", |
