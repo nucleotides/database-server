@@ -63,7 +63,17 @@
           (let [db-entry (db/read-event client domain (:body response))]
             (is (not (empty? db-entry)))
             (is (contains? db-entry :event_file_digest))
-            (is (contains? db-entry :event_file_s3_url)))))))
+            (is (contains? db-entry :event_file_s3_url)))))
+
+      (testing "with cgroup file parameters"
+        (let [response (f (merge valid-event-map
+                                 {:cgroup_file_digest "ade5...", :cgroup_file_s3_url "s3://url"}))]
+          (is (= 202 (:status response)))
+          (is (re-matches #"^\d+$" (:body response)))
+          (let [db-entry (db/read-event client domain (:body response))]
+            (is (not (empty? db-entry)))
+            (is (contains? db-entry :cgroup_file_digest))
+            (is (contains? db-entry :cgroup_file_s3_url)))))))
 
 
 
