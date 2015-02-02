@@ -10,10 +10,10 @@ listed. The API is listed in detail in [API.mkd][].
 The service is built using [compojure][] inside a clojure Docker container. The
 service is tested as follows:
 
-  * Ensure clojure unit tests pass using $./script/test$
-  * Ensure the service builds a docker image using $./script/build$
-  * Ensure the a running container of the service passes feature tests using
-    $./script/feature$
+  * Ensure clojure unit tests pass using `./script/test`
+  * Ensure the service builds a docker image using `./script/build`
+  * Ensure a running container instance of the service passes feature tests using
+    `./script/feature`
 
 [compojure]: https://github.com/weavejester/compojure
 [API.mkd]: https://github.com/nucleotides/event-api/blob/master/API.mkd

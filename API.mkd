@@ -20,7 +20,7 @@ http://api.nucleotides/1.0/events/update
     **Required**: The code identifying the type of benchmark. The list of
     possible benchmarks are defined in the [nucleotides benchmark list][bench].
 
-  * **state_code**
+  * **status_code**
 
     **Required**: The outcome code of the event. This may have one of the
     following values:
