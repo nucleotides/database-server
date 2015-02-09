@@ -158,5 +158,4 @@ http://api.nucleotides/1.0/events/show.json
 
 GET http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
 
-
-[bench]: https://github.com/nucleotides/nucleotides-data/blob/master/benchmark_type.yml
+[bench]: https://github.com/nucleotides/nucleotides-data/blob/master/data/benchmark_type.yml
