@@ -3,21 +3,24 @@ credentials := .aws_credentials
 
 fetch_cred  = $$(./script/get_credential $(credentials) $(1))
 
+access_key := AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)
+secret_key := AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)
+endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
+domain     := AWS_SDB_DOMAIN="event-dev"
+
+
 feature: Gemfile.lock .dev_container
-	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
-	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
-	AWS_SDB_DOMAIN="event-dev" \
-	AWS_REGION="us-west-1" \
+	$(access_key) $(secret_key) $(endpoint) $(domain) \
 	bundle exec cucumber $(ARGS)
 
 .dev_container: .image $(credentials)
 	docker run \
 	  --publish=80:80 \
 	  --detach=true \
-	  --env="AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)" \
-	  --env="AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)"\
-	  --env="AWS_SDB_DOMAIN=event-dev" \
-	  --env="AWS_REGION=us-west-1" \
+	  --env="$(access_key)" \
+	  --env="$(secret_key)" \
+	  --env="$(domain)" \
+	  --env="$(endpoint)" \
 	  $(name) > $@
 
 .sdb_container: .sdb_image
@@ -26,18 +29,13 @@ feature: Gemfile.lock .dev_container
 	  --detach=true \
 	  sdb > $@
 
-
 repl: $(credentials)
-	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
-	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
+	$(access_key) $(secret_key) $(endpoint) $(domain) \
 	lein repl
 
 irb: $(credentials)
-	AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY) \
-	AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY) \
-	AWS_SDB_DOMAIN=event-dev \
-	AWS_REGION="us-west-1" \
-	bundle exec irb
+	$(access_key) $(secret_key) $(endpoint) $(domain) \
+	bundle exec ./script/irb
 
 kill:
 	docker kill $(shell cat .dev_container)

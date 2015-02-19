@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
+
+require 'features/support/sdb'
+require 'features/support/http'
+require 'features/support/docker'
+
+require 'irb'
+require 'irb/completion'
+
+IRB.start
