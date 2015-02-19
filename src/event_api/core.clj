@@ -9,9 +9,11 @@
             [event-api.database     :as db]
             [event-api.server       :as server]))
 
-(def environment-vars
-   ["AWS_ACCESS_KEY" "AWS_SECRET_KEY" "AWS_SDB_DOMAIN" "AWS_REGION"])
-
+(def credential-variable-names
+  {:access-key "AWS_ACCESS_KEY"
+   :secret-key "AWS_SECRET_KEY"
+   :domain     "AWS_SDB_DOMAIN"
+   :endpoint   "AWS_ENDPOINT"})
 
 (defn get-env-var [v]
   (let [value (System/getenv v)]
@@ -23,10 +25,6 @@
         (log/info (str "Using environment variable: " v "=" value))
         value))))
 
-(defn get-region-endpoint [v]
-  (str "https://sdb." v ".amazonaws.com"))
-
-
 (defn api [client domain]
   (let [route #(partial % client domain)]
     (-> (routes (GET  "/events/show.json"   [] (route server/show))
@@ -35,7 +33,15 @@
         (wrap-with-logger)
         (wrap-params))))
 
+(defn fetch-credentials! []
+  (->> credential-variable-names
+       (map (fn [[k v]] [k (get-env-var v)]))
+       (into {})))
+
+(defn create-database-client! [credentials]
+  (apply db/create-client (map credentials [:access-key :secret-key :endpoint])))
+
 (defn -main [& args]
-  (let [[access-key secret-key domain region] (map get-env-var environment-vars)
-        client (db/create-client access-key secret-key (get-region-endpoint region))]
-    (run-jetty (site (api client domain)) {:port 80})))
+  (let [credentials (fetch-credentials!)
+        client      (create-database-client! credentials)]
+    (run-jetty (site (api client (:domain credentials))) {:port 80})))
