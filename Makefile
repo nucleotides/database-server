@@ -35,7 +35,7 @@ repl: $(credentials)
 
 irb: $(credentials)
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
-	bundle exec irb
+	bundle exec ./script/irb
 
 kill:
 	docker kill $(shell cat .dev_container)
