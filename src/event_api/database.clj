@@ -44,16 +44,15 @@
         (assoc :created_at (fmt/unparse (fmt/formatters :basic-date-time) event-time)))))
 
 (defn normalise-query-params [params]
-  (let [f (fn [[k v]] (if (= :max_id k) (list '<= ::sdb/id v) (list '= k v)))]
+  (let [transform (fn [[k v]] (if (= :max_id k) (list '<= ::sdb/id v) (list '= k v)))]
   (->> (keywordize-keys params)
-       (map f)
-       (flatten))))
+       (map transform))))
 
 (defn build-query [domain params]
-  (let [base (merge {'select '* 'from (symbol domain)})]
+  (let [select-statment (merge {'select '* 'from (symbol domain)})]
     (if (not (empty? params))
-      (merge base {'where (list 'and (normalise-query-params params))})
-      base)))
+      (merge select-statment {'where (cons 'and (normalise-query-params params))})
+      select-statment)))
 
 (defn create-event [client domain event]
   (do
