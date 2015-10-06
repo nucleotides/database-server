@@ -7,9 +7,12 @@
             [event-api.database :as db]
             [event-api.core     :as app]))
 
+(defn get-docker-host []
+  (re-find #"\d+.\d+.\d+.\d+" (System/getenv "DOCKER_HOST")))
+
 (def domain "dev")
-(def host (if (System/getenv "CI") "http://localhost" "http://192.168.59.103"))
-(def client (db/create-client "dummy" "dummy" (str host ":8081")))
+(def host   (if (System/getenv "CI") "localhost" (get-docker-host)))
+(def client (db/create-client "dummy" "dummy" (str "http://" host ":8081")))
 
 (defn sdb-domain-fixture [f]
   (do
