@@ -4,8 +4,12 @@
             [clojure.data.json  :as json]
             [ring.mock.request  :as mock]
             [cemerick.rummage   :as sdb]
+            [taoensso.timbre    :as log]
             [event-api.database :as db]
             [event-api.core     :as app]))
+
+; Silence logging to STDOUT during testing
+(log/set-config! [:appenders :standard-out :enabled? false])
 
 (defn get-docker-host []
   (re-find #"\d+.\d+.\d+.\d+" (System/getenv "DOCKER_HOST")))
@@ -19,6 +23,7 @@
     (sdb/create-domain client domain)
     (f)
     (sdb/delete-domain client domain)))
+
 
 (use-fixtures
   :once sdb-domain-fixture)
