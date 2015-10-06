@@ -3,9 +3,9 @@
   (:require [compojure.core         :refer [GET POST routes]]
             [compojure.handler      :refer [site]]
             [ring.middleware.params :refer [wrap-params]]
-            [ring.middleware.logger :refer [wrap-with-logger]]
+            [ring.logger.timbre     :refer [wrap-with-logger]]
             [ring.adapter.jetty     :refer [run-jetty]]
-            [clojure.tools.logging  :as log]
+            [taoensso.timbre        :as log]
             [event-api.database     :as db]
             [event-api.server       :as server]))
 
