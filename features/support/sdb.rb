@@ -1,4 +1,4 @@
-require 'fog/aws/simpledb'
+require 'fog'
 require 'hashie/mash'
 
 module SDB
