@@ -1,4 +1,4 @@
-(defproject event-api "current"
+(defproject nucleotides-api "current"
   :description "REST API for recording nucleotid.es benchmarking events."
 
   :dependencies [[org.clojure/clojure        "1.6.0"]
@@ -19,4 +19,5 @@
   :profiles {
     :dev        {:dependencies [[ring-mock "0.1.5"]]}
     :uberjar    {:aot :all}
-    :api-server {:main event-api.core}})
+    :api-server {:main nucleotides.api.core}
+    :db-build   {:main nucleotides.database.build}})

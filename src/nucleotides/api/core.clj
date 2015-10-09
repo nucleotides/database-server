@@ -1,14 +1,15 @@
-(ns event-api.core
+(ns nucleotides.api.core
   (:gen-class)
-  (:require [compojure.core         :refer [GET POST routes]]
-            [compojure.handler      :refer [site]]
-            [ring.middleware.params :refer [wrap-params]]
-            [ring.logger.timbre     :refer [wrap-with-logger]]
-            [ring.adapter.jetty     :refer [run-jetty]]
-            [taoensso.timbre        :as log]
-            [event-api.database     :as db]
-            [event-api.server       :as server]
-            [nucleotides.util       :as util]))
+  (:require [compojure.core          :refer [GET POST routes]]
+            [compojure.handler       :refer [site]]
+            [ring.middleware.params  :refer [wrap-params]]
+            [ring.logger.timbre      :refer [wrap-with-logger]]
+            [ring.adapter.jetty      :refer [run-jetty]]
+
+            [taoensso.timbre           :as log]
+            [nucleotides.api.database  :as db]
+            [nucleotides.api.server    :as server]
+            [nucleotides.util          :as util]))
 
 (def credential-variable-names
   {:access-key "AWS_ACCESS_KEY"
