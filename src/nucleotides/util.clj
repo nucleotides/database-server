@@ -11,3 +11,7 @@
         (log/info (str "Using environment variable: " v "=" value))
         value))))
 
+(defn fetch-variables! [variable-names]
+  (->> variable-names
+       (map (fn [[k v]] [k (get-env-var v)]))
+       (into {})))

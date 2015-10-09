@@ -6,12 +6,11 @@
             [ring.logger.timbre      :refer [wrap-with-logger]]
             [ring.adapter.jetty      :refer [run-jetty]]
 
-            [taoensso.timbre           :as log]
             [nucleotides.api.database  :as db]
             [nucleotides.api.server    :as server]
             [nucleotides.util          :as util]))
 
-(def credential-variable-names
+(def variable-names
   {:access-key "AWS_ACCESS_KEY"
    :secret-key "AWS_SECRET_KEY"
    :domain     "AWS_SDB_DOMAIN"
@@ -25,15 +24,10 @@
         (wrap-with-logger)
         (wrap-params))))
 
-(defn fetch-credentials! []
-  (->> credential-variable-names
-       (map (fn [[k v]] [k (util/get-env-var v)]))
-       (into {})))
-
 (defn create-database-client! [credentials]
   (apply db/create-client (map credentials [:access-key :secret-key :endpoint])))
 
 (defn -main [& args]
-  (let [credentials (fetch-credentials!)
+  (let [credentials (util/fetch-variables! variable-names)
         client      (create-database-client! credentials)]
     (run-jetty (site (api client (:domain credentials))) {:port 80})))
