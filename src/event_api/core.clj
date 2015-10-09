@@ -7,23 +7,14 @@
             [ring.adapter.jetty     :refer [run-jetty]]
             [taoensso.timbre        :as log]
             [event-api.database     :as db]
-            [event-api.server       :as server]))
+            [event-api.server       :as server]
+            [nucleotides.util       :as util]))
 
 (def credential-variable-names
   {:access-key "AWS_ACCESS_KEY"
    :secret-key "AWS_SECRET_KEY"
    :domain     "AWS_SDB_DOMAIN"
    :endpoint   "AWS_ENDPOINT"})
-
-(defn get-env-var [v]
-  (let [value (System/getenv v)]
-    (if (nil? value)
-      (do
-        (log/fatal (str "Unbound environment variable: " v))
-        (System/exit 1))
-      (do
-        (log/info (str "Using environment variable: " v "=" value))
-        value))))
 
 (defn api [client domain]
   (let [route #(partial % client domain)]
@@ -35,7 +26,7 @@
 
 (defn fetch-credentials! []
   (->> credential-variable-names
-       (map (fn [[k v]] [k (get-env-var v)]))
+       (map (fn [[k v]] [k (util/get-env-var v)]))
        (into {})))
 
 (defn create-database-client! [credentials]
