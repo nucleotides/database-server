@@ -9,20 +9,6 @@ endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
 domain     := AWS_SDB_DOMAIN="event-dev"
 
 
-feature: Gemfile.lock .api_container
-	$(access_key) $(secret_key) $(endpoint) $(domain) \
-	bundle exec cucumber $(ARGS)
-
-.api_container: .api_image $(credentials)
-	docker run \
-	  --publish=80:80 \
-	  --detach=true \
-	  --env="$(access_key)" \
-	  --env="$(secret_key)" \
-	  --env="$(domain)" \
-	  --env="$(endpoint)" \
-	  $(name) > $@
-
 repl: $(credentials)
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
 	lein repl
@@ -34,6 +20,32 @@ irb: $(credentials)
 kill:
 	docker kill $(shell cat .api_container)
 	rm -f .api_container
+
+################################################
+#
+# Test project
+#
+################################################
+
+feature: Gemfile.lock .api_container
+	$(access_key) $(secret_key) $(endpoint) $(domain) \
+	bundle exec cucumber $(ARGS)
+
+test:
+	lein trampoline test
+
+autotest:
+	lein prism
+
+.api_container: .api_image $(credentials)
+	docker run \
+	  --publish=80:80 \
+	  --detach=true \
+	  --env="$(access_key)" \
+	  --env="$(secret_key)" \
+	  --env="$(domain)" \
+	  --env="$(endpoint)" \
+	  $(name) > $@
 
 ################################################
 #
