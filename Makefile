@@ -9,11 +9,11 @@ endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
 domain     := AWS_SDB_DOMAIN="event-dev"
 
 
-feature: Gemfile.lock .dev_container
+feature: Gemfile.lock .api_container
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
 	bundle exec cucumber $(ARGS)
 
-.dev_container: .image $(credentials)
+.api_container: .api_image $(credentials)
 	docker run \
 	  --publish=80:80 \
 	  --detach=true \
@@ -22,12 +22,6 @@ feature: Gemfile.lock .dev_container
 	  --env="$(domain)" \
 	  --env="$(endpoint)" \
 	  $(name) > $@
-
-.sdb_container: .sdb_image
-	docker run \
-	  --publish=8081:8080 \
-	  --detach=true \
-	  sdb > $@
 
 repl: $(credentials)
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
@@ -38,19 +32,35 @@ irb: $(credentials)
 	bundle exec ./script/irb
 
 kill:
-	docker kill $(shell cat .dev_container)
-	rm -f .dev_container
+	docker kill $(shell cat .api_container)
+	rm -f .api_container
 
-bootstrap: Gemfile.lock $(credentials) .sdb_container
+################################################
+#
+# Bootstrap required project resources
+#
+################################################
+
+bootstrap: Gemfile.lock $(credentials) .sdb_container .mysql_image
 	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
-.image: Dockerfile project.clj $(shell find src -name "*.clj")
+.sdb_container: .sdb_image
+	docker run \
+	  --publish=8081:8080 \
+	  --detach=true \
+	  sdb > $@
+
+.api_image: Dockerfile project.clj $(shell find src -name "*.clj")
 	docker build --tag=$(name) .
 	touch $@
 
 .sdb_image: images/simpledb-dev/Dockerfile
 	docker build --tag=sdb $(dir $<)
+	touch $@
+
+.mysql_image:
+	docker pull mysql
 	touch $@
 
 $(credentials): ./script/create_aws_credentials
