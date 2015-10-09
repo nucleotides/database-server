@@ -9,14 +9,14 @@
                  [compojure                  "1.3.1"]
                  [com.cemerick/rummage       "1.0.1"]
                  [clj-time                   "0.9.0"]
+                 [migratus                   "0.8.7"]
                  [com.amazonaws/aws-java-sdk "1.3.21.1"]]
+
   :plugins      [[lein-ring "0.9.0"]]
 
   :local-repo  "vendor/maven"
 
-  :main event-api.core
-
   :profiles {
-    :dev     {:dependencies [[ring-mock "0.1.5"]]}
-    :uberjar {:aot :all}})
-
+    :dev        {:dependencies [[ring-mock "0.1.5"]]}
+    :uberjar    {:aot :all}
+    :api-server {:main event-api.core}})

@@ -1,4 +1,4 @@
 FROM clojure:lein-2.5.0
 COPY . /event-api
 WORKDIR /event-api
-CMD ["lein", "trampoline", "run"]
+CMD ["lein", "with-profile", "api-server", "trampoline", "run"]
