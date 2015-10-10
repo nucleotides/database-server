@@ -1,22 +1,23 @@
-(ns event-api.core
+(ns nucleotides.database.build
   (:gen-class)
   (:require
-    [nucleotides.util :as util]
-    [migratus.core    :as mg]))
+    [clojure.java.jdbc :as sql]
+    [nucleotides.util  :as util]
+    [migratus.core     :as mg]))
 
 (def variable-names
-  {:user      "MYSQL_USER"
-   :password  "MYSQL_PASSWORD"
-   :url       "MYSQL_HOST"})
+  {:user      "POSTGRES_USER"
+   :password  "POSTGRES_PASSWORD"
+   :url       "POSTGRES_HOST"})
 
-(defn config [vars]
-  {:store :database
-   :migration-dir "migrations"
-   :db {:classname    "com.mysql.jdbc.Driver"
-        :subprotocol  "mysql"
-        :subname      (:url vars)
-        :user         (:user vars)
-        :password     (:password vars)}})
+(defn create-db-spec [vars]
+  {:classname    "org.postgresql.Driver"
+   :subprotocol  "postgresql"
+   :subname      (:url vars)
+   :user         (:user vars)
+   :password     (:password vars)})
 
 (defn -main [& args]
-  (-> (util/fetch-variables! variable-names) config mg/migrate))
+  (let [vars    (util/fetch-variables! variable-names)
+        db-spec (create-db-spec vars)]
+    (mg/migrate db-spec)))
