@@ -8,10 +8,9 @@ secret_key := AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)
 endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
 domain     := AWS_SDB_DOMAIN="event-dev"
 
-db_database  := POSTGRES_DB=postgres
 db_user      := POSTGRES_USER=postgres
 db_pass      := POSTGRES_PASSWORD=pass
-db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")/$(db_database):5433
+db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")/postgres:5433
 
 repl: $(credentials)
 	@$(access_key) $(secret_key) $(endpoint) $(domain) \
@@ -76,7 +75,6 @@ bootstrap: Gemfile.lock $(credentials) .sdb_container .rdm_container
 	  --publish=5433:5432 \
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
-	  --env="$(db_database)" \
 	  --detach=true \
 	  postgres > $@
 
