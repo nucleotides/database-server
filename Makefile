@@ -8,9 +8,15 @@ secret_key := AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)
 endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
 domain     := AWS_SDB_DOMAIN="event-dev"
 
+mysql_root_pass := MYSQL_ROOT_PASSWORD=root_password
+mysql_database  := MYSQL_DATABASE=dev_database
+mysql_user      := MYSQL_USER=user
+mysql_pass      := MYSQL_PASSWORD=pass
+mysql_url       := MYSQL_URL=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+"):3307
 
 repl: $(credentials)
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
+	$(mysql_url) $(mysql_user) $(mysql_pass) \
 	lein repl
 
 irb: $(credentials)
@@ -29,9 +35,12 @@ kill:
 
 feature: Gemfile.lock .api_container
 	$(access_key) $(secret_key) $(endpoint) $(domain) \
+	$(mysql_url) $(mysql_user) $(mysql_pass) \
 	bundle exec cucumber $(ARGS)
 
 test:
+	$(access_key) $(secret_key) $(endpoint) $(domain) \
+	$(mysql_url) $(mysql_user) $(mysql_pass) \
 	lein trampoline test
 
 autotest:
@@ -61,7 +70,17 @@ bootstrap: Gemfile.lock $(credentials) .sdb_container .mysql_image
 	docker run \
 	  --publish=8081:8080 \
 	  --detach=true \
+	  --rm \
 	  sdb > $@
+
+.mysql_container: .mysql_image
+	docker run \
+	  --publish=3307:3306 \
+	  --env="$(mysql_root_pass)" \
+	  --env="$(mysql_user)" \
+	  --env="$(mysql_pass)" \
+	  --rm \
+	  mysql > $@
 
 .api_image: Dockerfile project.clj $(shell find src -name "*.clj")
 	docker build --tag=$(name) .
@@ -83,3 +102,5 @@ Gemfile.lock: Gemfile
 
 clean:
 	rm -f .image $(credentials)
+
+.PHONY: test
