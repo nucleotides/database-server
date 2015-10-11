@@ -87,7 +87,7 @@ bootstrap: Gemfile.lock $(credentials) .sdb_container .rdm_container
 	touch $@
 
 .rdm_image: images/postgres/Dockerfile
-	docker build --tag=sdb $(dir $<)
+	docker pull postgres
 	touch $@
 
 $(credentials): ./script/create_aws_credentials
