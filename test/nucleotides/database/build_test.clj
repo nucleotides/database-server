@@ -1,11 +1,10 @@
 (ns nucleotides.database.build-test
   (:require [clojure.test :refer :all]
+            [helper                     :as help]
             [clojure.java.jdbc          :as sql]
-            [taoensso.timbre            :as log]
             [nucleotides.database.build :as build]))
 
-; Silence logging to STDOUT during testing
-(log/set-config! [:appenders :standard-out :enabled? false])
+(help/silence-logging!)
 
 (def database-name "clojure_test_db")
 
