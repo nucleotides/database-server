@@ -10,7 +10,7 @@ domain     := AWS_SDB_DOMAIN="event-dev"
 
 db_user      := POSTGRES_USER=postgres
 db_pass      := POSTGRES_PASSWORD=pass
-db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")/postgres:5433
+db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+"):5433/postgres
 
 repl: $(credentials)
 	@$(access_key) $(secret_key) $(endpoint) $(domain) \
