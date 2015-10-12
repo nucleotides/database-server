@@ -5,22 +5,25 @@
     [nucleotides.util  :as util]
     [migratus.core     :as mg]))
 
-(def variable-names
-  {:user      "POSTGRES_USER"
-   :password  "POSTGRES_PASSWORD"
-   :url       "POSTGRES_HOST"})
+(defn create-sql-params []
+  (let [env-var-names {:user      "POSTGRES_USER"
+                       :password  "POSTGRES_PASSWORD"
+                       :host      "POSTGRES_HOST"}
+        vars          (util/fetch-variables! env-var-names)]
+    {:classname    "org.postgresql.Driver"
+     :subprotocol  "postgresql"
+     :subname      (:host vars)
+     :user         (:user vars)
+     :password     (:password vars)}))
 
-(defn create-db-spec [vars]
+
+(defn create-migratus-spec [sql-params]
   {:store                :database
    :migration-dir        "migrations/"
    :migration-table-name "db_version"
-   :db  {:classname    "org.postgresql.Driver"
-         :subprotocol  "postgresql"
-         :subname      (:url vars)
-         :user         (:user vars)
-         :password     (:password vars)}})
+   :db                   sql-params})
 
 (defn -main [& args]
-  (let [vars    (util/fetch-variables! variable-names)
-        db-spec (create-db-spec vars)]
-    (mg/migrate db-spec)))
+  (let [sql-config  (create-sql-params)
+        spec        (create-migratus-spec sql-config)]
+    (mg/migrate spec)))
