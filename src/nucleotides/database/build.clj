@@ -11,11 +11,14 @@
    :url       "POSTGRES_HOST"})
 
 (defn create-db-spec [vars]
-  {:classname    "org.postgresql.Driver"
-   :subprotocol  "postgresql"
-   :subname      (:url vars)
-   :user         (:user vars)
-   :password     (:password vars)})
+  {:store                :database
+   :migration-dir        "migrations/"
+   :migration-table-name "db_version"
+   :db  {:classname    "org.postgresql.Driver"
+         :subprotocol  "postgresql"
+         :subname      (:url vars)
+         :user         (:user vars)
+         :password     (:password vars)}})
 
 (defn -main [& args]
   (let [vars    (util/fetch-variables! variable-names)
