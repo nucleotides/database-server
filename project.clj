@@ -6,7 +6,7 @@
                  [com.cemerick/rummage       "1.0.1"]
                  [com.taoensso/timbre        "4.1.4"]
                  [compojure                  "1.3.1"]
-                 [org.clojure/java.jdbc      "0.4.1"]
+                 [org.clojure/java.jdbc      "0.4.2"]
                  [migratus                   "0.8.7"]
                  [org.clojure/clojure        "1.6.0"]
                  [org.clojure/data.json      "0.2.5"]
