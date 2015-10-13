@@ -86,7 +86,7 @@ bootstrap: Gemfile.lock $(credentials) .sdb_container .rdm_container
 	docker build --tag=sdb $(dir $<)
 	touch $@
 
-.rdm_image: images/postgres/Dockerfile
+.rdm_image:
 	docker pull postgres
 	touch $@
 
