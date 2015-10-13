@@ -10,16 +10,24 @@ domain     := AWS_SDB_DOMAIN="event-dev"
 
 db_user      := POSTGRES_USER=postgres
 db_pass      := POSTGRES_PASSWORD=pass
-db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+"):5433/postgres
+db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+"):5433
+db_name      := POSTGRES_NAME=postgres
+
+params := \
+	$(access_key) \
+	$(secret_key) \
+	$(endpoint) \
+	$(domain) \
+	$(db_host) \
+	$(db_user) \
+	$(db_pass) \
+	$(db_name)
 
 repl: $(credentials)
-	@$(access_key) $(secret_key) $(endpoint) $(domain) \
-	$(db_host) $(db_user) $(db_pass) \
-	lein repl
+	@$(params) lein repl
 
 irb: $(credentials)
-	$(access_key) $(secret_key) $(endpoint) $(domain) \
-	bundle exec ./script/irb
+	@$(params) bundle exec ./script/irb
 
 kill:
 	docker kill $(shell cat .api_container)
@@ -32,17 +40,13 @@ kill:
 ################################################
 
 feature: Gemfile.lock .api_container
-	@$(access_key) $(secret_key) $(endpoint) $(domain) \
-	$(db_host) $(db_user) $(db_pass) \
-	bundle exec cucumber $(ARGS)
+	@$(params) bundle exec cucumber $(ARGS)
 
 test:
-	@$(access_key) $(secret_key) $(endpoint) $(domain) \
-	$(db_host) $(db_user) $(db_pass) \
-	lein trampoline test $(ARGS)
+	@$(params) lein trampoline test $(ARGS)
 
 autotest:
-	lein prism
+	@$(params) lein prism
 
 .api_container: .api_image $(credentials)
 	docker run \

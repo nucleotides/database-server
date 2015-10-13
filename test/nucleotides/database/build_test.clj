@@ -5,7 +5,7 @@
 
 (help/silence-logging!)
 
-(def database-name "postgres")
+(def database-name "clojure_test_db")
 
 (use-fixtures
   :each (help/refresh-testing-database database-name))

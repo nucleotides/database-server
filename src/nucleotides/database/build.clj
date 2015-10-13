@@ -10,10 +10,8 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
-(defn migrate []
-  (let [sql-config  (con/create-sql-params)
-        spec        (create-migratus-spec sql-config)]
-    (mg/migrate spec)))
+(defn migrate [connection]
+  (mg/migrate (create-migratus-spec connection)))
 
 (defn -main [& args]
-  (migrate))
+  (migrate con/create-connection))
