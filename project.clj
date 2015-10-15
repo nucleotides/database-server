@@ -1,4 +1,8 @@
-(defproject nucleotides-api "current"
+(require '[clojure.string :as string])
+
+(defproject nucleotides-api
+  (-> "VERSION" slurp string/trim)
+
   :description "REST API for recording nucleotid.es benchmarking events."
 
   :dependencies [[clj-time                   "0.9.0"]
@@ -6,10 +10,10 @@
                  [com.cemerick/rummage       "1.0.1"]
                  [com.taoensso/timbre        "4.1.4"]
                  [compojure                  "1.3.1"]
-                 [org.clojure/java.jdbc      "0.4.2"]
                  [migratus                   "0.8.7"]
                  [org.clojure/clojure        "1.6.0"]
                  [org.clojure/data.json      "0.2.5"]
+                 [org.clojure/java.jdbc      "0.4.2"]
                  [postgresql/postgresql      "9.3-1102.jdbc41"]
                  [ring-logger-timbre         "0.7.4"]
                  [ring/ring-jetty-adapter    "1.3.1"]]
