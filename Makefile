@@ -23,15 +23,21 @@ params := \
 	$(db_pass) \
 	$(db_name)
 
+
+api-server := target/api-server-0.2.0-standalone.jar
+db-build   := target/db-build-0.2.0-standalone.jar
+
+################################################
+#
+# Consoles
+#
+################################################
+
 repl: $(credentials)
 	@$(params) lein repl
 
 irb: $(credentials)
 	@$(params) bundle exec ./script/irb
-
-kill:
-	docker kill $(shell cat .api_container)
-	rm -f .api_container
 
 ################################################
 #
@@ -57,6 +63,25 @@ autotest:
 	  --env="$(domain)" \
 	  --env="$(endpoint)" \
 	  $(name) > $@
+
+kill:
+	docker kill $(shell cat .api_container)
+	rm -f .api_container
+
+################################################
+#
+# Build the project jars
+#
+################################################
+
+build: $(api-server) $(db-build)
+
+$(api-server): project.clj VERSION $(shell find resources) $(shell find src)
+	lein with-profile api-server uberjar
+
+$(db-build): project.clj VERSION $(shell find resources) $(shell find src)
+	lein with-profile db-build uberjar
+
 
 ################################################
 #

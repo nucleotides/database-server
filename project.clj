@@ -1,7 +1,9 @@
 (require '[clojure.string :as string])
 
-(defproject nucleotides-api
-  (-> "VERSION" slurp string/trim)
+(def version
+  (-> "VERSION" slurp string/trim))
+
+(defproject nucleotides-api version
 
   :description "REST API for recording nucleotid.es benchmarking events."
 
@@ -25,5 +27,7 @@
   :profiles {
     :dev        {:dependencies [[ring-mock "0.1.5"]]}
     :uberjar    {:aot :all}
-    :api-server {:main nucleotides.api.core}
-    :db-build   {:main nucleotides.database.build}})
+    :api-server {:main nucleotides.api.core
+                 :uberjar-name ~(str "api-server-" version "-standalone.jar")}
+    :db-build   {:main nucleotides.database.build
+                 :uberjar-name ~(str "db-build-" version "-standalone.jar")}})
