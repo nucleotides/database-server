@@ -14,4 +14,6 @@
   (mg/migrate (create-migratus-spec connection)))
 
 (defn -main [& args]
-  (migrate (con/create-connection)))
+  (do
+    (migrate (con/create-connection))  
+    (System/exit 0)))
