@@ -12,7 +12,7 @@ CREATE TABLE image_task(
   task		text 		NOT NULL,
   sha256	integer 	NOT NULL,
   active	bool 		NOT NULL,
-  UNIQUE(image_type_id, name, task)
+  CONSTRAINT image UNIQUE(image_type_id, name, task)
 );
 --;;
 CREATE TABLE data_type(
@@ -30,7 +30,7 @@ CREATE TABLE data_instance(
   reference_url	text 		NOT NULL,
   input_md5	integer 	NOT NULL,
   reference_md5	integer 	NOT NULL,
-  UNIQUE(data_type_id, replicate)
+  CONSTRAINT data_replicates UNIQUE(data_type_id, replicate)
 );
 --;;
 CREATE TABLE benchmark_type(
@@ -38,7 +38,7 @@ CREATE TABLE benchmark_type(
   added		timestamp	NOT NULL DEFAULT current_timestamp,
   data_type_id	integer		NOT NULL REFERENCES data_type(id),
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  UNIQUE(data_type_id, image_type_id)
+  CONSTRAINT data_image UNIQUE(data_type_id, image_type_id)
 );
 --;;
 CREATE TABLE benchmark_instance(
@@ -47,7 +47,7 @@ CREATE TABLE benchmark_instance(
   benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
   image_task_id		integer		NOT NULL REFERENCES image_task(id),
   data_instance_id	integer         NOT NULL REFERENCES data_instance(id),
-  UNIQUE(benchmark_type_id, image_task_id, data_instance_id)
+  CONSTRAINT benchmark_image_data UNIQUE(benchmark_type_id, image_task_id, data_instance_id)
 );
 --;;
 CREATE TABLE benchmark_event_status(
@@ -61,7 +61,7 @@ CREATE TABLE benchmark_event(
   id				serial		PRIMARY KEY,
   added				timestamp	DEFAULT current_timestamp,
   benchmark_instance_id		integer		NOT NULL REFERENCES benchmark_instance(id),
-  benchmark_event_status_id	integer		NOT NULL REFERENCES benchmark_event_statuse(id)
+  benchmark_event_status_id	integer		NOT NULL REFERENCES benchmark_event_status(id)
 );
 --;;
 CREATE TABLE metric_type(
@@ -77,5 +77,5 @@ CREATE TABLE metric_instance(
   metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
   benchmark_event_id	integer		NOT NULL REFERENCES benchmark_event(id),
   value			float 		NOT NULL,
-  UNIQUE(metric_type_id, benchmark_event_id)
+  CONSTRAINT metric_to_event UNIQUE(metric_type_id, benchmark_event_id)
 );
