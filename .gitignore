@@ -8,7 +8,6 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 
-Gemfile.lock
 .aws_credentials
 .*image
 .*_container
