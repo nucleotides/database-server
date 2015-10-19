@@ -116,7 +116,7 @@ bootstrap: Gemfile.lock $(credentials) .sdb_container .rdm_container
 	  --detach=true \
 	  postgres > $@
 
-.api_image: Dockerfile project.clj $(shell find src -name "*.clj")
+.api_image: Dockerfile $(jar)
 	docker build --tag=$(name) .
 	touch $@
 
