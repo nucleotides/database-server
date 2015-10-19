@@ -37,6 +37,21 @@ repl: $(credentials)
 irb: $(credentials)
 	@$(params) bundle exec ./script/irb
 
+ssh: .api_image $(credentials)
+	@docker run \
+	  --tty \
+	  --interactive \
+	  --env="$(access_key)" \
+	  --env="$(secret_key)" \
+	  --env="$(domain)" \
+	  --env="$(endpoint)" \
+	  --env="$(db_host)" \
+	  --env="$(db_user)" \
+	  --env="$(db_pass)" \
+	  --env="$(db_name)" \
+	  $(name) \
+	  /bin/bash
+
 ################################################
 #
 # Test project
