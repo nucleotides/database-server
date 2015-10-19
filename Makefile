@@ -23,9 +23,7 @@ params := \
 	$(db_pass) \
 	$(db_name)
 
-
-api-server := target/api-server-0.2.0-standalone.jar
-db-build   := target/db-build-0.2.0-standalone.jar
+jar := target/nucleotides-api-0.2.0-standalone.jar
 
 ################################################
 #
@@ -74,14 +72,10 @@ kill:
 #
 ################################################
 
-build: $(api-server) $(db-build)
+build: $(jar)
 
-$(api-server): project.clj VERSION $(shell find resources) $(shell find src)
-	lein with-profile api-server uberjar
-
-$(db-build): project.clj VERSION $(shell find resources) $(shell find src)
-	lein with-profile db-build uberjar
-
+$(jar): project.clj VERSION $(shell find resources) $(shell find src)
+	lein uberjar
 
 ################################################
 #

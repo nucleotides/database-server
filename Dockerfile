@@ -1,4 +1,7 @@
 FROM clojure:lein-2.5.0
-COPY . /event-api
-WORKDIR /event-api
-CMD ["lein", "with-profile", "api-server", "trampoline", "run"]
+ENV DIR /nucleotides-api
+RUN mkdir -p ${DIR}/bin ${DIR}/target
+COPY bin ${DIR}/bin
+COPY target ${DIR}/target
+COPY VERSION ${DIR}/VERSION
+CMD ["/nucleotides-api/bin/server"]

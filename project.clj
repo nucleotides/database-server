@@ -26,8 +26,4 @@
 
   :profiles {
     :dev        {:dependencies [[ring-mock "0.1.5"]]}
-    :uberjar    {:aot :all}
-    :api-server {:main nucleotides.api.core
-                 :uberjar-name ~(str "api-server-" version "-standalone.jar")}
-    :db-build   {:main nucleotides.database.build
-                 :uberjar-name ~(str "db-build-" version "-standalone.jar")}})
+    :uberjar    {:aot :all}})
