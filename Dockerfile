@@ -1,4 +1,4 @@
-FROM clojure:lein-2.5.0
+FROM java
 ENV DIR /nucleotides-api
 RUN mkdir -p ${DIR}/bin ${DIR}/target
 COPY bin ${DIR}/bin
