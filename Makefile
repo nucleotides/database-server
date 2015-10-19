@@ -55,7 +55,7 @@ autotest:
 	@$(params) lein prism
 
 .api_container: .api_image $(credentials)
-	docker run \
+	@docker run \
 	  --publish=80:80 \
 	  --detach=true \
 	  --env="$(access_key)" \

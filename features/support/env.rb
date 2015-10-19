@@ -1,4 +1,6 @@
 require 'bundler/setup'
+require 'rspec'
+require 'aruba'
 
 # Allow `lein trampoline run` to complete
 sleep 5

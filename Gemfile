@@ -1,5 +1,6 @@
 source 'https://rubygems.org'
 
+gem 'rspec',    '~> 3.3.0'
 gem 'aruba',    '~> 0.9.0'
 gem 'cucumber', '~> 1.3.0'
 gem 'curb',     '~> 0.8.0'
