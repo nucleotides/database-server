@@ -46,7 +46,7 @@ irb: $(credentials)
 ################################################
 
 feature: Gemfile.lock .api_container
-	@$(params) bundle exec cucumber $(ARGS)
+	@$(params) bundle exec cucumber $(ARGS) --require features
 
 test:
 	@$(params) lein trampoline test $(ARGS)
