@@ -8,10 +8,16 @@ secret_key := AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)
 endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
 domain     := AWS_SDB_DOMAIN="event-dev"
 
+docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
+
 db_user      := POSTGRES_USER=postgres
 db_pass      := POSTGRES_PASSWORD=pass
-db_host      := POSTGRES_HOST=//$(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+"):5433
 db_name      := POSTGRES_NAME=postgres
+ifdef docker_host
+	db_host  := POSTGRES_HOST=//$(docker_host):5433
+else
+	db_host  := POSTGRES_HOST=//localhost:5433
+endif
 
 params := \
 	$(access_key) \
