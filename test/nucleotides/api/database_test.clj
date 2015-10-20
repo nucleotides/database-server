@@ -1,7 +1,8 @@
-(ns event-api.database-test
+(ns nucleotides.api.database-test
   (:require [clojure.test :refer :all]
-            [cemerick.rummage   :as sdb]
-            [event-api.database :as db]))
+
+            [cemerick.rummage         :as sdb]
+            [nucleotides.api.database :as db]))
 
 (def valid-request
   {:benchmark_id        "abcd"

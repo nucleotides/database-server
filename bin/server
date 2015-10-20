@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+
+DIR="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
+VERSION=$(cat ${DIR}/VERSION | tr -d "\n")
+
+java \
+  -cp \
+  ${DIR}/target/nucleotides-api-${VERSION}-standalone.jar \
+  nucleotides.api.core

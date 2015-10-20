@@ -1,7 +1,7 @@
-(ns event-api.server
-  (:require [clojure.string     :as st]
-            [clojure.data.json  :as json]
-            [event-api.database :as db]))
+(ns nucleotides.api.server
+  (:require [clojure.string             :as st]
+            [clojure.data.json         :as json]
+            [nucleotides.api.database  :as db]))
 
 (defn update
   "Process a post event request. Return 202 if

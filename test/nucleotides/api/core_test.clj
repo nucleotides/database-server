@@ -1,15 +1,15 @@
-(ns event-api.core-test
+(ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
             [compojure.handler  :refer [site]]
-            [clojure.data.json  :as json]
-            [ring.mock.request  :as mock]
-            [cemerick.rummage   :as sdb]
-            [taoensso.timbre    :as log]
-            [event-api.database :as db]
-            [event-api.core     :as app]))
 
-; Silence logging to STDOUT during testing
-(log/set-config! [:appenders :standard-out :enabled? false])
+            [helper                    :as help]
+            [clojure.data.json         :as json]
+            [ring.mock.request         :as mock]
+            [cemerick.rummage          :as sdb]
+            [nucleotides.api.database  :as db]
+            [nucleotides.api.core      :as app]))
+
+(help/silence-logging!)
 
 (defn get-docker-host []
   (re-find #"\d+.\d+.\d+.\d+" (System/getenv "DOCKER_HOST")))
