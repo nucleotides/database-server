@@ -1,3 +1,4 @@
+Gemfile.lock
 /target
 /classes
 /checkouts
@@ -13,3 +14,4 @@ pom.xml.asc
 .*_container
 vendor
 .bundle
+.gems
