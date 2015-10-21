@@ -15,3 +15,4 @@ pom.xml.asc
 vendor
 .bundle
 .gems
+tmp

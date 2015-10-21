@@ -22,3 +22,17 @@ Given(/^an empty database without any tables$/) do
   db.exec("drop schema public cascade;")
   db.exec("create schema public;")
 end
+
+Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
+  db_table = db.exec("select * from #{name}")
+  table.hashes.each do |test_row|
+    matching = db_table.select do |db_row|
+      test_row.keys.all? do |key|
+        db_row.has_key?(key) and (test_row[key] == db_row[key])
+      end
+    end
+    if matching.empty?
+      fail("The table '#{name}' should include the entry #{test_row.inspect}")
+    end
+  end
+end
