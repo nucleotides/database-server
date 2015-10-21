@@ -29,10 +29,18 @@ Lists the available tasks for available Docker images.
     "default".
 
   * **sha256** - INT. The SHA256 digest of the Docker image file system layers,
-    used to differentiate between builds of the same image.
+    used to differentiate between difference versions images with the same
+    name.
 
   * **active** - BOOLEAN. States whether the image should still be benchmarked.
-    A false value indicates the image is deprecated.
+    A false value indicates the image is deprecated. An image may be deprecated
+    because it is no longer support, or more likely because a new version is
+    created. Differences in versions of images with the same name are
+    identified by sha256 field.
+
+There is table constraint that combinations of image_type_id, name, task,
+sha256 should be unique. This ensures there are no duplicated Docker image
+tasks.
 
 ## Sequencing Data
 

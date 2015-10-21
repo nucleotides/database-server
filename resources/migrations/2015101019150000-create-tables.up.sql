@@ -12,7 +12,7 @@ CREATE TABLE image_task(
   task		text 		NOT NULL,
   sha256	integer 	NOT NULL,
   active	bool 		NOT NULL,
-  CONSTRAINT image UNIQUE(image_type_id, name, task)
+  CONSTRAINT image UNIQUE(image_type_id, name, task, sha256)
 );
 --;;
 CREATE TABLE data_type(
