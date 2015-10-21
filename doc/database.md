@@ -14,7 +14,10 @@ Tables used the store the docker images instances used in benchmarking
 
 Categorises the different kinds of images used for benchmarking.
 
-  * **description** - VARCHAR. Examples are "short_read_assembler".
+  * **name** - TEXT. Examples are "short_read_assembler". This field is unique
+    as there should not be duplicated types.
+
+  * **description** - TEXT. A more detailed description of the image type.
 
 ### image_task
 

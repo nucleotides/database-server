@@ -1,6 +1,7 @@
 CREATE TABLE image_type(
   id		serial 		PRIMARY KEY,
   added		timestamp	DEFAULT current_timestamp,
+  name          text            UNIQUE NOT NULL,
   description	text		NOT NULL
 );
 --;;
