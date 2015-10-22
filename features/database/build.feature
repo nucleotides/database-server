@@ -5,14 +5,14 @@ Feature: Migrating and loading input data for the database
     And a directory "data"
     And a file named "data/images.yml" with:
       """
-        image_type: short_read_assembler
-        description: |
-          Assembles paired Illumina short reads into contigs.
-        image_instances:
-          - image: bioboxes/velvet
-            tasks:
-              - default
-              - careful
+        - image_type: short_read_assembler
+          description: |
+            Assembles paired Illumina short reads into contigs.
+          image_instances:
+            - image: bioboxes/velvet
+              tasks:
+                - default
+                - careful
       """
     When I run `./bin/migrate data`
     Then the exit status should be 0
