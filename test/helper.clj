@@ -1,6 +1,6 @@
 (ns helper
-  (:require [taoensso.timbre                 :as log]
-            [clojure.java.jdbc               :as sql]
+  (:require [clojure.java.jdbc               :as sql]
+            [taoensso.timbre                 :as log]
             [nucleotides.database.connection :as con]))
 
 (defn silence-logging! []
@@ -11,9 +11,7 @@
     (with-open [s (.createStatement (:connection conn))]
       (.executeUpdate s command))))
 
-(defn refresh-testing-database [database-name]
-  (fn [f]
-    (do
-      (exec-db-command (str "drop database if exists " database-name))
-      (exec-db-command (str "create database " database-name))
-      (f))))
+(defn drop-all-tables []
+  (do
+    (exec-db-command "drop schema public cascade;")
+    (exec-db-command "create schema public;")))

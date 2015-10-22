@@ -1,21 +1,31 @@
 (ns nucleotides.database.build-test
   (:require [clojure.test :refer :all]
+            [clojure.java.jdbc               :as db]
+            [yesql.core                      :refer [defqueries]]
             [helper                          :as help]
             [nucleotides.database.build      :as build]
             [nucleotides.database.connection :as con]
-            [nucleotides.util                :as util]
-            ))
+            [nucleotides.util                :as util]))
 
 (help/silence-logging!)
+(defqueries "queryfile.sql" {:connection (con/create-connection)})
 
-(def database-name "clojure_test_db")
+(def initial-test-data
+  {:images
+   [{"image_type"      "type",
+     "description"     "description"
+     "image_instances" {"image" "image/name"
+                        "tasks" ["default" "careful"]}}]})
 
-(use-fixtures
-  :each (help/refresh-testing-database database-name))
+(defn refresh-migrate-load [f]
+  (do
+    (help/drop-all-tables)
+    (build/migrate (con/create-connection) initial-test-data)
+    (f)))
 
 (deftest build
-  (let [db-vars      (util/fetch-variables! con/env-var-names)
-        test-db-vars (assoc db-vars :db database-name)
-        conn         (con/sql-params test-db-vars)]
+
+  (use-fixtures :once refresh-migrate-load)
+
   (testing "#migrate"
-    (is (not ('thrown? org.postgresql.util.PSQLException (build/migrate conn)))))))
+    (is (not (empty? (image-types))))))
