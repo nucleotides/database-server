@@ -1,7 +1,9 @@
 (ns nucleotides.database.build
   (:gen-class)
   (:require
+    [clojure.java.io                 :as io]
     [migratus.core                   :as mg]
+    [clj-yaml.core                   :as yaml]
     [nucleotides.util                :as util]
     [nucleotides.database.load       :as loader]
     [nucleotides.database.connection :as con]))
@@ -18,10 +20,16 @@
     (loader/load-data connection initial-data)))
 
 (defn load-data-files [directory]
-  (let [file-names [:images]]
-    (map () file-names)))
+  (let [file-names [:image :data_type]
+        f          (fn [file]
+                     (->> (str (name file) ".yml")
+                          (io/file directory)
+                          (slurp)
+                          (yaml/parse-string)))]
+        (zipmap file-names (map f file-names))))
 
 (defn -main [& args]
-  (do
-    (migrate (con/create-connection))
-    (System/exit 0)))
+  (let [data (load-data-files (first args))]
+    (do
+      (migrate (con/create-connection) data)
+      (System/exit 0))))

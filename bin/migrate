@@ -9,4 +9,5 @@ VERSION=$(cat ${DIR}/VERSION | tr -d "\n")
 java \
   -cp \
   ${DIR}/target/nucleotides-api-${VERSION}-standalone.jar \
-  nucleotides.database.build
+  nucleotides.database.build \
+  $@

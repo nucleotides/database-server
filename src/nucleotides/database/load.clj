@@ -34,4 +34,5 @@
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
-  (load-image-types connection (:images data)))
+  (image-types connection (:image data))
+  (data-types connection  (:data_type data)))
