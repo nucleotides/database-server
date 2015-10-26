@@ -19,7 +19,9 @@ CREATE TABLE image_task(
 CREATE TABLE data_type(
   id		serial 		PRIMARY KEY,
   added		timestamp	NOT NULL DEFAULT current_timestamp,
-  description	text		NOT NULL
+  name		text		UNIQUE NOT NULL,
+  protocol	text		NOT NULL,
+  source	text		NOT NULL
 );
 --;;
 CREATE TABLE data_instance(

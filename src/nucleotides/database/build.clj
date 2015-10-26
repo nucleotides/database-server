@@ -17,6 +17,10 @@
     (mg/migrate (create-migratus-spec connection))
     (loader/load-data connection initial-data)))
 
+(defn load-data-files [directory]
+  (let [file-names [:images]]
+    (map () file-names)))
+
 (defn -main [& args]
   (do
     (migrate (con/create-connection))

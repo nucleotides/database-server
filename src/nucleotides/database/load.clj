@@ -7,25 +7,29 @@
 
 (defqueries "nucleotides/database/queries.sql")
 
-(defn load-image-types
+(defn- load-entries [transform save]
+  "Creates a function that transforms and saves data with a given
+  DB connection"
+  (fn [connection data]
+    (for [entry (transform data)]
+      (-> entry
+          (walk/keywordize-keys)
+          (save {:connection connection})))))
+
+
+(def image-types
   "Select the image types and load into the database"
-  [connection data]
-  (for [entry data]
-    (-> entry
-        (select-keys ["image_type", "description"])
-        (walk/keywordize-keys)
-        (st/rename-keys {:image_type :name})
-        (save-image-type<! {:connection connection}))))
+  (let [transform (fn [entry]
+                    (-> entry
+                        (select-keys ["image_type", "description"])
+                        (st/rename-keys {"image_type" "name"})))]
+    (load-entries (partial map transform)  save-image-type<!)))
 
 
-(def initial-test-data
-  {:images
-   [{"image_type"      "type",
-     "description"     "description"
-     "image_instances" {"image" "image/name"
-                        "tasks" ["default" "careful"]}}]})
+(def data-types
+  "Load data types into the database"
+  (load-entries identity save-data-type<!))
 
-;(load-image-types (con/create-connection) (:images initial-test-data))
 
 (defn load-data
   "Load and update benchmark data in the database"
