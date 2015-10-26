@@ -11,13 +11,19 @@
 (defqueries "queryfile.sql" {:connection (con/create-connection)})
 
 (def initial-test-data
-  {:images
+  {:image
    [{"image_type"      "type",
      "description"     "description"
      "image_instances" {"image" "image/name"
-                        "tasks" ["default" "careful"]}}]})
+                        "tasks" ["default" "careful"]}}]
+   :data_type
+   [{"name"     "data_name"
+     "protocol" "data_protocol"
+     "source"   "data_source"}]})
 
 
 (use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
-(deftest build)
+(deftest build
+  (testing "#migrate"
+    (build/migrate (con/create-connection) initial-test-data)))

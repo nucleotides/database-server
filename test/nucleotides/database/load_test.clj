@@ -19,18 +19,21 @@
                     "description"     "description"
                     "image_instances" {"image" "image/name"
                                        "tasks" ["default" "careful"]}}]
-          entries (run-loader ld/image-types data)]
-    (is (not (empty? entries)))
-    (is (= 1 (count entries)))
-    (is (= 1 (:id (first entries)))))))
+
+          _        (run-loader ld/image-types data)
+          entries  (help/data-types)]
+      (is (not (empty? entries)))
+      (is (= 1 (count entries)))
+      (is (= 1 (:id (first entries)))))))
 
 
 (deftest load-data-types
   (testing "with a single data type entry"
-    (let [data   [{"name"      "data_name"
-                   "protocol"  "protocol_type"
-                   "source"    "source_type"}]
-          entries (run-loader ld/data-types data)]
-    (is (not (empty? entries)))
-    (is (= 1 (count entries)))
-    (is (= 1 (:id (first entries)))))))
+    (let [data     [{"name"      "data_name"
+                     "protocol"  "protocol_type"
+                     "source"    "source_type"}]
+          _        (run-loader ld/data-types data)
+          entries  (help/data-types)]
+      (is (not (empty? entries)))
+      (is (= 1 (count entries)))
+      (is (= 1 (:id (first entries)))))))

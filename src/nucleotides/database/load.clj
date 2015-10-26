@@ -11,10 +11,11 @@
   "Creates a function that transforms and saves data with a given
   DB connection"
   (fn [connection data]
-    (for [entry (transform data)]
-      (-> entry
-          (walk/keywordize-keys)
-          (save {:connection connection})))))
+    (dorun
+      (for [entry (transform data)]
+        (-> entry
+            (walk/keywordize-keys)
+            (save {:connection connection}))))))
 
 
 (def image-types
@@ -23,7 +24,7 @@
                     (-> entry
                         (select-keys ["image_type", "description"])
                         (st/rename-keys {"image_type" "name"})))]
-    (load-entries (partial map transform)  save-image-type<!)))
+    (load-entries (partial map transform) save-image-type<!)))
 
 
 (def data-types
@@ -34,5 +35,6 @@
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
-  (image-types connection (:image data))
-  (data-types connection  (:data_type data)))
+  (do
+    (image-types connection (:image data))
+    (data-types connection  (:data_type data))))
