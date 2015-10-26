@@ -17,15 +17,7 @@
      "image_instances" {"image" "image/name"
                         "tasks" ["default" "careful"]}}]})
 
-(defn refresh-migrate-load [f]
-  (do
-    (help/drop-all-tables)
-    (build/migrate (con/create-connection) initial-test-data)
-    (f)))
 
-(deftest build
+(use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
-  (use-fixtures :once refresh-migrate-load)
-
-  (testing "#migrate"
-    (is (not (empty? (image-types))))))
+(deftest build)

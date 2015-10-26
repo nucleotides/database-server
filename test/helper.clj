@@ -1,7 +1,12 @@
 (ns helper
   (:require [clojure.java.jdbc               :as sql]
             [taoensso.timbre                 :as log]
+            [migratus.core                   :as mg]
+            [yesql.core                      :refer [defqueries]]
+            [nucleotides.database.build      :as build]
             [nucleotides.database.connection :as con]))
+
+
 
 (defn silence-logging! []
   (log/set-config! [:appenders :standard-out :enabled? false]))
@@ -11,7 +16,14 @@
     (with-open [s (.createStatement (:connection conn))]
       (.executeUpdate s command))))
 
-(defn drop-all-tables []
+(defn drop-tables []
   (do
     (exec-db-command "drop schema public cascade;")
     (exec-db-command "create schema public;")))
+
+(defn empty-database []
+  (do
+    (drop-tables)
+    (mg/migrate (build/create-migratus-spec (con/create-connection)))))
+
+(defqueries "queryfile.sql" {:connection (con/create-connection)})
