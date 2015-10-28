@@ -13,6 +13,7 @@
 (defn run-loader [f data]
   (f (con/create-connection) data))
 
+
 (deftest load-image-types
   (testing "with a single image type entry"
     (let [data    [{"image_type"      "type"
@@ -21,7 +22,7 @@
                                        "tasks" ["default" "careful"]}}]
 
           _        (run-loader ld/image-types data)
-          entries  (help/data-types)]
+          entries  (help/image-types)]
       (is (not (empty? entries)))
       (is (= 1 (count entries)))
       (is (= 1 (:id (first entries)))))))
