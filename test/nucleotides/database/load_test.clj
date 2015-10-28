@@ -15,10 +15,10 @@
 
 (deftest load-image-types
   (testing "with a single image type entry"
-    (let [data    [{"image_type"      "type"
-                    "description"     "description"
-                    "image_instances" {"image" "image/name"
-                                       "tasks" ["default" "careful"]}}]
+    (let [data    [{:image_type      "type"
+                    :description     "description"
+                    :image_instances {:image "image/name"
+                                      :tasks ["default" "careful"]}}]
 
           _        (run-loader ld/image-types data)
           entries  (help/image-types)]
@@ -27,9 +27,9 @@
 
 (deftest load-data-types
   (testing "with a single data type entry"
-    (let [data     [{"name"      "data_name"
-                     "protocol"  "protocol_type"
-                     "source"    "source_type"}]
+    (let [data     [{:name      "data_name"
+                     :protocol  "protocol_type"
+                     :source    "source_type"}]
           _        (run-loader ld/data-types data)
           entries  (help/data-types)]
       (is (= 1 (count entries))))))

@@ -14,11 +14,6 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
-(defn migrate [connection initial-data]
-  (do
-    (mg/migrate (create-migratus-spec connection))
-    (loader/load-data connection initial-data)))
-
 (defn load-data-files [directory]
   (let [file-names [:image :data_type]
         f          (fn [file]
@@ -28,8 +23,12 @@
                           (yaml/parse-string)))]
         (zipmap file-names (map f file-names))))
 
+(defn migrate [directory]
+  (let [data (load-data-files directory)
+        con  (con/create-connection)]
+    (mg/migrate (create-migratus-spec con))
+    (loader/load-data con data)))
+
 (defn -main [& args]
-  (let [data (load-data-files (first args))]
-    (do
-      (migrate (con/create-connection) data)
-      (System/exit 0))))
+  (migrate (first args))
+  (System/exit 0))

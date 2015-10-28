@@ -6,7 +6,7 @@
             [nucleotides.database.build      :as build]
             [nucleotides.database.connection :as con]))
 
-
+(defqueries "queryfile.sql" {:connection (con/create-connection)})
 
 (defn silence-logging! []
   (log/set-config! [:appenders :standard-out :enabled? false]))
@@ -26,4 +26,5 @@
     (drop-tables)
     (mg/migrate (build/create-migratus-spec (con/create-connection)))))
 
-(defqueries "queryfile.sql" {:connection (con/create-connection)})
+(def test-data-directory
+  (.getCanonicalPath (clojure.java.io/file "test/data")))
