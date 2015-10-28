@@ -26,4 +26,6 @@
 
 (deftest build
   (testing "#migrate"
-    (build/migrate (con/create-connection) initial-test-data)))
+    (build/migrate (con/create-connection) initial-test-data)
+    (is (= 1 (count (help/data-types))))
+    (is (= 1 (count (help/image-types))))))
