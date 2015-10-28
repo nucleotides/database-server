@@ -23,7 +23,8 @@ Feature: Migrating and loading input data for the database
         source: "Isolated microorganism"
       """
     When I run `./bin/migrate data`
-    Then the exit status should be 0
+    Then the stderr excluding logging info should not contain anything
+    And the exit status should be 0
     And the table "image_type" should have the entries:
       | name                 | description                                         |
       | short_read_assembler | Assembles paired Illumina short reads into contigs. |
