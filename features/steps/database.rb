@@ -18,21 +18,26 @@ def db
   @conn
 end
 
+def table_entries(name)
+  result = db.exec("select * from #{name}")
+  result.map{|i| Hash[i]}
+end
+
 Given(/^an empty database without any tables$/) do
   db.exec("drop schema public cascade;")
   db.exec("create schema public;")
 end
 
 Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
-  db_table = db.exec("select * from #{name}")
+  entries = table_entries(name)
   table.hashes.each do |test_row|
-    matching = db_table.select do |db_row|
+    matching = entries.select do |db_row|
       test_row.keys.all? do |key|
-        db_row.has_key?(key) and (test_row[key] == db_row[key])
+        db_row.has_key?(key) and (test_row[key].strip == db_row[key].strip)
       end
     end
     if matching.empty?
-      fail("The table '#{name}' should include the entry #{test_row.inspect}")
+      fail("The table '#{name}' should include the entry #{test_row.inspect} instead contains:\n#{entries}")
     end
   end
 end

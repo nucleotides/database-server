@@ -11,8 +11,9 @@
   DB connection"
   ([transform save]
    (fn [connection data]
-     (dorun
-       (map #(save % {:connection connection}) (transform data)))))
+     (->> (transform data)
+          (map #(save % {:connection connection}))
+          (dorun))))
   ([save]
    (load-entries identity save)))
 
