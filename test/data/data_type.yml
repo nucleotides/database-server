@@ -1,4 +1,0 @@
----
-- name: "isolate_2x150"
-  protocol: "Illumina 2x150 paired reads"
-  source: "Isolated microorganism"

@@ -26,10 +26,12 @@
 
 
 (deftest load-data-types
-  (testing "with a single data type entry"
-    (let [data     [{:name      "data_name"
-                     :protocol  "protocol_type"
-                     :source    "source_type"}]
+  (testing "with a single data entry"
+    (let [data     [{:name         "data_name"
+                     :library      "protocol_type"
+                     :type         "source_type"
+                     :description  "description"
+                     :entries      []}]
           _        (run-loader ld/data-types data)
           entries  (help/data-types)]
       (is (= 1 (count entries))))))

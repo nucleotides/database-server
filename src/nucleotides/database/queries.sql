@@ -10,5 +10,5 @@ VALUES (:image_type_id, :name, :task, :sha256, :active);
 
 -- name: save-data-type<!
 -- Creates a new data type entry
-INSERT INTO data_type (name, protocol, source)
-VALUES (:name, :protocol, :source);
+INSERT INTO data_type (name, library, type, description)
+VALUES (:name, :library, :type, :description);

@@ -28,7 +28,8 @@
 
 (def data-types
   "Load data types into the database"
-  (load-entries save-data-type<!))
+  (let [transform #(select-keys % [:name, :library, :type, :description])]
+  (load-entries (partial map transform) save-data-type<!)))
 
 
 (defn load-data

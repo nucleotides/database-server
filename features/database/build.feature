@@ -3,7 +3,7 @@ Feature: Migrating and loading input data for the database
   Scenario: Building the database
     Given an empty database without any tables
     And a directory "data"
-    And a file named "data/data_type.yml" with:
+    And a file named "data/data.yml" with:
       """
       ---
       - name: jgi_isolate_2x150

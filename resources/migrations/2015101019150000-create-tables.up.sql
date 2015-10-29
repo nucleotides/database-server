@@ -20,20 +20,23 @@ CREATE TABLE data_type(
   id		serial 		PRIMARY KEY,
   added		timestamp	NOT NULL DEFAULT current_timestamp,
   name		text		UNIQUE NOT NULL,
-  protocol	text		NOT NULL,
-  source	text		NOT NULL
+  library	text		NOT NULL,
+  description	text		NOT NULL,
+  type		text		NOT NULL
 );
 --;;
 CREATE TABLE data_instance(
   id		serial		PRIMARY KEY,
   added		timestamp	NOT NULL DEFAULT current_timestamp,
   data_type_id	integer		NOT NULL REFERENCES data_type(id),
+  entry_id	integer         NOT NULL,
   replicate	integer 	NOT NULL,
+  reads		integer		NOT NULL,
   input_url	text 		NOT NULL,
   reference_url	text 		NOT NULL,
   input_md5	integer 	NOT NULL,
   reference_md5	integer 	NOT NULL,
-  CONSTRAINT data_replicates UNIQUE(data_type_id, replicate)
+  CONSTRAINT data_replicates UNIQUE(data_type_id, entry_id, replicate)
 );
 --;;
 CREATE TABLE benchmark_type(
