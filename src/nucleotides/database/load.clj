@@ -32,9 +32,15 @@
   (load-entries (partial map transform) save-data-type<!)))
 
 
+(def data-instances
+  "Load data entries into the database"
+  (load-entries unfold-data-replicates identity))
+;save-data-instance<!
+
+
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
   (do
     (image-types connection (:image data))
-    (data-types connection  (:data_type data))))
+    (data-types  connection (:data  data))))

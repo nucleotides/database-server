@@ -14,14 +14,15 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
+(defn load-data-file [directory file]
+  (->> (str (name file) ".yml")
+       (io/file directory)
+       (slurp)
+       (yaml/parse-string)))
+
 (defn load-data-files [directory]
-  (let [file-names [:image :data_type]
-        f          (fn [file]
-                     (->> (str (name file) ".yml")
-                          (io/file directory)
-                          (slurp)
-                          (yaml/parse-string)))]
-        (zipmap file-names (map f file-names))))
+  (let [file-names [:image :data]]
+    (zipmap file-names (map (partial load-data-file directory) file-names))))
 
 (defn migrate [directory]
   (let [data (load-data-files directory)

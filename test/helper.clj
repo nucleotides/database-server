@@ -28,3 +28,7 @@
 
 (def test-data-directory
   (.getCanonicalPath (clojure.java.io/file "test/data")))
+
+(def fetch-test-data
+  (partial build/load-data-file test-data-directory))
+
