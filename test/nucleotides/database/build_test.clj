@@ -14,5 +14,6 @@
 (deftest build
   (testing "-main"
     (build/migrate help/test-data-directory)
+    (is (= 1 (count (help/image-types))))
     (is (= 1 (count (help/data-types))))
-    (is (= 1 (count (help/image-types))))))
+    (is (= 3 (count (help/data-instances))))))

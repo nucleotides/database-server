@@ -1,10 +1,35 @@
 (ns nucleotides.database.load
   (:require
-    [clojure.set  :as    st]
-    [yesql.core   :refer [defqueries]]
+    [clojure.set              :as st]
+    [com.rpl.specter          :refer :all]
+    [yesql.core               :refer [defqueries]]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
+
+(defn unfold-data-replicates [entries]
+  (let [select-fields (partial select
+                               [ALL (collect-one :type)
+                                    (keypath :entries)
+                                ALL (collect-one :reference)
+                                    (collect-one :reads)
+                                    (collect-one :entry_id)
+                                    (keypath :replicates)])]
+    (mapcat
+      (fn [[data-type reference reads entry-id replicates]]
+        (let [entry-data {:reference_url (:url    reference)
+                          :reference_md5 (:md5sum reference)
+                          :data_type      data-type
+                          :reads reads
+                          :entry_id entry-id}]
+          (map-indexed
+            (fn [idx rep]
+              (-> (st/rename-keys rep {:md5sum :input_md5 :url :input_url})
+                  (assoc :replicate (inc idx))
+                  (merge entry-data)))
+            replicates)))
+      (select-fields entries))))
+
 
 (defn- load-entries
   "Creates a function that transforms and saves data with a given
@@ -34,13 +59,14 @@
 
 (def data-instances
   "Load data entries into the database"
-  (load-entries unfold-data-replicates identity))
-;save-data-instance<!
+  (load-entries unfold-data-replicates save-data-instance<!))
 
 
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
   (do
-    (image-types connection (:image data))
-    (data-types  connection (:data  data))))
+    (image-types     connection (:image data))
+    (data-types      connection (:data  data))
+    (data-instances  connection (:data  data))))
+

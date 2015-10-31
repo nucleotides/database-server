@@ -34,8 +34,8 @@ CREATE TABLE data_instance(
   reads		integer		NOT NULL,
   input_url	text 		NOT NULL,
   reference_url	text 		NOT NULL,
-  input_md5	integer 	NOT NULL,
-  reference_md5	integer 	NOT NULL,
+  input_md5	text 		NOT NULL,
+  reference_md5	text 		NOT NULL,
   CONSTRAINT data_replicates UNIQUE(data_type_id, entry_id, replicate)
 );
 --;;
