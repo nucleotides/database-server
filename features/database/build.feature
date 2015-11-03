@@ -7,7 +7,7 @@ Feature: Migrating and loading input data for the database
       """
       ---
       - name: jgi_isolate_2x150
-        library_protocol: Illumina 2x150 paired reads
+        library: Illumina 2x150 paired reads
         type: short_read_isolate
         description: Verbose description
         entries:
@@ -62,10 +62,10 @@ Feature: Migrating and loading input data for the database
       | name                 | description                                         |
       | short_read_assembler | Assembles paired Illumina short reads into contigs. |
     And the table "data_type" should have the entries:
-      | name              | protocol                    | type              | description        |
-      | jgi_isolate_2x150 | Illumina 2x150 paired reads | microbial_isolate | Verbose descripton |
+      | name              | library                     | type               | description         |
+      | jgi_isolate_2x150 | Illumina 2x150 paired reads | short_read_isolate | Verbose description |
     And the table "data_instance" should have the entries:
       | entry_id | replicate | input_md5 | input_url  | reference_md5 | reference_url | reads   |
       | 1        | 1         | eaa53     | s3://url_1 | hexad         | s3://url_3    | 2000000 |
       | 1        | 2         | f01d2     | s3://url_2 | hexad         | s3://url_3    | 2000000 |
-      | 2        | 1         | 42325     | s3://url_3 | hexad         | s3://url_5    | 2000000 |
+      | 2        | 1         | 42325     | s3://url_4 | hexad         | s3://url_5    | 2000000 |

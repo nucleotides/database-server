@@ -1,4 +1,6 @@
 require 'pg'
+require 'awesome_print'
+require 'diffy'
 
 PARAMS = {
   user:      "POSTGRES_USER",
@@ -37,7 +39,10 @@ Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
       end
     end
     if matching.empty?
-      fail("The table '#{name}' should include the entry #{test_row.inspect} instead contains:\n#{entries}")
+      row   = test_row.awesome_inspect
+      table = entries.map(&:awesome_inspect).join("\n")
+      diff  = Diffy::Diff.new(row, table)
+      fail("The table '#{name}' should include the entry:\n#{row}\n\nDiff:\n\n#{diff}")
     end
   end
 end
