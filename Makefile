@@ -68,10 +68,10 @@ feature: Gemfile.lock .api_container
 	@$(params) bundle exec cucumber $(ARGS) --require features
 
 test:
-	@$(params) lein trampoline test $(ARGS)
+	@$(params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 autotest:
-	@$(params) lein prism
+	@$(params) lein prism 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 .api_container: .api_image $(credentials)
 	@docker run \

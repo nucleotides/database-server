@@ -1,7 +1,12 @@
 (ns helper
-  (:require [taoensso.timbre                 :as log]
-            [clojure.java.jdbc               :as sql]
+  (:require [clojure.java.jdbc               :as sql]
+            [taoensso.timbre                 :as log]
+            [migratus.core                   :as mg]
+            [yesql.core                      :refer [defqueries]]
+            [nucleotides.database.build      :as build]
             [nucleotides.database.connection :as con]))
+
+(defqueries "queryfile.sql" {:connection (con/create-connection)})
 
 (defn silence-logging! []
   (log/set-config! [:appenders :standard-out :enabled? false]))
@@ -11,9 +16,19 @@
     (with-open [s (.createStatement (:connection conn))]
       (.executeUpdate s command))))
 
-(defn refresh-testing-database [database-name]
-  (fn [f]
-    (do
-      (exec-db-command (str "drop database if exists " database-name))
-      (exec-db-command (str "create database " database-name))
-      (f))))
+(defn drop-tables []
+  (do
+    (exec-db-command "drop schema public cascade;")
+    (exec-db-command "create schema public;")))
+
+(defn empty-database []
+  (do
+    (drop-tables)
+    (mg/migrate (build/create-migratus-spec (con/create-connection)))))
+
+(def test-data-directory
+  (.getCanonicalPath (clojure.java.io/file "test/data")))
+
+(def fetch-test-data
+  (partial build/load-data-file test-data-directory))
+

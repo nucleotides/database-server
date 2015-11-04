@@ -1,8 +1,12 @@
 (ns nucleotides.database.build
   (:gen-class)
   (:require
-    [nucleotides.database.connection :as con]
-    [migratus.core                   :as mg]))
+    [clojure.java.io                 :as io]
+    [migratus.core                   :as mg]
+    [clj-yaml.core                   :as yaml]
+    [nucleotides.util                :as util]
+    [nucleotides.database.load       :as loader]
+    [nucleotides.database.connection :as con]))
 
 (defn create-migratus-spec [sql-params]
   {:store                :database
@@ -10,10 +14,22 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
-(defn migrate [connection]
-  (mg/migrate (create-migratus-spec connection)))
+(defn load-data-file [directory file]
+  (->> (str (name file) ".yml")
+       (io/file directory)
+       (slurp)
+       (yaml/parse-string)))
+
+(defn load-data-files [directory]
+  (let [file-names [:image :data :benchmark_type]]
+    (zipmap file-names (map (partial load-data-file directory) file-names))))
+
+(defn migrate [directory]
+  (let [data (load-data-files directory)
+        con  (con/create-connection)]
+    (mg/migrate (create-migratus-spec con))
+    (loader/load-data con data)))
 
 (defn -main [& args]
-  (do
-    (migrate (con/create-connection))  
-    (System/exit 0)))
+  (migrate (first args))
+  (System/exit 0))

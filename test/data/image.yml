@@ -1,0 +1,16 @@
+---
+- image_type: short_read_assembler
+  description: |
+    Assembles paired Illumina short reads into contigs.
+  image_instances:
+    - image: bioboxes/velvet
+      tasks:
+        - default
+        - careful
+- image_type: short_read_preprocessor
+  description: |
+    Performs filtering or editting of FASTQ reads and returns a subset or changed set of reads.
+  image_instances:
+    - image: bioboxes/my-filterer
+      tasks:
+        - default

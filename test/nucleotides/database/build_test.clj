@@ -1,21 +1,20 @@
 (ns nucleotides.database.build-test
   (:require [clojure.test :refer :all]
+            [clojure.java.jdbc               :as db]
+            [yesql.core                      :refer [defqueries]]
             [helper                          :as help]
             [nucleotides.database.build      :as build]
             [nucleotides.database.connection :as con]
-            [nucleotides.util                :as util]
-            ))
+            [nucleotides.util                :as util]))
 
 (help/silence-logging!)
 
-(def database-name "clojure_test_db")
-
-(use-fixtures
-  :each (help/refresh-testing-database database-name))
+(use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
 (deftest build
-  (let [db-vars      (util/fetch-variables! con/env-var-names)
-        test-db-vars (assoc db-vars :db database-name)
-        conn         (con/sql-params test-db-vars)]
-  (testing "#migrate"
-    (is (not ('thrown? org.postgresql.util.PSQLException (build/migrate conn)))))))
+  (testing "-main"
+    (build/migrate help/test-data-directory)
+    (is (= 2 (count (help/image-types))))
+    (is (= 1 (count (help/data-types))))
+    (is (= 3 (count (help/data-instances))))
+    (is (= 2 (count (help/benchmark-types))))))

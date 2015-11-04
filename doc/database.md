@@ -14,7 +14,10 @@ Tables used the store the docker images instances used in benchmarking
 
 Categorises the different kinds of images used for benchmarking.
 
-  * **description** - VARCHAR. Examples are "short_read_assembler".
+  * **name** - TEXT. Examples are "short_read_assembler". This field is unique
+    as there should not be duplicated types.
+
+  * **description** - TEXT. A more detailed description of the image type.
 
 ### image_task
 
@@ -29,10 +32,18 @@ Lists the available tasks for available Docker images.
     "default".
 
   * **sha256** - INT. The SHA256 digest of the Docker image file system layers,
-    used to differentiate between builds of the same image.
+    used to differentiate between difference versions images with the same
+    name.
 
   * **active** - BOOLEAN. States whether the image should still be benchmarked.
-    A false value indicates the image is deprecated.
+    A false value indicates the image is deprecated. An image may be deprecated
+    because it is no longer support, or more likely because a new version is
+    created. Differences in versions of images with the same name are
+    identified by sha256 field.
+
+There is table constraint that combinations of image_type_id, name, task,
+sha256 should be unique. This ensures there are no duplicated Docker image
+tasks.
 
 ## Sequencing Data
 
