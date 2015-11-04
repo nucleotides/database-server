@@ -21,7 +21,7 @@
        (yaml/parse-string)))
 
 (defn load-data-files [directory]
-  (let [file-names [:image :data]]
+  (let [file-names [:image :data :benchmark_type]]
     (zipmap file-names (map (partial load-data-file directory) file-names))))
 
 (defn migrate [directory]

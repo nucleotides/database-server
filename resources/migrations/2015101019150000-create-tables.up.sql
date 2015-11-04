@@ -42,6 +42,7 @@ CREATE TABLE data_instance(
 CREATE TABLE benchmark_type(
   id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
+  name		text		UNIQUE NOT NULL,
   data_type_id	integer		NOT NULL REFERENCES data_type(id),
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
   CONSTRAINT data_image UNIQUE(data_type_id, image_type_id)

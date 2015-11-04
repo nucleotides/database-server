@@ -1,0 +1,7 @@
+---
+- name: short_read_isolate_assembly
+  data_type: short_read_isolate
+  image_type: short_read_assembler
+- name: short_read_isolate_preprocessing
+  data_type: short_read_isolate
+  image_type: short_read_preprocessor

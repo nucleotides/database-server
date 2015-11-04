@@ -32,3 +32,10 @@ VALUES ((SELECT id FROM data_type WHERE type = :data_type),
 	:reference_url,
 	:input_md5,
 	:reference_md5);
+
+-- name: save-benchmark-type<!
+-- Creates a new benchmark type entry
+INSERT INTO benchmark_type (data_type_id, image_type_id, name)
+VALUES ((SELECT id FROM data_type  WHERE type = :data_type),
+        (SELECT id FROM image_type WHERE name = :image_type),
+	:name);
