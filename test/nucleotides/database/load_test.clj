@@ -22,6 +22,12 @@
         entries  (help/image-types)]
     (is (= 2 (count entries)))))
 
+(deftest load-image-tasks
+  (let [_        (run-loader ld/image-types :image)
+        _        (run-loader ld/image-tasks :image)
+        entries  (help/image-tasks)]
+    (is (= 4 (count entries)))))
+
 (deftest load-data-types
   (let [_        (run-loader ld/data-types :data)
         entries  (help/data-types)]
