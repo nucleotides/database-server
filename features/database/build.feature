@@ -37,7 +37,8 @@ Feature: Migrating and loading input data for the database
         description: |
           Assembles paired Illumina short reads into contigs.
         image_instances:
-          - image: bioboxes/velvet
+          - name: bioboxes/velvet
+            sha256: digest_1
             tasks:
               - default
               - careful
@@ -45,7 +46,8 @@ Feature: Migrating and loading input data for the database
         description: |
           Performs filtering or editting of FASTQ reads and returns a subset or changed set of reads.
         image_instances:
-          - image: bioboxes/my-filterer
+          - name: bioboxes/my-filterer
+            sha256: digest_2
             tasks:
               - default
       """
@@ -74,6 +76,11 @@ Feature: Migrating and loading input data for the database
       | name                    | description                                                                                 |
       | short_read_assembler    | Assembles paired Illumina short reads into contigs.                                         |
       | short_read_preprocessor | Performs filtering or editting of FASTQ reads and returns a subset or changed set of reads. |
+    And the table "image_task" should have the entries:
+      | name                 | task    | sha256   | active |
+      | bioboxes/velvet      | default | digest_1 | t      |
+      | bioboxes/velvet      | careful | digest_1 | t      |
+      | bioboxes/my-filterer | default | digest_2 | t      |
     And the table "benchmark_type" should have the entries:
       | name                             |
       | short_read_isolate_assembly      |

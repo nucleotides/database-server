@@ -6,7 +6,8 @@ VALUES (:name, :description);
 -- name: save-image-task<!
 -- Creates a new image task entry
 INSERT INTO image_task (image_type_id, name, task, sha256, active)
-VALUES (:image_type_id, :name, :task, :sha256, :active);
+VALUES ((SELECT id FROM image_type WHERE name = :image_type),
+	:name, :task, :sha256, true);
 
 -- name: save-data-type<!
 -- Creates a new data type entry

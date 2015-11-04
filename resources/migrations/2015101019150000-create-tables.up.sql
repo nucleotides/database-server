@@ -11,7 +11,7 @@ CREATE TABLE image_task(
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
   name		text	        NOT NULL,
   task		text 		NOT NULL,
-  sha256	integer 	NOT NULL,
+  sha256	text 		NOT NULL,
   active	bool 		NOT NULL,
   CONSTRAINT image UNIQUE(image_type_id, name, task, sha256)
 );

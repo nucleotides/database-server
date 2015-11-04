@@ -50,12 +50,21 @@
                                   (st/rename-keys {:image_type :name})))]
     (load-entries (partial map transform) save-image-type<!)))
 
+(def image-tasks
+  "Select the image tasks and load into the database"
+  (let [transform
+        (partial select [ALL (collect-one :image_type) (keypath :image_instances)
+                         ALL (collect-one :name) (collect-one :sha256) (keypath :tasks)
+                         ALL])
+        zip      (partial map (partial zipmap [:image_type :name :sha256 :task]))]
+    (load-entries (fn [entries] (zip (transform entries))) save-image-task<!)))
+
+
 
 (def data-types
   "Load data types into the database"
   (let [transform #(select-keys % [:name, :library, :type, :description])]
   (load-entries (partial map transform) save-data-type<!)))
-
 
 (def data-instances
   "Load data entries into the database"
@@ -71,6 +80,7 @@
   [connection data]
   (do
     (image-types      connection (:image data))
+    (image-tasks      connection (:image data))
     (data-types       connection (:data  data))
     (data-instances   connection (:data  data))
     (benchmark-types  connection (:benchmark_type  data))))

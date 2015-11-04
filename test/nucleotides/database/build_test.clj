@@ -15,6 +15,7 @@
   (testing "-main"
     (build/migrate help/test-data-directory)
     (is (= 2 (count (help/image-types))))
+    (is (= 4 (count (help/image-tasks))))
     (is (= 1 (count (help/data-types))))
     (is (= 3 (count (help/data-instances))))
     (is (= 2 (count (help/benchmark-types))))))
