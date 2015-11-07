@@ -51,6 +51,7 @@ CREATE TABLE benchmark_type(
 CREATE TABLE benchmark_instance(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
+  external_id		varchar(64)	NOT NULL UNIQUE,
   benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
   image_task_id		integer		NOT NULL REFERENCES image_task(id),
   data_instance_id	integer         NOT NULL REFERENCES data_instance(id),
