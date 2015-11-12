@@ -15,11 +15,11 @@
   [[:image-type     2]
    [:image-task     4]
    [:data-type      1]
-   [:data-instance  4] ;3
+   [:data-instance  3]
    [:benchmark-type 2]])
 
 (deftest migrate
   (testing "-main"
     (migrate/migrate help/test-data-directory)
-    (for [[table-name length] expected-lengths]
-      (is (= length (help/table-length table-name))))))
+    (doall (for [[table-name length] expected-lengths]
+             (is (= length (help/table-length table-name)))))))
