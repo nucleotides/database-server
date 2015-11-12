@@ -1,12 +1,10 @@
 (ns helper
   (:require [clojure.java.jdbc               :as sql]
+            [clojure.string                  :as string]
             [taoensso.timbre                 :as log]
             [migratus.core                   :as mg]
-            [yesql.core                      :refer [defqueries]]
-            [nucleotides.database.build      :as build]
+            [nucleotides.database.migrate    :as build]
             [nucleotides.database.connection :as con]))
-
-(defqueries "queryfile.sql" {:connection (con/create-connection)})
 
 (defn silence-logging! []
   (log/set-config! [:appenders :standard-out :enabled? false]))
@@ -25,6 +23,16 @@
   (do
     (drop-tables)
     (mg/migrate (build/create-migratus-spec (con/create-connection)))))
+
+(defn table-entries [table-name]
+  (let [con            (con/create-connection)
+        formatted-name (-> (str table-name)
+                           (string/replace  "-" "_")
+                           (string/replace  ":" ""))]
+    (sql/query con (apply str "select * from " formatted-name))))
+
+(def table-length
+  (comp count table-entries))
 
 (def test-data-directory
   (.getCanonicalPath (clojure.java.io/file "test/data")))

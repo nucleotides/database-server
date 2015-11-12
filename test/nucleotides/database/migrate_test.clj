@@ -1,9 +1,9 @@
-(ns nucleotides.database.build-test
+(ns nucleotides.database.migrate-test
   (:require [clojure.test :refer :all]
             [clojure.java.jdbc               :as db]
             [yesql.core                      :refer [defqueries]]
             [helper                          :as help]
-            [nucleotides.database.build      :as build]
+            [nucleotides.database.migrate    :as migrate]
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
@@ -11,11 +11,15 @@
 
 (use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
-(deftest build
+(def expected-lengths
+  [[:image-type     2]
+   [:image-task     4]
+   [:data-type      1]
+   [:data-instance  4] ;3
+   [:benchmark-type 2]])
+
+(deftest migrate
   (testing "-main"
-    (build/migrate help/test-data-directory)
-    (is (= 2 (count (help/image-types))))
-    (is (= 4 (count (help/image-tasks))))
-    (is (= 1 (count (help/data-types))))
-    (is (= 3 (count (help/data-instances))))
-    (is (= 2 (count (help/benchmark-types))))))
+    (migrate/migrate help/test-data-directory)
+    (for [[table-name length] expected-lengths]
+      (is (= length (help/table-length table-name))))))
