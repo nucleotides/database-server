@@ -50,7 +50,7 @@ CREATE TABLE benchmark_type(
 --;;
 CREATE MATERIALIZED VIEW benchmark_instance AS
 SELECT
-  md5('nucleotid.es' || bt.id || di.id || it.id) AS id,
+  md5(bt.id || "-" || di.id || "-" || it.id) AS id,
   bt.id AS benchmark_type_id,
   di.id AS data_instance_id,
   it.id AS image_task_id,
