@@ -1,4 +1,4 @@
-(ns nucleotides.database.build
+(ns nucleotides.database.migrate
   (:gen-class)
   (:require
     [clojure.java.io                 :as io]

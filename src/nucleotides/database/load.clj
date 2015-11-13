@@ -1,6 +1,7 @@
 (ns nucleotides.database.load
   (:require
     [clojure.set              :as st]
+    [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
     [nucleotides.database.connection :as con]))
@@ -74,6 +75,9 @@
   "Load benchmark types into the database"
   (load-entries save-benchmark-type<!))
 
+(defn rebuild-benchmark-instance [connection]
+  (sql/execute! connection ["REFRESH MATERIALIZED VIEW benchmark_instance;"])
+  (sql/execute! connection ["REINDEX TABLE benchmark_instance;"]))
 
 (defn load-data
   "Load and update benchmark data in the database"
@@ -83,5 +87,6 @@
     (image-tasks      connection (:image data))
     (data-types       connection (:data  data))
     (data-instances   connection (:data  data))
-    (benchmark-types  connection (:benchmark_type  data))))
+    (benchmark-types  connection (:benchmark_type  data))
+    (rebuild-benchmark-instance connection)))
 

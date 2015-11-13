@@ -48,14 +48,23 @@ CREATE TABLE benchmark_type(
   CONSTRAINT data_image UNIQUE(data_type_id, image_type_id)
 );
 --;;
-CREATE TABLE benchmark_instance(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	DEFAULT current_timestamp,
-  benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
-  image_task_id		integer		NOT NULL REFERENCES image_task(id),
-  data_instance_id	integer         NOT NULL REFERENCES data_instance(id),
-  CONSTRAINT benchmark_image_data UNIQUE(benchmark_type_id, image_task_id, data_instance_id)
-);
+CREATE MATERIALIZED VIEW benchmark_instance AS
+SELECT
+  md5(bt.id || '-' || di.id || '-' || it.id) AS id,
+  bt.id AS benchmark_type_id,
+  di.id AS data_instance_id,
+  it.id AS image_task_id,
+  bt.data_type_id,
+  bt.image_type_id
+FROM benchmark_type     AS bt
+LEFT JOIN data_instance AS di ON bt.data_type_id  = di.data_type_id
+LEFT JOIN image_task    AS it ON it.image_type_id = bt.image_type_id;
+--;;
+CREATE UNIQUE INDEX primary_key   ON benchmark_instance (id);
+--;;
+CREATE INDEX data_instance_id_idx ON benchmark_instance (data_instance_id);
+--;;
+CREATE INDEX image_task_id_idx    ON benchmark_instance (image_task_id);
 --;;
 CREATE TABLE benchmark_event_status(
   id			serial		PRIMARY KEY,
@@ -67,9 +76,11 @@ CREATE TABLE benchmark_event_status(
 CREATE TABLE benchmark_event(
   id				serial		PRIMARY KEY,
   created_at			timestamp	DEFAULT current_timestamp,
-  benchmark_instance_id		integer		NOT NULL REFERENCES benchmark_instance(id),
+  benchmark_instance_id		integer		NOT NULL,
   benchmark_event_status_id	integer		NOT NULL REFERENCES benchmark_event_status(id)
 );
+--;;
+CREATE INDEX benchmark_instance_id_idx ON benchmark_event (benchmark_instance_id);
 --;;
 CREATE TABLE metric_type(
   id		serial		PRIMARY KEY,
