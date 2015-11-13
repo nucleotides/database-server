@@ -12,11 +12,12 @@
 (use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
 (def expected-lengths
-  [[:image-type     2]
-   [:image-task     4]
-   [:data-type      1]
-   [:data-instance  3]
-   [:benchmark-type 2]])
+  [[:image-type         2]
+   [:image-task         4]
+   [:data-type          1]
+   [:data-instance      3]
+   [:benchmark-type     2]
+   [:benchmark-instance 12]])
 
 (deftest migrate
   (testing "-main"
