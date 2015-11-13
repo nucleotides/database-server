@@ -86,5 +86,6 @@ Feature: Migrating and loading input data for the database
       | short_read_isolate_assembly      |
       | short_read_isolate_preprocessing |
     And the table "benchmark_instance" should have the entries:
-      | image_task_id                                     | data_instance_id                      | benchmark_type_id                                  |
-      | $image_task?name='bioboxes/velvet'&task='careful' | $data_instance?entry_id=2&replicate=1 | $benchmark_type?name='short_read_isolate_assembly' |
+      | image_task_id                                          | data_instance_id                      | benchmark_type_id                                       |
+      | $image_task?name='bioboxes/velvet'&task='careful'      | $data_instance?entry_id=2&replicate=1 | $benchmark_type?name='short_read_isolate_assembly'      |
+      | $image_task?name='bioboxes/my-filterer'&task='default' | $data_instance?entry_id=1&replicate=1 | $benchmark_type?name='short_read_isolate_preprocessing' |

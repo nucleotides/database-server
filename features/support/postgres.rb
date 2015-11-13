@@ -32,5 +32,5 @@ def entry_lookup(entry)
   elsif result.length < 1
     raise "The query \"#{query}\" returned no IDs"
   end
-  result.first.first.to_i
+  result.first.first
 end
