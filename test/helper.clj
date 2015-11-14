@@ -1,5 +1,4 @@
-(ns helper
-  (:require [clojure.java.jdbc               :as sql]
+(ns helper (:require [clojure.java.jdbc               :as sql]
             [clojure.string                  :as string]
             [taoensso.timbre                 :as log]
             [migratus.core                   :as mg]
@@ -40,3 +39,5 @@
 (def fetch-test-data
   (partial build/load-data-file test-data-directory))
 
+(defn load-fixture [x]
+  (do (empty-database)))

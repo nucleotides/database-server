@@ -40,3 +40,7 @@ INSERT INTO benchmark_type (data_type_id, image_type_id, name)
 VALUES ((SELECT id FROM data_type  WHERE type = :data_type),
         (SELECT id FROM image_type WHERE name = :image_type),
 	:name);
+
+-- name: benchmark-instances
+-- Get all benchmark entries
+SELECT * FROM benchmark_instance;
