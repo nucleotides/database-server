@@ -64,6 +64,10 @@ autotest:
 	@docker run \
 	  --publish=80:80 \
 	  --detach=true \
+	  --env="$(db_host)" \
+	  --env="$(db_user)" \
+	  --env="$(db_pass)" \
+	  --env="$(db_name)" \
 	  $(name) > $@
 
 kill:
