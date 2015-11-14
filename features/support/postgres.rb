@@ -34,3 +34,20 @@ def entry_lookup(entry)
   end
   result.first.first
 end
+
+def execute_sql_file(path)
+  db.exec(File.read(path))
+end
+
+def drop_all_tables
+  db.exec("drop schema public cascade;")
+  db.exec("create schema public;")
+end
+
+def create_tables
+  execute_sql_file('resources/migrations/2015101019150000-create-tables.up.sql')
+end
+
+def execute_sql_fixture(fixture_name)
+  execute_sql_file("test/fixtures/#{fixture_name}.sql")
+end

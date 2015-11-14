@@ -3,8 +3,18 @@ require 'awesome_print'
 require 'diffy'
 
 Given(/^an empty database without any tables$/) do
-  db.exec("drop schema public cascade;")
-  db.exec("create schema public;")
+  drop_all_tables
+end
+
+Given(/^a clean database$/) do
+  drop_all_tables
+  create_tables
+end
+
+Given(/^the database scenario with "(.*?)"$/) do |scenario_name|
+  drop_all_tables
+  create_tables
+  execute_sql_fixture(scenario_name.gsub(" ", "_"))
 end
 
 Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
