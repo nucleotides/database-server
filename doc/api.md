@@ -31,10 +31,6 @@ http://api.nucleotides/0.2/benchmarks/show.json
 			"url" : "s3://",
 			"md5" : "ad545..."
 		},
-		"reference"               : {
-			"url" : "s3://",
-			"md5" : "ad545..."
-		},
 		"benchmark_type"      : "short_read_isolate",
 		"status"              : "incomplete"
 	}
