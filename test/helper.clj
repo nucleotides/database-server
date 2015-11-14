@@ -1,4 +1,5 @@
-(ns helper (:require [clojure.java.jdbc               :as sql]
+(ns helper
+  (:require [clojure.java.jdbc               :as sql]
             [clojure.string                  :as string]
             [taoensso.timbre                 :as log]
             [migratus.core                   :as mg]
@@ -11,7 +12,7 @@
 (defn exec-db-command [command]
   (sql/with-db-connection [conn (con/create-connection)]
     (with-open [s (.createStatement (:connection conn))]
-      (.executeUpdate s command))))
+      (.execute s command))))
 
 (defn drop-tables []
   (do
@@ -40,4 +41,5 @@
   (partial build/load-data-file test-data-directory))
 
 (defn load-fixture [x]
-  (do (empty-database)))
+  (do (empty-database)
+      (exec-db-command (slurp (str "test/fixtures/" x ".sql")))))
