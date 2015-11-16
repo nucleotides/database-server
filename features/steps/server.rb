@@ -44,7 +44,8 @@ Then(/^the returned JSON should contain the entries:$/) do |table|
     end
     if matching.empty?
       row   = test_row.awesome_inspect
-      table = @document.map(&:awesome_inspect).join("\n")
+      table = @document.map(&:sorted_awesome_inspect).join("\n")
+
       diff  = Diffy::Diff.new(row, table)
       fail("The document should include the entry:\n#{row}\n\nDiff:\n\n#{diff}")
     end

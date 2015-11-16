@@ -32,8 +32,8 @@ Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
       end
     end
     if matching.empty?
-      row   = test_row.awesome_inspect
-      table = entries.map(&:awesome_inspect).join("\n")
+      row   = test_row.sorted_awesome_inspect
+      table = entries.map(&:sorted_awesome_inspect).join("\n")
       diff  = Diffy::Diff.new(row, table)
       fail("The table '#{name}' should include the entry:\n#{row}\n\nDiff:\n\n#{diff}")
     end

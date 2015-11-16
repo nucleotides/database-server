@@ -6,7 +6,7 @@ Feature: Getting and posting benchmarks to the API
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the returned JSON should contain the entries:
-      | image.name | image.sha256 | image.task | input.url | input.md5 | complete |
+      | image_name | image_sha256 | image_task | input_url | input_md5 | complete |
       | image      | 123456       | default    | s3://url  | 123456    | false    |
 
   Scenario: Getting a single benchmark from the API
@@ -15,7 +15,7 @@ Feature: Getting and posting benchmarks to the API
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the returned JSON should contain the entries:
-      | image.name | image.sha256 | image.task | input.url | input.md5 | complete |
+      | image_name | image_sha256 | image_task | input_url | input_md5 | complete |
       | image      | 123456       | default    | s3://url  | 123456    | false    |
 
   Scenario: Getting a single benchmark from the API
