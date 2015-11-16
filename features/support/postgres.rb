@@ -36,6 +36,7 @@ def entry_lookup(entry)
 end
 
 def execute_sql_file(path)
+  fail("Fixture does not exist - #{path}") unless File.exists? path
   db.exec(File.read(path))
 end
 
