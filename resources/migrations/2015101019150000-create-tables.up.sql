@@ -66,18 +66,16 @@ CREATE INDEX data_instance_id_idx ON benchmark_instance (data_instance_id);
 --;;
 CREATE INDEX image_task_id_idx    ON benchmark_instance (image_task_id);
 --;;
-CREATE TABLE benchmark_event_status(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	NOT NULL DEFAULT current_timestamp,
-  name			varchar(80)	UNIQUE NOT NULL,
-  description		text 		NOT NULL
-);
+CREATE TYPE benchmark_event_type AS ENUM ('product', 'evaluation');
 --;;
 CREATE TABLE benchmark_event(
-  id				serial		PRIMARY KEY,
-  created_at			timestamp	DEFAULT current_timestamp,
-  benchmark_instance_id		integer		NOT NULL,
-  benchmark_event_status_id	integer		NOT NULL REFERENCES benchmark_event_status(id)
+  id				serial			PRIMARY KEY,
+  created_at			timestamp		DEFAULT current_timestamp,
+  benchmark_instance_id		text			NOT NULL,
+  benchmark_file		text			NOT NULL,
+  log_file			text			NOT NULL,
+  event_type			benchmark_event_type	NOT NULL,
+  success			boolean			NOT NULL
 );
 --;;
 CREATE INDEX benchmark_instance_id_idx ON benchmark_event (benchmark_instance_id);
