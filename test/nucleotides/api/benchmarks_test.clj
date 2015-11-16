@@ -26,14 +26,6 @@
             {:keys [status body]} (show)]
         (is (= 200 status))
         (is (= 1 (count (json/read-str body))))
-
-        (let [entry (first-entry-in-response body)]
-          (is (contains? entry :id))
-          (is (contains? entry :image))
-          (is (= (entry :image)
-                 {:name "image" :task "default" :sha256 "123456"}))
-          (is (contains? entry :image))
-          (is (= (entry :input)
-                 {:url "s3://url" :md5 "123456"})))))))
-
-
+        (dorun
+          (for [k [:id :image_task :image_name :image_sha256 :input_url :input_md5]]
+            (is (contains? (first-entry-in-response body) k))))))))

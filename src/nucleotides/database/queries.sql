@@ -44,7 +44,12 @@ VALUES ((SELECT id FROM data_type  WHERE type = :data_type),
 -- name: benchmark-instances
 -- Get all benchmark entries
 SELECT
-bi.id AS id, task, name, sha256, input_url as url, input_md5 as md5
+bi.id  AS id,
+task   AS image_task,
+name   AS image_name,
+sha256 AS image_sha256,
+input_url,
+input_md5
 FROM benchmark_instance AS bi
 LEFT JOIN image_task    AS it ON bi.image_task_id    = it.id
 LEFT JOIN data_instance AS di ON bi.data_instance_id = di.id;
