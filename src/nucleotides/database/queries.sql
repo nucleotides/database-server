@@ -40,28 +40,3 @@ INSERT INTO benchmark_type (data_type_id, image_type_id, name)
 VALUES ((SELECT id FROM data_type  WHERE type = :data_type),
         (SELECT id FROM image_type WHERE name = :image_type),
 	:name);
-
--- name: benchmark-instances
--- Get all benchmark entries
-SELECT
-bi.id  AS id,
-task   AS image_task,
-name   AS image_name,
-sha256 AS image_sha256,
-input_url,
-input_md5,
-( SELECT
-  be.created_at
-  FROM benchmark_event AS be
-  WHERE be.benchmark_instance_id = bi.id
-  AND be.success = true
-  AND be.event_type = 'product') IS NOT NULL AS product,
-( SELECT
-  be.created_at
-  FROM benchmark_event AS be
-  WHERE be.benchmark_instance_id = bi.id
-  AND be.success = true
-  AND be.event_type = 'evaluation') IS NOT NULL AS evaluation
-FROM benchmark_instance   AS bi
-LEFT JOIN image_task      AS it ON bi.image_task_id    = it.id
-LEFT JOIN data_instance   AS di ON bi.data_instance_id = di.id;

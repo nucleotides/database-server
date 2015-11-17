@@ -14,7 +14,7 @@ end
 Given(/^the database scenario with "(.*?)"$/) do |scenario_name|
   drop_all_tables
   create_tables
-  execute_sql_fixture(scenario_name.gsub(" ", "_"))
+  execute_sql_fixture(scenario_name.strip.gsub(" ", "_"))
 end
 
 Then(/^the table "(.*?)" should have the entries:$/) do |name, table|

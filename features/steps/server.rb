@@ -53,9 +53,9 @@ Then(/^the returned JSON should contain the entries:$/) do |table|
 end
 
 Then(/^the returned JSON should be empty$/) do
-  expect(@document.length).to eq(0)
+  expect(@document).to be_empty
 end
 
 Then(/^the returned JSON should not be empty$/) do
-  expect(@document.length).to_not eq(0)
+  expect(@document).to_not be_empty
 end

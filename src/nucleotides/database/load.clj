@@ -89,4 +89,3 @@
     (data-instances   connection (:data  data))
     (benchmark-types  connection (:benchmark_type  data))
     (rebuild-benchmark-instance connection)))
-
