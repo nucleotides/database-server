@@ -30,16 +30,16 @@
 
       (let [response (f)]
         (is-ok-response response)
-        (is (not (empty (json/read-str (:body response))))))
+        (is (not (empty? (json/read-str (:body response))))))
 
       (let [response (f "?product=true")]
         (is-ok-response response)
-        (is (not (empty (json/read-str (:body response))))))
+        (is (not (empty? (json/read-str (:body response))))))
 
       (let [response (f "?evaluation=true")]
         (is-ok-response response)
-        (is (not (empty (json/read-str (:body response))))))
+        (is (not (empty? (json/read-str (:body response))))))
 
       (let [response (f "?product=true&evaluation=false")]
         (is-ok-response response)
-        (is (empty (json/read-str (:body response))))))))
+        (is (empty? (json/read-str (:body response))))))))

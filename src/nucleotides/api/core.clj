@@ -6,6 +6,7 @@
             [ring.middleware.params          :refer [wrap-params]]
             [ring.logger.timbre              :refer [wrap-with-logger]]
             [ring.adapter.jetty              :refer [run-jetty]]
+            [ring.middleware.json            :refer [wrap-json-response]]
 
             [nucleotides.database.connection  :as con]
             [nucleotides.api.database         :as db]
@@ -14,6 +15,7 @@
 
 (defn api [database-client]
   (-> (routes (GET "/benchmarks/show.json" [] (partial benchmarks/show database-client)))
+      (wrap-json-response)
       (wrap-with-logger)
       (wrap-keyword-params)
       (wrap-params)))
