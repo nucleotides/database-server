@@ -10,8 +10,6 @@
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
-(help/silence-logging!)
-
 (use-fixtures :each (fn [f] (help/empty-database) (f)))
 
 (defn run-loader [f file]

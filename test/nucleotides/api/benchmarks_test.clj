@@ -7,8 +7,6 @@
             [nucleotides.api.benchmarks       :as bench]
             [helper                           :as help]))
 
-(help/silence-logging!)
-
 (defn show
   ([params] (bench/show (con/create-connection) {:query-params params}))
   ([]       (show {})))

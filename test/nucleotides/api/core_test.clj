@@ -10,7 +10,6 @@
             [nucleotides.api.core             :as app]
             [helper                           :as help]))
 
-(help/silence-logging!)
 
 (defn request
   "Create a mock request to the API"
