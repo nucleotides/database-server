@@ -6,6 +6,8 @@ PARAMS = {
 }
 
 def db
+  return @conn if @conn
+
   params = Hash[PARAMS.map do |k,v|
     [k, ENV[v]]
   end]
@@ -13,6 +15,7 @@ def db
   params[:host] = params[:host].split(':').first.gsub("//","")
 
   @conn ||= PG.connect(params)
+  @conn.exec("set client_min_messages = warning")
   @conn
 end
 
