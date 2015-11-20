@@ -8,7 +8,6 @@ docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
 db_user := POSTGRES_USER=postgres
 db_pass := POSTGRES_PASSWORD=pass
 db_name := POSTGRES_NAME=postgres
-db_host := POSTGRES_HOST=//localhost:5432
 
 ifdef docker_host
        db_host  := POSTGRES_HOST=//$(docker_host):5433
@@ -31,6 +30,7 @@ repl: $(credentials)
 
 irb: $(credentials)
 	@$(params) bundle exec ./script/irb
+
 
 ssh: .rdm_container .api_image $(credentials)
 	@docker run \
@@ -101,7 +101,7 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container
 	  --detach=true \
 	  postgres > $@
 
-.api_image: Dockerfile $(jar)
+.api_image: $(shell find image) $(jar)
 	docker build --tag=$(name) .
 	touch $@
 
