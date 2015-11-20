@@ -6,6 +6,8 @@ PARAMS = {
 }
 
 def db
+  return @conn if @conn
+
   params = Hash[PARAMS.map do |k,v|
     [k, ENV[v]]
   end]
@@ -13,6 +15,7 @@ def db
   params[:host] = params[:host].split(':').first.gsub("//","")
 
   @conn ||= PG.connect(params)
+  @conn.exec("set client_min_messages = warning")
   @conn
 end
 
@@ -33,4 +36,22 @@ def entry_lookup(entry)
     raise "The query \"#{query}\" returned no IDs"
   end
   result.first.first
+end
+
+def execute_sql_file(path)
+  fail("Fixture does not exist - #{path}") unless File.exists? path
+  db.exec(File.read(path))
+end
+
+def drop_all_tables
+  db.exec("drop schema public cascade;")
+  db.exec("create schema public;")
+end
+
+def create_tables
+  execute_sql_file('resources/migrations/2015101019150000-create-tables.up.sql')
+end
+
+def execute_sql_fixture(fixture_name)
+  execute_sql_file("test/fixtures/#{fixture_name}.sql")
 end

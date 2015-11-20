@@ -1,119 +1,45 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
             [compojure.handler  :refer [site]]
+            [clojure.data.json  :as json]
+            [clojure.walk       :as walk]
+            [ring.mock.request  :as mock]
 
-            [helper                    :as help]
-            [clojure.data.json         :as json]
-            [ring.mock.request         :as mock]
-            [cemerick.rummage          :as sdb]
-            [nucleotides.api.database  :as db]
-            [nucleotides.api.core      :as app]))
-
-(help/silence-logging!)
-
-(defn get-docker-host []
-  (re-find #"\d+.\d+.\d+.\d+" (System/getenv "DOCKER_HOST")))
-
-(def domain "dev")
-(def host   (if (System/getenv "CI") "localhost" (get-docker-host)))
-(def client (db/create-client "dummy" "dummy" (str "http://" host ":8081")))
-
-(defn sdb-domain-fixture [f]
-  (do
-    (sdb/create-domain client domain)
-    (f)
-    (sdb/delete-domain client domain)))
+            [nucleotides.database.connection  :as con]
+            [nucleotides.database.load        :as db]
+            [nucleotides.api.core             :as app]
+            [helper                           :as help]))
 
 
-(use-fixtures
-  :once sdb-domain-fixture)
+(defn request
+  "Create a mock request to the API"
+  ([method url params]
+   (let [hnd (site (app/api (con/create-connection)))]
+     (hnd (mock/request method url params))))
+  ([method url]
+   (request method url {})))
 
-(defn request [method url params]
-  (let [hnd (site (app/api client domain))]
-    (hnd (mock/request method url params))))
-
-(def valid-event-map
-  {:benchmark_id        "abcd"
-   :benchmark_type_code "0000"
-   :status_code         "0000"
-   :event_type_code     "0000"})
+(defn is-ok-response [response]
+  (is (= 200 (:status response))))
 
 (deftest app
 
-  (testing "POST /events"
-    (let [f #(request :post "/events/update" %)]
+  (testing "GET /benchmarks/show.json"
+    (let [f (comp (partial request :get) (partial str "/benchmarks/show.json"))
+          _ (help/load-fixture "a_single_benchmark_with_completed_evaluation")]
 
-      (testing "with invalid parameters"
-        (is (= 422 (:status (f {}))))
-        (is (= 422 (:status (f {:benchmark_id "abcd"})))))
+      (let [response (f)]
+        (is-ok-response response)
+        (is (not (empty? (json/read-str (:body response))))))
 
-      (testing "with valid paramters"
-        (let [response (f valid-event-map)]
-          (is (= 202 (:status response)))
-          (is (re-matches #"^\d+$" (:body response)))
-          (is (not (empty? (db/read-event client domain (:body response)))))))
+      (let [response (f "?product=true")]
+        (is-ok-response response)
+        (is (not (empty? (json/read-str (:body response))))))
 
-      (testing "with log file parameters"
-        (let [response (f (merge valid-event-map
-                                 {:log_file_digest "ade5...", :log_file_s3_url "s3://url"}))]
-          (is (= 202 (:status response)))
-          (is (re-matches #"^\d+$" (:body response)))
-          (let [db-entry (db/read-event client domain (:body response))]
-            (is (not (empty? db-entry)))
-            (is (contains? db-entry :log_file_digest))
-            (is (contains? db-entry :log_file_s3_url)))))
+      (let [response (f "?evaluation=true")]
+        (is-ok-response response)
+        (is (not (empty? (json/read-str (:body response))))))
 
-      (testing "with event file parameters"
-        (let [response (f (merge valid-event-map
-                                 {:event_file_digest "ade5...", :event_file_s3_url "s3://url"}))]
-          (is (= 202 (:status response)))
-          (is (re-matches #"^\d+$" (:body response)))
-          (let [db-entry (db/read-event client domain (:body response))]
-            (is (not (empty? db-entry)))
-            (is (contains? db-entry :event_file_digest))
-            (is (contains? db-entry :event_file_s3_url)))))
-
-      (testing "with cgroup file parameters"
-        (let [response (f (merge valid-event-map
-                                 {:cgroup_file_digest "ade5...", :cgroup_file_s3_url "s3://url"}))]
-          (is (= 202 (:status response)))
-          (is (re-matches #"^\d+$" (:body response)))
-          (let [db-entry (db/read-event client domain (:body response))]
-            (is (not (empty? db-entry)))
-            (is (contains? db-entry :cgroup_file_digest))
-            (is (contains? db-entry :cgroup_file_s3_url)))))))
-
-
-
-  (testing "GET /events/show.json"
-    (let [f #(request :get (str "/events/show.json?id=" %1) %2)]
-
-      (testing "with a valid event ID"
-        (let [eid (db/create-event client domain
-                                   (db/create-event-map valid-event-map))]
-          (is (= 200 (:status (f eid {}))))
-          (is (contains? (json/read-str (:body (f eid {}))) "created_at"))
-          (is (contains? (json/read-str (:body (f eid {}))) "benchmark_id"))))))
-
-
-
-  (testing "GET /events/lookup.json"
-    (let [f #(request :get (str "/events/lookup.json?" %) {})]
-
-      (testing "with an benchmark_type_code matching one entry"
-        (let [eid      (db/create-event client domain
-                         (db/create-event-map valid-event-map))
-              response (f "benchmark_type_code=0000")]
-
-          (is (= 200 (:status response)))
-          (is (contains? (->> (:body response) (json/read-str) (first)) "created_at"))
-          (is (contains? (->> (:body response) (json/read-str) (first)) "benchmark_id"))))
-
-      (testing "with two query parameters matching one entry"
-        (let [eid      (db/create-event client domain
-                         (db/create-event-map valid-event-map))
-              response (f "benchmark_type_code=0000&status_code=0000")]
-
-          (is (= 200 (:status response)))
-          (is (contains? (->> (:body response) (json/read-str) (first)) "created_at"))
-          (is (contains? (->> (:body response) (json/read-str) (first)) "benchmark_id")))))))
+      (let [response (f "?product=true&evaluation=false")]
+        (is-ok-response response)
+        (is (empty? (json/read-str (:body response))))))))

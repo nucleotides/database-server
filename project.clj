@@ -19,9 +19,11 @@
                  [org.clojure/clojure        "1.7.0"]
                  [org.clojure/data.json      "0.2.5"]
                  [org.clojure/java.jdbc      "0.4.2"]
+                 [org.clojure/core.match     "0.3.0-alpha4"]
                  [postgresql/postgresql      "9.3-1102.jdbc41"]
                  [ring-logger-timbre         "0.7.4"]
                  [ring/ring-jetty-adapter    "1.3.1"]
+                 [ring/ring-json             "0.4.0"]
                  [yesql                      "0.5.1"]]
 
   :plugins      [[lein-ring "0.9.0"]]

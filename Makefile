@@ -3,31 +3,19 @@ credentials := .aws_credentials
 
 fetch_cred  = $$(./script/get_credential $(credentials) $(1))
 
-access_key := AWS_ACCESS_KEY=$(call fetch_cred,AWS_ACCESS_KEY)
-secret_key := AWS_SECRET_KEY=$(call fetch_cred,AWS_SECRET_KEY)
-endpoint   := AWS_ENDPOINT="https://sdb.us-west-1.amazonaws.com"
-domain     := AWS_SDB_DOMAIN="event-dev"
-
 docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
 
-db_user      := POSTGRES_USER=postgres
-db_pass      := POSTGRES_PASSWORD=pass
-db_name      := POSTGRES_NAME=postgres
+db_user := POSTGRES_USER=postgres
+db_pass := POSTGRES_PASSWORD=pass
+db_name := POSTGRES_NAME=postgres
+
 ifdef docker_host
-	db_host  := POSTGRES_HOST=//$(docker_host):5433
+       db_host  := POSTGRES_HOST=//$(docker_host):5433
 else
-	db_host  := POSTGRES_HOST=//localhost:5433
+       db_host  := POSTGRES_HOST=//localhost:5433
 endif
 
-params := \
-	$(access_key) \
-	$(secret_key) \
-	$(endpoint) \
-	$(domain) \
-	$(db_host) \
-	$(db_user) \
-	$(db_pass) \
-	$(db_name)
+params := $(db_user) $(db_pass) $(db_name) $(db_host)
 
 jar := target/nucleotides-api-0.2.0-standalone.jar
 
@@ -43,15 +31,12 @@ repl: $(credentials)
 irb: $(credentials)
 	@$(params) bundle exec ./script/irb
 
-ssh: .api_image $(credentials)
+
+ssh: .rdm_container .api_image $(credentials)
 	@docker run \
 	  --tty \
 	  --interactive \
-	  --env="$(access_key)" \
-	  --env="$(secret_key)" \
-	  --env="$(domain)" \
-	  --env="$(endpoint)" \
-	  --env="$(db_host)" \
+	  --link $(shell cat $<):postgres \
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
 	  --env="$(db_name)" \
@@ -73,14 +58,14 @@ test:
 autotest:
 	@$(params) lein prism 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
-.api_container: .api_image $(credentials)
+.api_container: .rdm_container .api_image $(credentials)
 	@docker run \
 	  --publish=80:80 \
 	  --detach=true \
-	  --env="$(access_key)" \
-	  --env="$(secret_key)" \
-	  --env="$(domain)" \
-	  --env="$(endpoint)" \
+	  --link $(shell cat $<):postgres \
+	  --env="$(db_user)" \
+	  --env="$(db_pass)" \
+	  --env="$(db_name)" \
 	  $(name) > $@
 
 kill:
@@ -104,30 +89,20 @@ $(jar): project.clj VERSION $(shell find resources) $(shell find src)
 #
 ################################################
 
-bootstrap: Gemfile.lock $(credentials) .sdb_container .rdm_container
+bootstrap: Gemfile.lock $(credentials) .rdm_container
 	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
-.sdb_container: .sdb_image
-	docker run \
-	  --publish=8081:8080 \
-	  --detach=true \
-	  sdb > $@
-
 .rdm_container: .rdm_image
 	docker run \
-	  --publish=5433:5432 \
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
+          --publish=5433:5432 \
 	  --detach=true \
 	  postgres > $@
 
-.api_image: Dockerfile $(jar)
+.api_image: $(shell find image) $(jar)
 	docker build --tag=$(name) .
-	touch $@
-
-.sdb_image: images/simpledb-dev/Dockerfile
-	docker build --tag=sdb $(dir $<)
 	touch $@
 
 .rdm_image:

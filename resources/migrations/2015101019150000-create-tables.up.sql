@@ -66,21 +66,44 @@ CREATE INDEX data_instance_id_idx ON benchmark_instance (data_instance_id);
 --;;
 CREATE INDEX image_task_id_idx    ON benchmark_instance (image_task_id);
 --;;
-CREATE TABLE benchmark_event_status(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	NOT NULL DEFAULT current_timestamp,
-  name			varchar(80)	UNIQUE NOT NULL,
-  description		text 		NOT NULL
-);
+CREATE TYPE benchmark_event_type AS ENUM ('product', 'evaluation');
 --;;
 CREATE TABLE benchmark_event(
-  id				serial		PRIMARY KEY,
-  created_at			timestamp	DEFAULT current_timestamp,
-  benchmark_instance_id		integer		NOT NULL,
-  benchmark_event_status_id	integer		NOT NULL REFERENCES benchmark_event_status(id)
+  id				serial			PRIMARY KEY,
+  created_at			timestamp		DEFAULT current_timestamp,
+  benchmark_instance_id		text			NOT NULL,
+  benchmark_file		text			NOT NULL,
+  log_file			text			NOT NULL,
+  event_type			benchmark_event_type	NOT NULL,
+  success			boolean			NOT NULL
 );
 --;;
 CREATE INDEX benchmark_instance_id_idx ON benchmark_event (benchmark_instance_id);
+--;;
+CREATE VIEW benchmark_instance_status AS SELECT
+bi.id  AS id,
+task   AS image_task,
+name   AS image_name,
+sha256 AS image_sha256,
+input_url,
+input_md5,
+( SELECT
+  be.created_at
+  FROM benchmark_event AS be
+  WHERE be.benchmark_instance_id = bi.id
+  AND be.success = true
+  AND be.event_type = 'product'
+  LIMIT 1) IS NOT NULL AS product,
+( SELECT
+  be.created_at
+  FROM benchmark_event AS be
+  WHERE be.benchmark_instance_id = bi.id
+  AND be.success = true
+  AND be.event_type = 'evaluation'
+  LIMIT 1) IS NOT NULL AS evaluation
+FROM benchmark_instance   AS bi
+LEFT JOIN image_task      AS it ON bi.image_task_id    = it.id
+LEFT JOIN data_instance   AS di ON bi.data_instance_id = di.id;
 --;;
 CREATE TABLE metric_type(
   id		serial		PRIMARY KEY,

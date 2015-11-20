@@ -7,8 +7,6 @@
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
-(help/silence-logging!)
-
 (use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
 (def expected-lengths

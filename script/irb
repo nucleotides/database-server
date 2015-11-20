@@ -2,9 +2,8 @@
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..'))
 
-require 'features/support/sdb'
-require 'features/support/http'
 require 'features/support/docker'
+require 'features/support/postgres'
 
 require 'irb'
 require 'irb/completion'

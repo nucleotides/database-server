@@ -6,13 +6,12 @@
             [nucleotides.database.migrate    :as build]
             [nucleotides.database.connection :as con]))
 
-(defn silence-logging! []
-  (log/set-config! [:appenders :standard-out :enabled? false]))
+(log/set-config! [:appenders :standard-out :enabled? false])
 
 (defn exec-db-command [command]
   (sql/with-db-connection [conn (con/create-connection)]
     (with-open [s (.createStatement (:connection conn))]
-      (.executeUpdate s command))))
+      (.execute s command))))
 
 (defn drop-tables []
   (do
@@ -40,3 +39,6 @@
 (def fetch-test-data
   (partial build/load-data-file test-data-directory))
 
+(defn load-fixture [x]
+  (do (empty-database)
+      (exec-db-command (slurp (str "test/fixtures/" x ".sql")))))
