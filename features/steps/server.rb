@@ -18,7 +18,7 @@ When(/^I get the url "(.*?)"$/) do |endpoint|
 end
 
 When(/^I post the url "(.*?)" with:$/) do |endpoint, table|
-  HTTP.post(endpoint, table.hashes.first)
+  @response = HTTP.post(endpoint, table.hashes.first)
 end
 
 Then(/^the returned HTTP status code should be "(.*?)"$/) do |code|
