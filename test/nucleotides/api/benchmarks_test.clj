@@ -57,5 +57,5 @@
                     :success         "true"}
             {:keys [status body]} (create params)]
         (is (= 201 status))
-        (is (= 1 body))
+        (is (= "1" body))
         (is (= 1 (help/table-length "benchmark-event")))))))

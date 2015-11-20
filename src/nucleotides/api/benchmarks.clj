@@ -23,4 +23,5 @@
   [db-client {params :params}]
   (->> (create-benchmark-event<! params {:connection db-client})
        (:id)
+       (str)
        (assoc {:status 201} :body)))

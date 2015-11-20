@@ -20,7 +20,7 @@ Feature: Posting benchmarks results to the API
       | id                               | benchmark_file | log_file | event_type | success |
       | 2f221a18eb86380369570b2ed147d8b4 | s3://url       | s3://url | evaluation | <state> |
     Then the returned HTTP status code should be "201"
-    And the returned body should equal "1"
+    And the returned body should equal "2"
 
     Examples:
       | state |
