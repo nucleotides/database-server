@@ -1,3 +1,107 @@
+# Nucleotid.es REST API
+
+## /benchmarks/
+
+Get and post data resulting from benchmarking Docker containers on data sets.
+
+### GET /benchmarks/show
+
+#### Resource URL
+
+http://api.nucleotides/0.2/benchmarks/show.json
+
+#### Parameters
+
+  * **status**
+
+    **Optional**: Specifying which benchmarks to return. Allowed values are
+    `complete` or `incomplete`
+
+#### Example response
+
+[
+	{
+		"id"                  : "56e5ff..",
+		"image"               : {
+			"name" : "bioboxes/velvet",
+			"sha256" : "ad3452...",
+			"task" : "default"
+		},
+		"input"               : {
+			"url" : "s3://",
+			"md5" : "ad545..."
+		},
+		"benchmark_type"      : "short_read_isolate",
+		"status"              : "incomplete"
+	}
+]
+
+### POST /benchmarks/
+
+TODO: Post a completed benchmark
+
+
+### GET /benchmarks/id
+
+TODO: Get benchmark by id. Is necessary?
+
+
+
+
+
+### GET /events/show/:id
+
+2eturns a single event as JSON document.
+
+
+#### Parameters
+
+  * **id**
+
+    **Required**: The unique ID of this event. This is the time stamp of this
+    event in milliseconds since 00:00:00 Coordinated Universal Time (UTC). This
+    is unique for this event. (Assuming no two events are created at exactly
+    the same millisecond.)
+
+#### Example request
+
+GET http://api.nucleotides/0.2/events/show.json?id=1234
+
+#### Example response
+
+    {"id"                  : "243145735212777472",
+     "created_at"          : "20150113T162702.420Z",
+     "benchmark_id"        : "afd0...",
+     "benchmark_type_code" : "0000",
+     "state_code"          : "0000",
+     "event_type_code"     : "0000"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## /events/
 
 ### POST /events/update
@@ -6,7 +110,7 @@ Add a new event to the database.
 
 #### Resource URL
 
-http://api.nucleotides/1.0/events/update
+http://api.nucleotides/0.2/events/update
 
 #### Parameters
 
@@ -74,7 +178,7 @@ http://api.nucleotides/1.0/events/update
 
 #### Example request
 
-POST http://api.nucleotides/1.0/events/update?benchmark_id=afd0&benchmark_type_code=0000&state_code=0000&event_type_code=0000
+POST http://api.nucleotides/0.2/events/update?benchmark_id=afd0&benchmark_type_code=0000&state_code=0000&event_type_code=0000
 
 #### Example response
 
@@ -82,7 +186,7 @@ HTTP/1.1 201 Created
 Date: Fri, 7 Oct 2005 17:17:11 GMT
 Content-Length: nnn
 Content-Type: text/plain;charset="utf-8"
-Location: http://api.nucleotides/1.0/events/show.json?id=243145735212777472
+Location: http://api.nucleotides/0.2/events/show.json?id=243145735212777472
 
 243145735212777472
 
@@ -90,11 +194,11 @@ Location: http://api.nucleotides/1.0/events/show.json?id=243145735212777472
 
 ### GET /events/show/:id
 
-Returns a single event as JSON document.
+2eturns a single event as JSON document.
 
 #### Resource URL
 
-http://api.nucleotides/1.0/events/show.json
+http://api.nucleotides/0.2/events/show.json
 
 #### Parameters
 
@@ -107,7 +211,7 @@ http://api.nucleotides/1.0/events/show.json
 
 #### Example request
 
-GET http://api.nucleotides/1.0/events/show.json?id=1234
+GET http://api.nucleotides/0.2/events/show.json?id=1234
 
 #### Example response
 
@@ -126,7 +230,7 @@ Returns a list of up to 100 events as a JSON document.
 
 #### Resource URL
 
-http://api.nucleotides/1.0/events/show.json
+http://api.nucleotides/0.2/events/show.json
 
 #### Parameters
 
@@ -156,6 +260,6 @@ http://api.nucleotides/1.0/events/show.json
 
 #### Example request
 
-GET http://api.nucleotides/1.0/events/lookup.json?benchmark_id=a8f3&max_id=1234
+GET http://api.nucleotides/0.2/events/lookup.json?benchmark_id=a8f3&max_id=1234
 
 [bench]: https://github.com/nucleotides/nucleotides-data/blob/master/data/benchmark_type.yml

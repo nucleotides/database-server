@@ -1,5 +1,9 @@
 ---
 machine:
+  java:
+    version: oraclejdk8
+  ruby:
+    version: 2.2.3
   services:
     - docker
 

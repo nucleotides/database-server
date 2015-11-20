@@ -1,21 +1,35 @@
-(defproject event-api "current"
+(require '[clojure.string :as string])
+
+(def version
+  (-> "VERSION" slurp string/trim))
+
+(defproject nucleotides-api version
+
   :description "REST API for recording nucleotid.es benchmarking events."
 
-  :dependencies [[org.clojure/clojure        "1.6.0"]
-                 [org.clojure/data.json      "0.2.5"]
-                 [ring/ring-jetty-adapter    "1.3.1"]
-                 [ring.middleware.logger     "0.5.0"]
-                 [compojure                  "1.3.1"]
-                 [com.cemerick/rummage       "1.0.1"]
+  :dependencies [[camel-snake-kebab          "0.3.2"]
                  [clj-time                   "0.9.0"]
-                 [com.amazonaws/aws-java-sdk "1.3.21.1"]]
+                 [circleci/clj-yaml          "0.5.4"]
+                 [com.amazonaws/aws-java-sdk "1.3.21.1"]
+                 [com.cemerick/rummage       "1.0.1"]
+                 [com.rpl/specter            "0.8.0"]
+                 [com.taoensso/timbre        "4.1.4"]
+                 [compojure                  "1.3.1"]
+                 [migratus                   "0.8.7"]
+                 [org.clojure/clojure        "1.7.0"]
+                 [org.clojure/data.json      "0.2.5"]
+                 [org.clojure/java.jdbc      "0.4.2"]
+                 [org.clojure/core.match     "0.3.0-alpha4"]
+                 [postgresql/postgresql      "9.3-1102.jdbc41"]
+                 [ring-logger-timbre         "0.7.4"]
+                 [ring/ring-jetty-adapter    "1.3.1"]
+                 [ring/ring-json             "0.4.0"]
+                 [yesql                      "0.5.1"]]
+
   :plugins      [[lein-ring "0.9.0"]]
 
   :local-repo  "vendor/maven"
 
-  :main event-api.core
-
   :profiles {
-    :dev     {:dependencies [[ring-mock "0.1.5"]]}
-    :uberjar {:aot :all}})
-
+    :dev        {:dependencies [[ring-mock "0.1.5"]]}
+    :uberjar    {:aot :all}})

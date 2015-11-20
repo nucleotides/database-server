@@ -1,4 +1,4 @@
-(ns event-api.database
+(ns nucleotides.api.database
   (:require [cemerick.rummage          :as sdb]
             [cemerick.rummage.encoding :as enc]
             [clj-time.core             :as ctime]
