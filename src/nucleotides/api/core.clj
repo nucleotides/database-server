@@ -14,7 +14,9 @@
             [nucleotides.util                 :as util]))
 
 (defn api [database-client]
-  (-> (routes (GET "/benchmarks/show.json" [] (partial benchmarks/show database-client)))
+  (-> (routes
+        (GET  "/benchmarks/show.json" [] (partial benchmarks/show   database-client))
+        (POST "/benchmarks/"          [] (partial benchmarks/create database-client)))
       (wrap-json-response)
       (wrap-with-logger)
       (wrap-keyword-params)

@@ -17,8 +17,16 @@ When(/^I get the url "(.*?)"$/) do |endpoint|
   @response = HTTP.get(endpoint)
 end
 
+When(/^I post the url "(.*?)" with:$/) do |endpoint, table|
+  @response = HTTP.post(endpoint, table.hashes.first)
+end
+
 Then(/^the returned HTTP status code should be "(.*?)"$/) do |code|
   expect(@response.status.split.first).to eq(code)
+end
+
+Then(/^the returned body should equal "(.*?)"$/) do |body|
+  expect(@response.body.strip).to eq(body)
 end
 
 Then(/^the returned body should match "(.*?)"$/) do |re|

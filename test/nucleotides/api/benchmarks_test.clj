@@ -8,9 +8,13 @@
             [helper                           :as help]))
 
 (defn show
-  ([params] (bench/show (con/create-connection) {:params params
-                                                 :query-params params}))
+  ([params] (bench/show (con/create-connection) {:params params :query-params params}))
   ([]       (show {})))
+
+(def create
+  #(bench/create (con/create-connection) {:params %}))
+
+
 
 (deftest nucleotides.api.benchmarks
 
@@ -40,4 +44,18 @@
         (testing "with product=true request parameter"
           (let [{:keys [status body]} (show {:product "true"})]
             (is (= 200   status))
-            (is (empty?  body))))))))
+            (is (empty?  body)))))))
+
+  (testing "#create"
+
+    (testing "with a product benchmark"
+      (let [_ (help/load-fixture "a_single_benchmark")
+            params {:id              "2f221a18eb86380369570b2ed147d8b4"
+                    :benchmark_file  "s3://url"
+                    :log_file        "s3://url"
+                    :event_type      "product"
+                    :success         "true"}
+            {:keys [status body]} (create params)]
+        (is (= 201 status))
+        (is (= "1" body))
+        (is (= 1 (help/table-length "benchmark-event")))))))

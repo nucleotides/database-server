@@ -1,4 +1,4 @@
-Feature: Getting and posting benchmarks to the API
+Feature: Getting benchmarks from the API
 
   Scenario: Getting a single benchmark from the API
     Given the database scenario with "a single benchmark"
