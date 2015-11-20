@@ -21,5 +21,6 @@
 (defn create
   "Creates a new benchmark event from the given parameters"
   [db-client {params :params}]
-  {:status 201
-   :body   (:id (create-benchmark-event<! params {:connection db-client}))})
+  (->> (create-benchmark-event<! params {:connection db-client})
+       (:id)
+       (assoc {:status 201} :body)))
