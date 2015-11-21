@@ -14,6 +14,9 @@
 (def create
   #(bench/create (con/create-connection) {:params %}))
 
+(def lookup
+  #(bench/lookup (con/create-connection) % {}))
+
 
 
 (deftest nucleotides.api.benchmarks
@@ -58,4 +61,26 @@
             {:keys [status body]} (create params)]
         (is (= 201 status))
         (is (= "1" body))
-        (is (= 1 (help/table-length "benchmark-event")))))))
+        (is (= 1 (help/table-length "benchmark-event"))))))
+
+  (testing "#lookup"
+
+    (testing "an incomplete benchmark"
+      (let [_   (help/load-fixture "a_single_benchmark")
+            id  "2f221a18eb86380369570b2ed147d8b4"
+            exp {:id              "2f221a18eb86380369570b2ed147d8b4"
+                 :image_name      "image"
+                 :image_sha256    "123456"
+                 :image_task      "default"
+                 :input_md5       "123456"
+                 :input_url       "s3://url"
+                 :product         false
+                 :product_url     nil
+                 :evaluation      false
+                 :metrics         nil}
+            {:keys [status body]} (lookup id)]
+        (is (= 200 status))
+        (doall
+          (for [k (keys exp)]
+            (do (is (contains? body k))
+                (is (= (k exp) (k body))))))))))
