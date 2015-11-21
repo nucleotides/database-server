@@ -38,26 +38,17 @@ Then(/^the returned body should be a valid JSON document$/) do
 end
 
 Then(/^the returned JSON should contain the entries:$/) do |table|
-  table = table.hashes.map do |row|
-    row = Hash[row.map do |(k, v)|
-      [k, v.strip]
-    end]
-  end
-
-  table.each do |test_row|
-    matching = @document.select do |doc_row|
-      test_row.keys.all? do |key|
-        doc_row.has_key?(key) and (test_row[key] == doc_row[key].to_s.strip)
-      end
-    end
-    if matching.empty?
-      row   = test_row.awesome_inspect
-      table = @document.map(&:sorted_awesome_inspect).join("\n")
-
-      diff  = Diffy::Diff.new(row, table)
-      fail("The document should include the entry:\n#{row}\n\nDiff:\n\n#{diff}")
+  table.hashes.each do |row|
+    unless contains_row?(@document, row)
+      difference = diff(row, @document)
+      expected = row.to_str_values.awesome_inspect
+      fail("The expected entry not found:\n#{expected}\n\nDiff:\n\n#{difference}")
     end
   end
+end
+
+Then(/^the returned JSON should contain:$/) do |table|
+  pending # express the regexp above with the code you wish you had
 end
 
 Then(/^the returned JSON should be empty$/) do
