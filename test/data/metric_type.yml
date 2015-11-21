@@ -1,0 +1,3 @@
+---
+- name: ng50
+  description: N50 normalised by reference genome length
