@@ -48,7 +48,10 @@ Then(/^the returned JSON should contain the entries:$/) do |table|
 end
 
 Then(/^the returned JSON should contain:$/) do |table|
-  pending # express the regexp above with the code you wish you had
+  expected = table.hashes.inject(Hash.new) do |hash, row|
+    hash[row['key']] = row['value']
+    hash
+  end
 end
 
 Then(/^the returned JSON should be empty$/) do
