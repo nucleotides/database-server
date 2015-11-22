@@ -54,4 +54,11 @@
                   :success         "true"}]
       (let [response (f params)]
         (is-ok-response response)
-        (is (= "1" (:body response)))))))
+        (is (= "1" (:body response))))))
+
+  (testing "GET /benchmarks/:id"
+    (let [f #(request :get (str "/benchmarks/" %))
+          _ (help/load-fixture "a_single_benchmark")
+          response (f "2f221a18eb86380369570b2ed147d8b4")]
+        (is-ok-response response)
+        (is (not (empty? (json/read-str (:body response))))))))
