@@ -10,7 +10,10 @@ class Hash
   end
 
   def to_str_values
-    Hash[self.map{|(k,v)| [k, v.to_s.strip]}]
+    Hash[self.map do |(k,v)|
+      v = "nil" if v.nil?
+      [k, v.to_s.strip]
+    end]
   end
 
 end

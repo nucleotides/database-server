@@ -48,14 +48,22 @@ Then(/^the returned JSON should contain the entries:$/) do |table|
 end
 
 Then(/^the returned JSON should contain:$/) do |table|
-  expected = table.hashes.inject(Hash.new) do |hash, row|
-    hash[row['key']] = row['value']
-    hash
+  table.hashes.each do |row|
+    path = row['key'].split('.')
+    value = path.inject(@document) do |acc, key|
+      expect(acc).to include(key),
+        "Expected key #{row['key']} in: #{@document.awesome_inspect}"
+      acc[key]
+    end
+    expect(value.to_s).to eq(row['value'].to_s),
+      "Expected #{row['key']} to equal '#{row['value'].to_s}' but was '#{value.to_s}'"
+
   end
+    #expected = row.to_str_values.awesome_inspect
 end
 
 Then(/^the returned JSON should be empty$/) do
-  expect(@document).to be_empty
+  expect(@document.awesome_inspect).to be_empty
 end
 
 Then(/^the returned JSON should not be empty$/) do
