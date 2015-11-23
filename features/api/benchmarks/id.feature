@@ -15,7 +15,7 @@ Feature: Getting benchmarks from the API by their ID
       | product      | false    |
       | product_url  |          |
       | evaluation   | false    |
-      | metrics      |          |
+      | metrics      | {}       |
 
   Scenario: Getting a product-complete benchmark by ID
     Given the database scenario with "a single benchmark with completed product"
@@ -32,7 +32,7 @@ Feature: Getting benchmarks from the API by their ID
       | product      | true     |
       | product_url  | s3://url |
       | evaluation   | false    |
-      | metrics      |          |
+      | metrics      | {}       |
 
   Scenario: Getting a evaluation-complete benchmark by ID
     Given the database scenario with "a single benchmark with completed evaluation"
@@ -49,4 +49,5 @@ Feature: Getting benchmarks from the API by their ID
       | product      | true     |
       | product_url  | s3://url |
       | evaluation   | true     |
-      | metrics.ng50 | 20000    |
+      | metrics.ng50 | 20000.0  |
+      | metrics.l50  | 10.0     |

@@ -17,6 +17,12 @@
 (def lookup
   #(bench/lookup (con/create-connection) % {}))
 
+(def long->wide
+  (comp (filter #(nil? %1)) (partial apply hash-map) flatten (partial map vals)))
+
+(long->wide (bench/metrics-by-benchmark-id
+              {:id "2f221a18eb86380369570b2ed147d8b4"}
+              {:connection (con/create-connection)}))
 
 
 (deftest nucleotides.api.benchmarks
@@ -77,7 +83,27 @@
                  :product         false
                  :product_url     nil
                  :evaluation      false
-                 :metrics         nil}
+                 :metrics         {}}
+            {:keys [status body]} (lookup id)]
+        (is (= 200 status))
+        (doall
+          (for [k (keys exp)]
+            (do (is (contains? body k))
+                (is (= (k exp) (k body))))))))
+
+    (testing "a complete benchmark"
+      (let [_   (help/load-fixture "a_single_benchmark_with_completed_evaluation")
+            id  "2f221a18eb86380369570b2ed147d8b4"
+            exp {:id              "2f221a18eb86380369570b2ed147d8b4"
+                 :image_name      "image"
+                 :image_sha256    "123456"
+                 :image_task      "default"
+                 :input_md5       "123456"
+                 :input_url       "s3://url"
+                 :product         true
+                 :product_url     "s3://url"
+                 :evaluation      true
+                 :metrics         {"ng50" 20000.0 "l50" 10.0}}
             {:keys [status body]} (lookup id)]
         (is (= 200 status))
         (doall

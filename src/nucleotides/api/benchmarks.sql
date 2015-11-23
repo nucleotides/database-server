@@ -17,10 +17,19 @@ WHERE evaluation = :evaluation::boolean;
 SELECT
 id, image_task, image_name, image_sha256, input_url, input_md5, product_url,
 evaluation_id IS NOT NULL AS evaluation,
-product_id    IS NOT NULL AS product,
-NULL AS metrics
+product_id    IS NOT NULL AS product
 FROM benchmark_instance_status WHERE id = :id
 LIMIT 1;
+
+-- name: metrics-by-benchmark-id
+-- Get metrics by a given benchmark ID
+SELECT
+mt.name,
+mi.value
+FROM benchmark_instance_status AS bis
+LEFT JOIN metric_instance      AS mi ON mi.benchmark_event_id = bis.evaluation_id
+LEFT JOIN metric_type          AS mt ON mi.metric_type_id = mt.id
+WHERE bis.id = :id;
 
 -- name: create-benchmark-event<!
 -- Create a new benchmark event

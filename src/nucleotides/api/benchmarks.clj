@@ -8,6 +8,13 @@
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
+(def long->wide
+  (comp
+    #(dissoc % nil)
+    (partial apply hash-map)
+    flatten
+    (partial map vals)))
+
 (defn show
   "Returns all benchmarks, can be parameterised by product/evaluation completed or
   not."
@@ -30,6 +37,11 @@
 (defn lookup
   "Finds a benchmark instance by ID"
   [db-client id _]
-  (->> (benchmark-by-id {:id id} {:connection db-client})
+  (let [metrics (->> (metrics-by-benchmark-id {:id id} {:connection db-client})
+                     (long->wide)
+                     (future))] ; I put this here because I wanted to experiment
+                                ; with clojure futures. This may not be optimal.
+   (-> (benchmark-by-id {:id id} {:connection db-client})
        (first)
-       (ring/response)))
+       (assoc :metrics @metrics)
+       (ring/response))))
