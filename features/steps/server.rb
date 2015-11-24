@@ -63,7 +63,7 @@ Then(/^the returned JSON should contain:$/) do |table|
 end
 
 Then(/^the returned JSON should be empty$/) do
-  expect(@document.awesome_inspect).to be_empty
+  expect(@document).to be_empty
 end
 
 Then(/^the returned JSON should not be empty$/) do
