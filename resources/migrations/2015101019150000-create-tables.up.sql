@@ -99,16 +99,16 @@ name   AS image_name,
 sha256 AS image_sha256,
 input_url,
 input_md5,
-spv.benchmark_file AS product_url,
-spv.id AS product_id,
-sev.id AS evaluation_id,
-(spv.id IS NOT NULL) AS evaluation,
-(sev.id IS NOT NULL) AS product
+prd.benchmark_file AS product_url,
+prd.id AS product_id,
+evl.id AS evaluation_id,
+(prd.id IS NOT NULL) AS product,
+(evl.id IS NOT NULL) AS evaluation
 FROM benchmark_instance                         AS bi
 LEFT JOIN image_task                            AS it  ON bi.image_task_id    = it.id
 LEFT JOIN data_instance                         AS di  ON bi.data_instance_id = di.id
-LEFT JOIN benchmark_successful_product_event    AS spv ON bi.id = spv.benchmark_instance_id
-LEFT JOIN benchmark_successful_evaluation_event AS sev ON bi.id = sev.benchmark_instance_id;
+LEFT JOIN benchmark_successful_product_event    AS prd ON bi.id = prd.benchmark_instance_id
+LEFT JOIN benchmark_successful_evaluation_event AS evl ON bi.id = evl.benchmark_instance_id;
 --;;
 CREATE TABLE metric_type(
   id		serial		PRIMARY KEY,
