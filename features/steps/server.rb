@@ -8,7 +8,7 @@ Given(/^I post to url "(.*?)" with the entries:$/) do |endpoint, table|
   sleep 1 # Allow data to be posted
 end
 
-Given(/^I post to url "(.*?)" with the data:$/) do |endpoint, data_string|
+Given(/^I post to "(.*?)" with the data:$/) do |endpoint, data_string|
   @response = HTTP.post(endpoint, JSON.parse(data_string))
   sleep 1 # Allow data to be posted
 end
