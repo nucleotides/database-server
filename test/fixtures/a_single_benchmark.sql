@@ -1,3 +1,6 @@
+INSERT INTO metric_type (name, description)
+VALUES ('ng50', 'An assembly metric'), ('l50', 'Another assembly metric');
+--;;
 INSERT INTO image_type (name, description)
 VALUES ('short_read_assembler', 'none');
 --;;
