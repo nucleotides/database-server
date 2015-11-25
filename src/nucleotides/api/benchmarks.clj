@@ -29,10 +29,8 @@
 (defn create
   "Creates a new benchmark event from the given parameters"
   [db-client {params :params}]
-  (->> (create-benchmark-event<! params {:connection db-client})
-       (:id)
-       (str)
-       (assoc {:status 201} :body)))
+  (let [id (:id (create-benchmark-event<! params {:connection db-client}))]
+    (ring/response id)))
 
 (defn lookup
   "Finds a benchmark instance by ID"

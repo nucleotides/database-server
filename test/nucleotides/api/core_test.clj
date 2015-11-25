@@ -75,7 +75,7 @@
                   :success         "true"}]
       (let [response (f params)]
         (is-ok-response response)
-        (is (= "1" (:body response))))))
+        (is (= 1 (:body response))))))
 
   (testing "GET /benchmarks/:id"
     (let [f #(request :get (str "/benchmarks/" %))
