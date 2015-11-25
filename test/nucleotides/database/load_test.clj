@@ -41,4 +41,4 @@
 
 (deftest load-metric-types
   (let [_  (run-loader ld/metric-types :metric_type)]
-    (is (= 1 (help/table-length :metric-type)))))
+    (is (= 2 (help/table-length :metric-type)))))

@@ -50,4 +50,4 @@ Feature: Getting benchmarks from the API by their ID
       | product_url  | s3://url |
       | evaluation   | true     |
       | metrics.ng50 | 20000.0  |
-      | metrics.l50  | 10.0     |
+      | metrics.lg50 | 10.0     |

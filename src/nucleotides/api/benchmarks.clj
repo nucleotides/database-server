@@ -4,6 +4,8 @@
             [clojure.string      :as st]
             [clojure.data.json   :as json]
             [ring.util.response  :as ring]
+
+            [nucleotides.database.connection  :as con]
             [taoensso.timbre     :as log]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
@@ -14,6 +16,11 @@
     (partial apply hash-map)
     flatten
     (partial map vals)))
+
+
+(def wide->long
+  (partial map #(->> (interleave [:name :value] %)
+                     (apply hash-map))))
 
 (defn show
   "Returns all benchmarks, can be parameterised by product/evaluation completed or
@@ -29,8 +36,13 @@
 (defn create
   "Creates a new benchmark event from the given parameters"
   [db-client {params :params}]
-  (let [id (:id (create-benchmark-event<! params {:connection db-client}))]
-    (ring/response id)))
+  (let [id (:id (create-benchmark-event<! params {:connection db-client}))
+        {:keys [event_type success metrics]} params]
+    (if (and (= event_type "evaluation") (= success "true"))
+      (->> (wide->long metrics)
+           (map #(assoc % :id id))
+           (map #(create-metric-instance<! % {:connection (con/create-connection)}))
+           (dorun))) (ring/response id)))
 
 (defn lookup
   "Finds a benchmark instance by ID"

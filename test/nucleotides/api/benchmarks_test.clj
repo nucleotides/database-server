@@ -20,11 +20,6 @@
 (def long->wide
   (comp (filter #(nil? %1)) (partial apply hash-map) flatten (partial map vals)))
 
-(long->wide (bench/metrics-by-benchmark-id
-              {:id "2f221a18eb86380369570b2ed147d8b4"}
-              {:connection (con/create-connection)}))
-
-
 (deftest nucleotides.api.benchmarks
 
   (testing "#show"
@@ -57,7 +52,7 @@
 
   (testing "#create"
 
-    (testing "with a product benchmark"
+    (testing "a product benchmark"
       (let [_ (help/load-fixture "a_single_benchmark")
             params {:id              "2f221a18eb86380369570b2ed147d8b4"
                     :benchmark_file  "s3://url"
@@ -65,9 +60,23 @@
                     :event_type      "product"
                     :success         "true"}
             {:keys [status body]} (create params)]
-        (is (= 201 status))
-        (is (= "1" body))
-        (is (= 1 (help/table-length "benchmark-event"))))))
+        (is (= 200 status))
+        (is (= 1 body))
+        (is (= 1 (help/table-length "benchmark-event")))))
+
+    (testing "an evaluation benchmark"
+      (let [_ (help/load-fixture "a_single_benchmark_with_completed_product")
+            params {:id              "2f221a18eb86380369570b2ed147d8b4"
+                    :benchmark_file  "s3://url"
+                    :log_file        "s3://url"
+                    :event_type      "evaluation"
+                    :success         "true"
+                    :metrics         {"ng50" 10000 "lg50" 10}}
+            {:keys [status body]} (create params)]
+        (is (= 200 status))
+        (is (= 2 body))
+        (is (= 2 (help/table-length "benchmark-event")))
+        (is (= 2 (help/table-length "metric-instance"))))))
 
   (testing "#lookup"
 
@@ -103,7 +112,7 @@
                  :product         true
                  :product_url     "s3://url"
                  :evaluation      true
-                 :metrics         {"ng50" 20000.0 "l50" 10.0}}
+                 :metrics         {"ng50" 20000.0 "lg50" 10.0}}
             {:keys [status body]} (lookup id)]
         (is (= 200 status))
         (doall

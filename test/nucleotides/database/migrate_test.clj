@@ -16,7 +16,7 @@
    [:data-instance      3]
    [:benchmark-type     2]
    [:benchmark-instance 12]
-   [:metric-type        1]])
+   [:metric-type        2]])
 
 (deftest migrate
   (testing "-main"

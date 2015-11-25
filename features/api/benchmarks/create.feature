@@ -90,6 +90,6 @@ Feature: Posting benchmarks results to the API
       | metrics      | <metrics> |
 
     Examples:
-      | input_metrics                              | metrics                      | state |
-      |                                            | {}                           | false |
-      | , "metrics" : {"ng50": 20000, "l50" : 10 } | {"ng50": 20000, "l50" : 10 } | false |
+      | input_metrics                               | metrics                       | state |
+      |                                             | {}                            | false |
+      | , "metrics" : {"ng50": 20000, "lg50" : 10 } | {"ng50": 20000, "lg50" : 10 } | false |
