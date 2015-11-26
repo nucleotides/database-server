@@ -72,7 +72,7 @@ CREATE TABLE benchmark_event(
   id				serial			PRIMARY KEY,
   created_at			timestamp		DEFAULT current_timestamp,
   benchmark_instance_id		text			NOT NULL,
-  benchmark_file		text			NOT NULL,
+  benchmark_file		text			,
   log_file			text			NOT NULL,
   event_type			benchmark_event_type	NOT NULL,
   success			boolean			NOT NULL

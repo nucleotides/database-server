@@ -11,14 +11,8 @@
   ([params] (bench/show (con/create-connection) {:params params :query-params params}))
   ([]       (show {})))
 
-(def create
-  #(bench/create (con/create-connection) {:params %}))
-
 (def lookup
   #(bench/lookup (con/create-connection) % {}))
-
-(def long->wide
-  (comp (filter #(nil? %1)) (partial apply hash-map) flatten (partial map vals)))
 
 (deftest nucleotides.api.benchmarks
 
@@ -49,34 +43,6 @@
           (let [{:keys [status body]} (show {:product "true"})]
             (is (= 200   status))
             (is (empty?  body)))))))
-
-  (testing "#create"
-
-    (testing "a product benchmark"
-      (let [_ (help/load-fixture "a_single_benchmark")
-            params {:id              "2f221a18eb86380369570b2ed147d8b4"
-                    :benchmark_file  "s3://url"
-                    :log_file        "s3://url"
-                    :event_type      "product"
-                    :success         "true"}
-            {:keys [status body]} (create params)]
-        (is (= 200 status))
-        (is (= 1 body))
-        (is (= 1 (help/table-length "benchmark-event")))))
-
-    (testing "an evaluation benchmark"
-      (let [_ (help/load-fixture "a_single_benchmark_with_completed_product")
-            params {:id              "2f221a18eb86380369570b2ed147d8b4"
-                    :benchmark_file  "s3://url"
-                    :log_file        "s3://url"
-                    :event_type      "evaluation"
-                    :success         "true"
-                    :metrics         {"ng50" 10000 "lg50" 10}}
-            {:keys [status body]} (create params)]
-        (is (= 200 status))
-        (is (= 2 body))
-        (is (= 2 (help/table-length "benchmark-event")))
-        (is (= 2 (help/table-length "metric-instance"))))))
 
   (testing "#lookup"
 

@@ -2,16 +2,27 @@ Feature: Posting benchmarks results to the API
 
   Scenario Outline: Posting a product benchmark
     Given the database scenario with "a single benchmark"
-    When I post the url "/benchmarks/" with:
-      | id                               | benchmark_file | log_file | event_type | success |
-      | 2f221a18eb86380369570b2ed147d8b4 | s3://url       | s3://url | product    | <state> |
-    Then the returned HTTP status code should be "201"
+    When I post to "/benchmarks/" with the data:
+      """
+      {
+        "id"             : "2f221a18eb86380369570b2ed147d8b4",
+        "log_file"       : "s3://url",
+        "event_type"     : "product",
+        "success"        : <state>
+        <input_url>
+      }
+      """
+    Then the returned HTTP status code should be "200"
     And the returned body should equal "1"
+    And the table "benchmark_event" should have the entries:
+      | benchmark_instance_id            | benchmark_file | log_file | event_type | success    |
+      | 2f221a18eb86380369570b2ed147d8b4 | <url>          | s3://url | product    | <db_state> |
 
     Examples:
-      | state |
-      | true  |
-      | false |
+      | state | input_url                       | url      | db_state |
+      | true  | , "benchmark_file" : "s3://url" | s3://url | t        |
+      | false |                                 |          | f        |
+      | false | , "benchmark_file" : null       |          | f        |
 
 
   Scenario Outline: Posting an evaluation benchmark
@@ -19,7 +30,7 @@ Feature: Posting benchmarks results to the API
     When I post the url "/benchmarks/" with:
       | id                               | benchmark_file | log_file | event_type | success |
       | 2f221a18eb86380369570b2ed147d8b4 | s3://url       | s3://url | evaluation | <state> |
-    Then the returned HTTP status code should be "201"
+    Then the returned HTTP status code should be "200"
     And the returned body should equal "2"
 
     Examples:

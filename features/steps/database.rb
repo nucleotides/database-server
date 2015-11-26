@@ -21,14 +21,14 @@ Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
   entries = table_entries(name)
   table   = table.hashes.map do |row|
     row = Hash[row.map do |(k, v)|
-      [k, entry_lookup(v.strip)]
+      [k, entry_lookup(v.to_s.strip)]
     end]
   end
 
   table.each do |test_row|
     matching = entries.select do |db_row|
       test_row.keys.all? do |key|
-        db_row.has_key?(key) and (test_row[key] == db_row[key].strip)
+        db_row.has_key?(key) and (test_row[key].to_s.strip == db_row[key].to_s.strip)
       end
     end
     if matching.empty?

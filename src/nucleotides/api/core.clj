@@ -11,12 +11,13 @@
             [nucleotides.database.connection  :as con]
             [nucleotides.api.database         :as db]
             [nucleotides.api.benchmarks       :as benchmarks]
+            [nucleotides.api.events           :as events]
             [nucleotides.util                 :as util]))
 
 (defn api [database-client]
   (-> (routes
         (GET  "/benchmarks/show.json" []   (partial benchmarks/show   database-client))
-        (POST "/benchmarks/"          []   (partial benchmarks/create database-client))
+        (POST "/benchmarks/"          []   (partial events/create     database-client))
         (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup database-client id)))
       (wrap-json-response)
       (wrap-with-logger)

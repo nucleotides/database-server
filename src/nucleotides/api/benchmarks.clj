@@ -2,10 +2,7 @@
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
             [clojure.string      :as st]
-            [clojure.data.json   :as json]
             [ring.util.response  :as ring]
-
-            [nucleotides.database.connection  :as con]
             [taoensso.timbre     :as log]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
@@ -17,11 +14,6 @@
     flatten
     (partial map vals)))
 
-
-(def wide->long
-  (partial map #(->> (interleave [:name :value] %)
-                     (apply hash-map))))
-
 (defn show
   "Returns all benchmarks, can be parameterised by product/evaluation completed or
   not."
@@ -32,17 +24,6 @@
        (contains? params :product)    benchmarks-by-product
        :else                          benchmarks)
      params {:connection db-client})))
-
-(defn create
-  "Creates a new benchmark event from the given parameters"
-  [db-client {params :params}]
-  (let [id (:id (create-benchmark-event<! params {:connection db-client}))
-        {:keys [event_type success metrics]} params]
-    (if (and (= event_type "evaluation") (= success "true"))
-      (->> (wide->long metrics)
-           (map #(assoc % :id id))
-           (map #(create-metric-instance<! % {:connection (con/create-connection)}))
-           (dorun))) (ring/response id)))
 
 (defn lookup
   "Finds a benchmark instance by ID"

@@ -66,16 +66,29 @@
           (is-empty-body response)))))
 
   (testing "POST /benchmarks/"
-    (let [f (partial request :post "/benchmarks/")
-          _ (help/load-fixture "a_single_benchmark")
-          params {:id              "2f221a18eb86380369570b2ed147d8b4"
-                  :benchmark_file  "s3://url"
-                  :log_file        "s3://url"
-                  :event_type      "product"
-                  :success         "true"}]
-      (let [response (f params)]
-        (is-ok-response response)
-        (is (= 1 (:body response))))))
+    (let [f (partial request :post "/benchmarks/")]
+
+      (let [ _ (help/load-fixture "a_single_benchmark")
+            params {:id              "2f221a18eb86380369570b2ed147d8b4"
+                    :benchmark_file  "s3://url"
+                    :log_file        "s3://url"
+                    :event_type      "product"
+                    :success         "true"}]
+        (let [response (f params)]
+          (is-ok-response response)
+          (is (= 1 (help/table-length "benchmark-event")))))
+
+      (let [ _ (help/load-fixture "a_single_benchmark_with_completed_product")
+            params {:id              "2f221a18eb86380369570b2ed147d8b4"
+                    :benchmark_file  "s3://url"
+                    :log_file        "s3://url"
+                    :event_type      "evaluation"
+                    :success         "true"
+                    :metrics         (json/write-str {"lg50" 10, "ng50" 10000})}]
+        (let [response (f params)]
+          (is-ok-response response)
+          (is (= 2 (help/table-length "benchmark-event")))
+          (is (= 2 (help/table-length "metric-instance")))))))
 
   (testing "GET /benchmarks/:id"
     (let [f #(request :get (str "/benchmarks/" %))
