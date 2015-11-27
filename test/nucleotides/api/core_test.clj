@@ -1,11 +1,11 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
-            [compojure.handler  :refer [site]]
             [clojure.data.json  :as json]
             [clojure.walk       :as walk]
             [ring.mock.request  :as mock]
 
             [nucleotides.database.connection  :as con]
+            [nucleotides.api.middleware       :as md]
             [nucleotides.database.load        :as db]
             [nucleotides.api.core             :as app]
             [helper                           :as help]))
@@ -14,7 +14,7 @@
 (defn request
   "Create a mock request to the API"
   ([method url params]
-   (let [hnd (site (app/api (con/create-connection)))]
+   (let [hnd (md/middleware (app/api (con/create-connection)))]
      (hnd (mock/request method url params))))
   ([method url]
    (request method url {})))
