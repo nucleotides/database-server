@@ -1,12 +1,11 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
             [clojure.data.json  :as json]
-            [clojure.walk       :as walk]
             [ring.mock.request  :as mock]
 
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.middleware       :as md]
             [nucleotides.database.load        :as db]
+            [nucleotides.api.middleware       :as md]
             [nucleotides.api.core             :as app]
             [helper                           :as help]))
 
@@ -14,7 +13,7 @@
 (defn request
   "Create a mock request to the API"
   ([method url params]
-   (let [hnd (md/middleware (app/api (con/create-connection)))]
+   (let [hnd (md/middleware (app/api {:connection (con/create-connection)}))]
      (hnd (mock/request method url params))))
   ([method url]
    (request method url {})))
@@ -84,7 +83,8 @@
                     :log_file        "s3://url"
                     :event_type      "evaluation"
                     :success         "true"
-                    :metrics         (json/write-str {"lg50" 10, "ng50" 10000})}]
+                    "metrics[lg50]"   10
+                    "metrics[ng50]"   20000}]
         (let [response (f params)]
           (is-ok-response response)
           (is (= 2 (help/table-length "benchmark-event")))

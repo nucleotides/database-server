@@ -6,7 +6,7 @@
             [helper                           :as help]))
 
 (def create
-  #(event/create (con/create-connection) {:params %}))
+  #(event/create {:connection (con/create-connection)} {:params %}))
 
 (deftest nucleotides.api.events
 

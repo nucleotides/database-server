@@ -8,11 +8,12 @@
             [helper                           :as help]))
 
 (defn show
-  ([params] (bench/show (con/create-connection) {:params params :query-params params}))
+  ([params] (bench/show {:connection (con/create-connection)}
+                        {:params params :query-params params}))
   ([]       (show {})))
 
 (def lookup
-  #(bench/lookup (con/create-connection) % {}))
+  #(bench/lookup {:connection (con/create-connection)} % {}))
 
 (deftest nucleotides.api.benchmarks
 

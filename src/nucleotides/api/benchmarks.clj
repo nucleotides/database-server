@@ -23,16 +23,16 @@
        (contains? params :evaluation) benchmarks-by-eval
        (contains? params :product)    benchmarks-by-product
        :else                          benchmarks)
-     params {:connection db-client})))
+     params db-client)))
 
 (defn lookup
   "Finds a benchmark instance by ID"
   [db-client id _]
-  (let [metrics (->> (metrics-by-benchmark-id {:id id} {:connection db-client})
+  (let [metrics (->> (metrics-by-benchmark-id {:id id} db-client)
                      (long->wide)
                      (future))] ; I put this here because I wanted to experiment
                                 ; with clojure futures. This may not be optimal.
-   (-> (benchmark-by-id {:id id} {:connection db-client})
+   (-> (benchmark-by-id {:id id} db-client)
        (first)
        (assoc :metrics @metrics)
        (ring/response))))

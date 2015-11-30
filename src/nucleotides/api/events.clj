@@ -16,7 +16,7 @@
             (apply hash-map)))))
 
 (defn- create-event [db-client params]
-  (let [f #(create-benchmark-event<! % {:connection db-client})]
+  (let [f #(create-benchmark-event<! % db-client)]
    (if-not (contains? params :benchmark_file)
     (f (assoc params :benchmark_file nil))
     (f params))))
@@ -26,7 +26,7 @@
     (->> metrics
          (wide->long)
          (map #(assoc % :id id))
-         (map #(create-metric-instance<! % {:connection db-client}))
+         (map #(create-metric-instance<! % db-client))
          (dorun))))
 
 (defn create
