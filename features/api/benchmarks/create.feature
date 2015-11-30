@@ -84,7 +84,7 @@ Feature: Posting benchmarks results to the API
       | false | , "benchmark_file" : null       |          |
 
 
-  Scenario Outline: Posting an evaluation benchmark and requesting the benchmarks
+  Scenario: Posting an evaluation benchmark and requesting the benchmarks
     Given the database scenario with "a single benchmark with completed product"
     When I post to "/benchmarks/" with the data:
       """
@@ -93,8 +93,9 @@ Feature: Posting benchmarks results to the API
         "log_file"       : "s3://url",
         "benchmark_file" : "s3://url",
         "event_type"     : "evaluation",
-        "success"        : <state>
-        <input_metrics>
+        "success"        : "true",
+        "metrics[ng50]"  : 20000,
+        "metrics[lg50]"  : 10
       }
       """
     And I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
@@ -109,10 +110,6 @@ Feature: Posting benchmarks results to the API
       | input_url    | s3://url  |
       | product      | true      |
       | product_url  | s3://url  |
-      | evaluation   | <state>   |
-      | metrics      | <metrics> |
-
-    Examples:
-      | input_metrics                                   | metrics                         | state |
-      |                                                 | {}                              | false |
-      | , "metrics[ng50]" : 20000, "metrics[lg50]" : 10 | {"ng50"=>20000.0, "lg50"=>10.0} | true  |
+      | evaluation   | true      |
+      | metrics.ng50 | 20000.0   |
+      | metrics.lg50 | 10.0      |
