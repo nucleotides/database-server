@@ -1,16 +1,15 @@
 require 'rspec'
 require 'json'
 
+
 Given(/^I post to url "(.*?)" with the entries:$/) do |endpoint, table|
   table.hashes.each do |row|
     @response = HTTP.post(endpoint, row)
   end
-  sleep 1 # Allow data to be posted
 end
 
 Given(/^I post to "(.*?)" with the data:$/) do |endpoint, data_string|
   @response = HTTP.post(endpoint, JSON.parse(data_string))
-  sleep 1 # Allow data to be posted
 end
 
 When(/^I get the url "(.*?)"$/) do |endpoint|

@@ -1,8 +1,12 @@
 module HTTP
   require 'curl'
 
+  ALLOW_REQUEST_TO_PROCESS = 0.1
+
   def self.post(endpoint, params)
-    Curl.post(docker_url + endpoint, params)
+    response = Curl.post(docker_url + endpoint, params)
+    sleep ALLOW_REQUEST_TO_PROCESS
+    response
   end
 
   def self.get(endpoint, query = {})
