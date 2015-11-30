@@ -91,6 +91,7 @@ Feature: Posting benchmarks results to the API
       {
         "id"             : "2f221a18eb86380369570b2ed147d8b4",
         "log_file"       : "s3://url",
+        "benchmark_file" : "s3://url",
         "event_type"     : "evaluation",
         "success"        : <state>
         <input_metrics>
@@ -112,6 +113,6 @@ Feature: Posting benchmarks results to the API
       | metrics      | <metrics> |
 
     Examples:
-      | input_metrics                               | metrics                       | state |
-      |                                             | {}                            | false |
-      | , "metrics" : {"ng50": 20000, "lg50" : 10 } | {"ng50": 20000, "lg50" : 10 } | false |
+      | input_metrics                                   | metrics                         | state |
+      |                                                 | {}                              | false |
+      | , "metrics[ng50]" : 20000, "metrics[lg50]" : 10 | {"ng50"=>20000.0, "lg50"=>10.0} | true  |

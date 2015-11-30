@@ -1,14 +1,19 @@
 (ns nucleotides.api.events
   (:require [yesql.core          :refer [defqueries]]
+            [clojure.walk        :as walk]
+            [clojure.string      :as st]
             [ring.util.response  :as ring]
-            [clojure.data.json   :as json]
             ))
 
 (defqueries "nucleotides/api/events.sql")
 
 (def wide->long
-  (partial map #(->> (interleave [:name :value] %)
-                     (apply hash-map))))
+  (partial map
+     (fn [x]
+       (->> x
+            (walk/postwalk #(if (keyword? %) (st/replace (str %) ":" "") %))
+            (interleave [:name :value])
+            (apply hash-map)))))
 
 (defn- create-event [db-client params]
   (let [f #(create-benchmark-event<! % {:connection db-client})]
@@ -19,7 +24,6 @@
 (defn- create-metrics [db-client id {:keys [event_type success metrics]}]
   (if (and (= event_type "evaluation") (= success "true"))
     (->> metrics
-         (json/read-str)
          (wide->long)
          (map #(assoc % :id id))
          (map #(create-metric-instance<! % {:connection db-client}))

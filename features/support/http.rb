@@ -15,9 +15,4 @@ module HTTP
     Curl.get(url)
   end
 
-  def self.post(endpoint, body)
-    url = docker_url + endpoint
-    Curl.post(url, body)
-  end
-
 end

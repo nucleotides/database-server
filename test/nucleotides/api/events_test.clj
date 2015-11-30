@@ -42,7 +42,7 @@
                     :log_file        "s3://url"
                     :event_type      "evaluation"
                     :success         "true"
-                    :metrics         (json/write-str {"ng50" 10000 "lg50" 10})}
+                    :metrics         {:ng50 10000 :lg50 10}}
             {:keys [status body]} (create params)]
         (is (= 200 status))
         (is (= "2" body))
