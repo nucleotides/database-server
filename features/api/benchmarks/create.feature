@@ -27,16 +27,27 @@ Feature: Posting benchmarks results to the API
 
   Scenario Outline: Posting an evaluation benchmark
     Given the database scenario with "a single benchmark with completed product"
-    When I post the url "/benchmarks/" with:
-      | id                               | benchmark_file | log_file | event_type | success |
-      | 2f221a18eb86380369570b2ed147d8b4 | s3://url       | s3://url | evaluation | <state> |
+    When I post to "/benchmarks/" with the data:
+      """
+      {
+        "id"             : "2f221a18eb86380369570b2ed147d8b4",
+        "log_file"       : "s3://url",
+        "event_type"     : "evaluation",
+        "success"        : false
+        <input_url>
+        <metrics>
+      }
+      """
     Then the returned HTTP status code should be "200"
     And the returned body should equal "2"
+    And the table "benchmark_event" should have the entries:
+      | benchmark_instance_id            | log_file | event_type | success |
+      | 2f221a18eb86380369570b2ed147d8b4 | s3://url | evaluation | f       |
 
     Examples:
-      | state |
-      | true  |
-      | false |
+      | input_url                 | metrics            |
+      |                           | , "metrics" : null |
+      | , "benchmark_file" : null |                    |
 
 
   Scenario Outline: Posting a product benchmark and requesting the benchmarks
