@@ -48,7 +48,7 @@ Lists all Docker images used.
 There is table constraint that combinations of image_type_id, name, sha256
 should be unique. This ensures there are no duplicated Docker images.
 
-### image_instance_run_mode
+### image_instance_task
 
   * **image_instance_id** - INT. Foreign key for the `image_instance_table`
 
@@ -62,7 +62,7 @@ There is table constraint that combinations of image_instance_id and task
 should be unique. This ensures there are no duplicated tasks for the same
 image.
 
-## Sequencing Data
+## Input Data
 
 Tables used to store the data used in benchmarking
 
@@ -71,9 +71,8 @@ Tables used to store the data used in benchmarking
 Groups the different sets of data used for benchmarking by their name and
 description.
 
-  * **short_name** - VARCHAR. The name of this data set used to indentify it
-    when populating the database from file. Examples of this would be
-    "jgi_isolate_microbe_2x150"
+  * **name** - VARCHAR. The name is used to indentify the data when populating
+    the database from file. Examples of this would be "jgi_isolate_microbe_2x150"
 
   * **description** - VARCHAR. Examples are "Illumina 2x150 isolated microbe
     sequenced at the JGI".
@@ -127,29 +126,21 @@ Maps the Docker image type to benchmark data type.
 
 ### benchmark_instance
 
-A materialise view created from mapping each Docker `image_instance_run_mode`
-to each `data_record` via the m:n mappings in the `benchmark_type` table.
+A materialise view created from mapping each Docker `image_instance_task` to
+each `data_record` via the m:n mappings in the `benchmark_type` table.
 
   * **benchmark_type_id** - INT. Foreign key to the `benchmark_type` table.
 
   * **data_instance_id** - INT. Foreign key to the `data_instance` table.
 
-  * **image_instance_run_mode_id** - INT. Foreign key to the
-    `image_instance_run_mode` table.
+  * **image_instance_task_id** - INT. Foreign key to the `image_instance_task`
+    table.
 
 ## Benchmarking Events
 
 Tables for recording the results of benchmarking.
 
-### benchmark_event_status
-
-Description of the status of benchmarking events.
-
-  * **name** - VARCHAR. Short name for the status.
-
-  * **description** - INT. Description of this status.
-
-### benchmark_event
+### event
 
 Record benchmark events as they occur.
 

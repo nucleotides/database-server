@@ -15,6 +15,8 @@
 (defn run-loader [f file]
   (f (con/create-connection) (help/fetch-test-data file)))
 
+
+
 (deftest load-image-types
   (let [_  (run-loader ld/image-types :image)]
     (is (= 2 (help/table-length :image-type)))))
