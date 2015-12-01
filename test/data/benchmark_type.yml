@@ -1,7 +1,11 @@
 ---
-- name: short_read_isolate_assembly
-  data_type: short_read_isolate
-  image_type: short_read_assembler
-- name: short_read_isolate_preprocessing
-  data_type: short_read_isolate
-  image_type: short_read_preprocessor
+- name: illumina_isolate_reference_assembly
+  product_image_type: short_read_assembler
+  evaluation_image_type: assembly_evaluation
+  data_sets:
+    - jgi_isolate_2x150
+- name: short_read_preprocessing_reference_evaluation
+  product_image_type: short_read_preprocessor
+  evaluation_image_type: short_processing_evaluation
+  data_sets:
+    - jgi_isolate_2x150
