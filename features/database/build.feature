@@ -61,6 +61,12 @@ Feature: Migrating and loading input data for the database
         data_type: short_read_isolate
         image_type: short_read_preprocessor
       """
+    And a file named "data/metric_type.yml" with:
+      """
+      ---
+      - name: ng50
+        description: N50 normalised by reference genome length
+      """
     When I run `./bin/migrate data`
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
@@ -89,3 +95,6 @@ Feature: Migrating and loading input data for the database
       | image_task_id                                          | data_instance_id                      | benchmark_type_id                                       |
       | $image_task?name='bioboxes/velvet'&task='careful'      | $data_instance?entry_id=2&replicate=1 | $benchmark_type?name='short_read_isolate_assembly'      |
       | $image_task?name='bioboxes/my-filterer'&task='default' | $data_instance?entry_id=1&replicate=1 | $benchmark_type?name='short_read_isolate_preprocessing' |
+    And the table "metric_type" should have the entries:
+      | name | description                               |
+      | ng50 | N50 normalised by reference genome length |

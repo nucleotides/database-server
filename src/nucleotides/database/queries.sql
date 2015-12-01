@@ -14,6 +14,11 @@ VALUES ((SELECT id FROM image_type WHERE name = :image_type),
 INSERT INTO data_type (name, library, type, description)
 VALUES (:name, :library, :type, :description);
 
+-- name: save-metric-type<!
+-- Creates a new data type entry
+INSERT INTO metric_type (name, description)
+VALUES (:name, :description);
+
 -- name: save-data-instance<!
 -- Creates a new data instance entry
 INSERT INTO data_instance (

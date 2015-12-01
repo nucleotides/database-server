@@ -38,3 +38,7 @@
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/benchmark-types :benchmark_type)]
     (is (= 2 (help/table-length :benchmark-type)))))
+
+(deftest load-metric-types
+  (let [_  (run-loader ld/metric-types :metric_type)]
+    (is (= 2 (help/table-length :metric-type)))))

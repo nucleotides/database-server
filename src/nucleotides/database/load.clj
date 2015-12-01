@@ -71,6 +71,10 @@
   "Load data entries into the database"
   (load-entries unfold-data-replicates save-data-instance<!))
 
+(def metric-types
+  "Load metric types into the database"
+  (load-entries save-metric-type<!))
+
 (def benchmark-types
   "Load benchmark types into the database"
   (load-entries save-benchmark-type<!))
@@ -83,9 +87,10 @@
   "Load and update benchmark data in the database"
   [connection data]
   (do
-    (image-types      connection (:image data))
-    (image-tasks      connection (:image data))
-    (data-types       connection (:data  data))
-    (data-instances   connection (:data  data))
+    (image-types      connection (:image           data))
+    (image-tasks      connection (:image           data))
+    (data-types       connection (:data            data))
+    (data-instances   connection (:data            data))
+    (metric-types     connection (:metric_type     data))
     (benchmark-types  connection (:benchmark_type  data))
     (rebuild-benchmark-instance connection)))

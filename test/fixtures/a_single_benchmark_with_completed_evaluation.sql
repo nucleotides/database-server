@@ -1,3 +1,6 @@
+INSERT INTO metric_type (name, description)
+VALUES ('ng50', 'An assembly metric'), ('lg50', 'Another assembly metric');
+--;;
 INSERT INTO image_type (name, description)
 VALUES ('short_read_assembler', 'none');
 --;;
@@ -23,3 +26,6 @@ VALUES ('2f221a18eb86380369570b2ed147d8b4', 's3://url', 's3://url', 'product', t
 --;;
 INSERT INTO benchmark_event (benchmark_instance_id, benchmark_file, log_file, event_type, success)
 VALUES ('2f221a18eb86380369570b2ed147d8b4', 's3://url', 's3://url', 'evaluation', true);
+--;;
+INSERT INTO metric_instance (metric_type_id, benchmark_event_id, value)
+VALUES (1, 2, 20000), (2, 2, 10);

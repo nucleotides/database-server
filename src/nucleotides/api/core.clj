@@ -1,29 +1,21 @@
 (ns nucleotides.api.core
   (:gen-class)
-  (:require [compojure.core                  :refer [GET POST routes]]
-            [compojure.handler               :refer [site]]
-            [ring.middleware.keyword-params  :refer [wrap-keyword-params]]
-            [ring.middleware.params          :refer [wrap-params]]
-            [ring.logger.timbre              :refer [wrap-with-logger]]
-            [ring.adapter.jetty              :refer [run-jetty]]
-            [ring.middleware.json            :refer [wrap-json-response]]
+  (:require [compojure.core      :refer [GET POST routes]]
+            [ring.adapter.jetty  :refer [run-jetty]]
 
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.database         :as db]
+            [nucleotides.api.middleware       :as md]
             [nucleotides.api.benchmarks       :as benchmarks]
-            [nucleotides.util                 :as util]))
+            [nucleotides.api.events           :as events]))
 
-(defn api [database-client]
+(defn api [db]
   (-> (routes
-        (GET  "/benchmarks/show.json" [] (partial benchmarks/show   database-client))
-        (POST "/benchmarks/"          [] (partial benchmarks/create database-client)))
-      (wrap-json-response)
-      (wrap-with-logger)
-      (wrap-keyword-params)
-      (wrap-params)))
+        (GET  "/benchmarks/show.json" []   (partial benchmarks/show   db))
+        (POST "/benchmarks/"          []   (partial events/create     db))
+        (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup db id)))))
 
 (defn -main [& args]
-  (-> (con/create-connection)
+  (-> {:connection (con/create-connection)}
       (api)
-      (site)
+      (md/middleware)
       (run-jetty {:port 80})))
