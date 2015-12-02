@@ -15,16 +15,20 @@
 (defn run-loader [f file]
   (f (con/create-connection) (help/fetch-test-data file)))
 
-
-
 (deftest load-image-types
   (let [_  (run-loader ld/image-types :image)]
-    (is (= 2 (help/table-length :image-type)))))
+    (is (= 4 (help/table-length :image-type)))))
 
-(deftest load-image-tasks
+(deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)]
+    (is (= 5 (help/table-length :image-instance)))))
+
+(deftest load-image-instances
+  (let [_  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)]
-    (is (= 4 (help/table-length :image-task)))))
+    (is (= 6 (help/table-length :image-instance-task)))))
 
 (deftest load-data-types
   (let [_  (run-loader ld/data-types :data)]

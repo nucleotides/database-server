@@ -1,13 +1,19 @@
 -- name: save-image-type<!
--- Creates a new Docker image type table entry
+-- Creates a new Docker image type entry
 INSERT INTO image_type (name, description)
 VALUES (:name, :description);
 
+-- name: save-image-instance<!
+-- Creates a new Docker image instance entry
+INSERT INTO image_instance (image_type_id, name, sha256, active)
+VALUES ((SELECT id FROM image_type WHERE name = :image_type),
+	:name, :sha256, true);
+
 -- name: save-image-task<!
 -- Creates a new image task entry
-INSERT INTO image_task (image_type_id, name, task, sha256, active)
-VALUES ((SELECT id FROM image_type WHERE name = :image_type),
-	:name, :task, :sha256, true);
+INSERT INTO image_instance_task (image_instance_id, task, active)
+VALUES ((SELECT id FROM image_instance WHERE name = :name AND sha256 = :sha256),
+	:task, true);
 
 -- name: save-data-type<!
 -- Creates a new data type entry
