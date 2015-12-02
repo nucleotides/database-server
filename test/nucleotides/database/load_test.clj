@@ -30,14 +30,14 @@
         _  (run-loader ld/image-tasks :image)]
     (is (= 6 (help/table-length :image-instance-task)))))
 
-(deftest load-data-types
-  (let [_  (run-loader ld/data-types :data)]
-    (is (= 1 (help/table-length :data-type)))))
+(deftest load-data-sets
+  (let [_  (run-loader ld/data-sets :data)]
+    (is (= 1 (help/table-length :data-set)))))
 
-(deftest load-data-instances
-  (let [_  (run-loader ld/data-types :data)
-        _  (run-loader ld/data-instances :data)]
-    (is (= 3 (help/table-length :data-instance)))))
+(deftest load-data-records
+  (let [_  (run-loader ld/data-sets :data)
+        _  (run-loader ld/data-records :data)]
+    (is (= 3 (help/table-length :data-record)))))
 
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-types :data)

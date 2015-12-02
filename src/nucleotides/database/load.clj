@@ -10,19 +10,19 @@
 
 (defn unfold-data-replicates [entries]
   (let [select-fields (partial select
-                               [ALL (collect-one :type)
+                               [ALL (collect-one :name)
                                     (keypath :entries)
                                 ALL (collect-one :reference)
                                     (collect-one :reads)
                                     (collect-one :entry_id)
                                     (keypath :replicates)])]
     (mapcat
-      (fn [[data-type reference reads entry-id replicates]]
+      (fn [[name reference reads entry-id replicates]]
         (let [entry-data {:reference_url (:url    reference)
                           :reference_md5 (:md5sum reference)
-                          :data_type      data-type
-                          :reads reads
-                          :entry_id entry-id}]
+                          :name          name
+                          :reads         reads
+                          :entry_id      entry-id}]
           (map-indexed
             (fn [idx rep]
               (-> (st/rename-keys rep {:md5sum :input_md5 :url :input_url})
@@ -66,16 +66,14 @@
         zip       (partial map (partial zipmap [:name :sha256 :task]))]
     (load-entries (fn [entries] (zip (transform entries))) save-image-task<!)))
 
+(def data-sets
+  "Load data sets into the database"
+  (let [transform #(select-keys % [:name, :description])]
+  (load-entries (partial map transform) save-data-set<!)))
 
-
-(def data-types
-  "Load data types into the database"
-  (let [transform #(select-keys % [:name, :library, :type, :description])]
-  (load-entries (partial map transform) save-data-type<!)))
-
-(def data-instances
-  "Load data entries into the database"
-  (load-entries unfold-data-replicates save-data-instance<!))
+(def data-records
+  "Load data records into the database"
+  (load-entries unfold-data-replicates save-data-record<!))
 
 (def metric-types
   "Load metric types into the database"

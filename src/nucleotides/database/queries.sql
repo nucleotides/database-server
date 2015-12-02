@@ -15,20 +15,20 @@ INSERT INTO image_instance_task (image_instance_id, task, active)
 VALUES ((SELECT id FROM image_instance WHERE name = :name AND sha256 = :sha256),
 	:task, true);
 
--- name: save-data-type<!
+-- name: save-data-set<!
 -- Creates a new data type entry
-INSERT INTO data_type (name, library, type, description)
-VALUES (:name, :library, :type, :description);
+INSERT INTO data_set (name, description, active)
+VALUES (:name, :description, true);
 
 -- name: save-metric-type<!
 -- Creates a new data type entry
 INSERT INTO metric_type (name, description)
 VALUES (:name, :description);
 
--- name: save-data-instance<!
+-- name: save-data-record<!
 -- Creates a new data instance entry
-INSERT INTO data_instance (
-	data_type_id,
+INSERT INTO data_record (
+	data_set_id,
 	entry_id,
 	replicate,
 	reads,
@@ -36,7 +36,7 @@ INSERT INTO data_instance (
 	reference_url,
 	input_md5,
 	reference_md5)
-VALUES ((SELECT id FROM data_type WHERE type = :data_type),
+VALUES ((SELECT id FROM data_set WHERE name = :name),
 	:entry_id,
 	:replicate,
 	:reads,
@@ -47,7 +47,7 @@ VALUES ((SELECT id FROM data_type WHERE type = :data_type),
 
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry
-INSERT INTO benchmark_type (data_type_id, image_type_id, name)
-VALUES ((SELECT id FROM data_type  WHERE type = :data_type),
+INSERT INTO benchmark_type (data_set_id, image_type_id, name)
+VALUES ((SELECT id FROM data_set  WHERE type = :data_set),
         (SELECT id FROM image_type WHERE name = :image_type),
 	:name);
