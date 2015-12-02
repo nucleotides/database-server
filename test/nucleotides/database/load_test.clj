@@ -40,7 +40,7 @@
     (is (= 3 (help/table-length :data-record)))))
 
 (deftest load-benchmark-types
-  (let [_  (run-loader ld/data-types :data)
+  (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/benchmark-types :benchmark_type)]
     (is (= 2 (help/table-length :benchmark-type)))))

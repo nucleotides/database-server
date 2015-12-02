@@ -47,7 +47,16 @@ VALUES ((SELECT id FROM data_set WHERE name = :name),
 
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry
-INSERT INTO benchmark_type (data_set_id, image_type_id, name)
-VALUES ((SELECT id FROM data_set  WHERE type = :data_set),
-        (SELECT id FROM image_type WHERE name = :image_type),
-	:name);
+WITH benchmark AS (
+  INSERT INTO benchmark_type (name, product_image_type_id, evaluation_image_type_id, active)
+  VALUES (
+   :name,
+   (SELECT id FROM image_type WHERE name = :product_image_type),
+   (SELECT id FROM image_type WHERE name = :evaluation_image_type),
+   true)
+   RETURNING id
+)
+INSERT INTO benchmark_data (data_set_id, benchmark_type_id, active)
+VALUES((SELECT id FROM data_set WHERE name = :data_set_name),
+       (SELECT id FROM benchmark),
+       true)

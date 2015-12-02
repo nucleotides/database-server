@@ -56,7 +56,7 @@ test:
 	@$(params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 autotest:
-	@$(params) lein prism 2>&1 | egrep -v 'INFO|clojure.tools.logging'
+	@$(params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 .api_container: .rdm_container .api_image $(credentials)
 	@docker run \

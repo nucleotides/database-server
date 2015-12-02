@@ -81,7 +81,13 @@
 
 (def benchmark-types
   "Load benchmark types into the database"
-  (load-entries save-benchmark-type<!))
+  (let [f (fn [acc entry]
+            (let [benchmark (dissoc entry :data_sets)]
+              (->> (:data_sets entry)
+                   (map (partial assoc benchmark :data_set_name))
+                   (concat acc))))
+        transform (partial reduce f [])]
+    (load-entries transform save-benchmark-type<!)))
 
 (defn rebuild-benchmark-instance [connection]
   (sql/execute! connection ["REFRESH MATERIALIZED VIEW benchmark_instance;"])
@@ -93,8 +99,8 @@
   (do
     (image-types      connection (:image           data))
     (image-tasks      connection (:image           data))
-    (data-types       connection (:data            data))
-    (data-instances   connection (:data            data))
+    (data-sets        connection (:data            data))
+    (data-records     connection (:data            data))
     (metric-types     connection (:metric_type     data))
     (benchmark-types  connection (:benchmark_type  data))
     (rebuild-benchmark-instance connection)))

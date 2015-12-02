@@ -59,7 +59,21 @@ CREATE TABLE benchmark_type(
   name				text		UNIQUE NOT NULL,
   product_image_type_id		integer		NOT NULL REFERENCES image_type(id),
   evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  data_set_id			integer		NOT NULL REFERENCES data_set(id),
-  active			bool 		NOT NULL,
-  CONSTRAINT data_image UNIQUE(data_set_id, product_image_type_id)
+  active			bool 		NOT NULL
+);
+--;;
+CREATE TABLE benchmark_data(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	NOT NULL DEFAULT current_timestamp,
+  data_set_id		integer		NOT NULL REFERENCES data_set(id),
+  benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
+  active		bool 		NOT NULL,
+  CONSTRAINT benchmark_data_idx UNIQUE(data_set_id, benchmark_type_id)
+);
+--;;
+CREATE TABLE metric_type(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	DEFAULT current_timestamp,
+  name		varchar(80)	UNIQUE NOT NULL,
+  description	text 		NOT NULL
 );
