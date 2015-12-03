@@ -35,7 +35,8 @@ INSERT INTO data_record (
 	input_url,
 	reference_url,
 	input_md5,
-	reference_md5)
+	reference_md5,
+	active)
 VALUES ((SELECT id FROM data_set WHERE name = :name),
 	:entry_id,
 	:replicate,
@@ -43,7 +44,8 @@ VALUES ((SELECT id FROM data_set WHERE name = :name),
 	:input_url,
 	:reference_url,
 	:input_md5,
-	:reference_md5);
+	:reference_md5,
+        true);
 
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry

@@ -45,6 +45,16 @@
         _  (run-loader ld/benchmark-types :benchmark_type)]
     (is (= 2 (help/table-length :benchmark-type)))))
 
+(deftest load-benchmark-instances
+  (let [_  (run-loader ld/data-sets :data)
+        _  (run-loader ld/data-records :data)
+        _  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)
+        _  (run-loader ld/image-tasks :image)
+        _  (run-loader ld/benchmark-types :benchmark_type)
+        _  (ld/rebuild-benchmark-instance (con/create-connection))]
+    (is (not (= 0 (help/table-length :benchmark-instance))))))
+
 (deftest load-metric-types
   (let [_  (run-loader ld/metric-types :metric_type)]
     (is (= 2 (help/table-length :metric-type)))))
