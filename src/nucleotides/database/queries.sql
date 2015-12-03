@@ -84,3 +84,27 @@ LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_i
 WHERE NOT EXISTS(
 	SELECT external_id FROM benchmark_instance WHERE benchmark_instance.external_id = external_id
 );
+
+-- name: populate-task!
+-- Populates benchmark instance table with combinations of data record and image task
+INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
+	SELECT
+	benchmark_instance.id   AS benchmark_instance_id,
+	image_instance_task.id  AS image_instance_task_id,
+	'evaluate'::task_type AS benchmark_task_type
+	FROM benchmark_instance
+	LEFT JOIN benchmark_type      ON benchmark_type_id = benchmark_instance.benchmark_type_id
+	LEFT JOIN image_instance      ON benchmark_type.evaluation_image_type_id = image_instance.image_type_id
+	LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
+UNION
+	SELECT
+	benchmark_instance.id	 AS benchmark_instance_id,
+	benchmark_instance.product_image_instance_task_id AS image_instance_task_id,
+	'produce'::task_type AS type
+	FROM benchmark_instance
+EXCEPT
+	SELECT
+	benchmark_instance_id,
+	image_instance_task_id,
+	task_type
+	FROM task

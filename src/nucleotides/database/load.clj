@@ -89,8 +89,10 @@
         transform (partial reduce f [])]
     (load-entries transform save-benchmark-type<!)))
 
-(defn rebuild-benchmark-instance [connection]
-  (populate-benchmark-instance! {} {:connection connection}))
+(defn rebuild-benchmark-task [connection]
+  (let [args [{} {:connection connection}]]
+    (apply populate-benchmark-instance! args)
+    (apply populate-task! args)))
 
 (defn load-data
   "Load and update benchmark data in the database"
@@ -102,4 +104,4 @@
     (data-records     connection (:data            data))
     (metric-types     connection (:metric_type     data))
     (benchmark-types  connection (:benchmark_type  data))
-    (rebuild-benchmark-instance connection)))
+    (rebuild-benchmark-task connection)))

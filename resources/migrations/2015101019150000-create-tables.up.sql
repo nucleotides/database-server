@@ -90,3 +90,16 @@ CREATE TABLE benchmark_instance(
   product_image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
   CONSTRAINT benchmark_instance_idx UNIQUE(data_record_id, product_image_instance_task_id)
 );
+--;;
+--;; Evaluation tasks
+--;;
+CREATE TYPE task_type AS ENUM ('produce', 'evaluate');
+--;;
+CREATE TABLE task(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	NOT NULL DEFAULT current_timestamp,
+  benchmark_instance_id		integer		NOT NULL REFERENCES benchmark_instance(id),
+  image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
+  task_type			task_type	NOT NULL,
+  CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
+);
