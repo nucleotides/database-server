@@ -90,8 +90,7 @@
     (load-entries transform save-benchmark-type<!)))
 
 (defn rebuild-benchmark-instance [connection]
-  (sql/execute! connection ["REFRESH MATERIALIZED VIEW benchmark_instance;"])
-  (sql/execute! connection ["REINDEX TABLE benchmark_instance;"]))
+  (populate-benchmark-instance! {} {:connection connection}))
 
 (defn load-data
   "Load and update benchmark data in the database"
