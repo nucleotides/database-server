@@ -17,27 +17,44 @@
 
 (deftest load-image-types
   (let [_  (run-loader ld/image-types :image)]
-    (is (= 2 (help/table-length :image-type)))))
+    (is (= 4 (help/table-length :image-type)))))
 
-(deftest load-image-tasks
+(deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)]
+    (is (= 5 (help/table-length :image-instance)))))
+
+(deftest load-image-instances
+  (let [_  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)]
-    (is (= 4 (help/table-length :image-task)))))
+    (is (= 6 (help/table-length :image-instance-task)))))
 
-(deftest load-data-types
-  (let [_  (run-loader ld/data-types :data)]
-    (is (= 1 (help/table-length :data-type)))))
+(deftest load-data-sets
+  (let [_  (run-loader ld/data-sets :data)]
+    (is (= 1 (help/table-length :data-set)))))
 
-(deftest load-data-instances
-  (let [_  (run-loader ld/data-types :data)
-        _  (run-loader ld/data-instances :data)]
-    (is (= 3 (help/table-length :data-instance)))))
+(deftest load-data-records
+  (let [_  (run-loader ld/data-sets :data)
+        _  (run-loader ld/data-records :data)]
+    (is (= 3 (help/table-length :data-record)))))
 
 (deftest load-benchmark-types
-  (let [_  (run-loader ld/data-types :data)
+  (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/benchmark-types :benchmark_type)]
     (is (= 2 (help/table-length :benchmark-type)))))
+
+(deftest load-benchmark-instances
+  (let [_  (run-loader ld/data-sets :data)
+        _  (run-loader ld/data-records :data)
+        _  (run-loader ld/image-types :image)
+        _  (run-loader ld/image-instances :image)
+        _  (run-loader ld/image-tasks :image)
+        _  (run-loader ld/benchmark-types :benchmark_type)
+        _  (ld/rebuild-benchmark-task (con/create-connection))]
+    (is (not (= 0 (help/table-length :benchmark-instance))))
+    (is (not (= 0 (help/table-length :task))))))
 
 (deftest load-metric-types
   (let [_  (run-loader ld/metric-types :metric_type)]

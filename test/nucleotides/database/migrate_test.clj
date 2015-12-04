@@ -9,17 +9,24 @@
 
 (use-fixtures :each (fn [f] (help/drop-tables) (f)))
 
-(def expected-lengths
-  [[:image-type         2]
-   [:image-task         4]
-   [:data-type          1]
-   [:data-instance      3]
-   [:benchmark-type     2]
-   [:benchmark-instance 12]
-   [:metric-type        2]])
+(def tables
+  [:image-type
+   :image-instance
+   :image-instance-task
+   :data-set
+   :data-record
+   :benchmark-type
+   :benchmark-instance
+   :benchmark-data
+   :metric-type
+   :task])
+
+(do
+  (help/drop-tables)
+  (migrate/migrate help/test-data-directory))
 
 (deftest migrate
   (testing "-main"
     (migrate/migrate help/test-data-directory)
-    (doall (for [[table-name length] expected-lengths]
-             (is (= length (help/table-length table-name)))))))
+    (dorun (for [table-name tables]
+             (is (not (= 0 (help/table-length table-name))) (str table-name))))))
