@@ -94,14 +94,19 @@
     (apply populate-benchmark-instance! args)
     (apply populate-task! args)))
 
+(def loaders
+  [[data-sets        :data]
+   [data-records     :data]
+   [image-types      :image]
+   [image-instances  :image]
+   [image-tasks      :image]
+   [benchmark-types  :benchmark_type]
+   [metric-types     :metric_type]])
+
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
-  (do
-    (image-types      connection (:image           data))
-    (image-tasks      connection (:image           data))
-    (data-sets        connection (:data            data))
-    (data-records     connection (:data            data))
-    (metric-types     connection (:metric_type     data))
-    (benchmark-types  connection (:benchmark_type  data))
-    (rebuild-benchmark-task connection)))
+  (let [load_ (fn [[f k]] (f connection (k data)))]
+    (do
+      (dorun (map load_ loaders))
+      (rebuild-benchmark-task connection))))
