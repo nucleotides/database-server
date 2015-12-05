@@ -10,12 +10,22 @@ eval_image_type_ AS (
 
 product_image_instance_ AS (
 	INSERT INTO image_instance (image_type_id, name, sha256, active)
-	VALUES((SELECT id FROM product_image_type_), 'bioboxes/velvet', '1234567890abcdef', true) RETURNING id
+	VALUES((SELECT id FROM product_image_type_), 'bioboxes/velvet', '123abc', true) RETURNING id
 ),
 
-image_instance_task_ AS (
+product_image_instance_task_ AS (
 	INSERT INTO image_instance_task (image_instance_id, task, active)
 	VALUES((SELECT id FROM product_image_instance_), 'default', true) RETURNING id
+),
+
+eval_image_instance_ AS (
+	INSERT INTO image_instance (image_type_id, name, sha256, active)
+	VALUES((SELECT id FROM eval_image_type_), 'bioboxes/quast', '123abc', true) RETURNING id
+),
+
+eval_image_instance_task_ AS (
+	INSERT INTO image_instance_task (image_instance_id, task, active)
+	VALUES((SELECT id FROM eval_image_type_), 'default', true) RETURNING id
 ),
 
 data_set_ AS (
@@ -41,10 +51,9 @@ benchmark_instance_ AS (
 	VALUES('abcdef',
 		(SELECT id FROM benchmark_type_),
 		(SELECT id FROM data_record_),
-		(SELECT id FROM image_instance_task_)
+		(SELECT id FROM product_image_instance_task_)
 	) RETURNING id
 )
 INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
-VALUES ((SELECT id FROM image_instance_task_),
-	(SELECT id FROM image_instance_task_),
-	'produce')
+VALUES ((SELECT id FROM benchmark_instance_), (SELECT id FROM product_image_instance_task_), 'produce'),
+       ((SELECT id FROM benchmark_instance_), (SELECT id FROM eval_image_instance_task_), 'evaluate')
