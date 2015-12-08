@@ -8,7 +8,7 @@
 (def create
   #(event/create {:connection (con/create-connection)} {:params %}))
 
-(deftest nucleotides.api.events
+(comment (deftest nucleotides.api.events
 
   (testing "#create"
 
@@ -47,4 +47,4 @@
         (is (= 200 status))
         (is (= "2" body))
         (is (= 2 (help/table-length "benchmark-event")))
-        (is (= 2 (help/table-length "metric-instance")))))))
+        (is (= 2 (help/table-length "metric-instance"))))))))

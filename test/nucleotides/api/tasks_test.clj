@@ -17,4 +17,12 @@
         (dorun
           (for [k [:id :input_url :input_md5 :task_type
                    :image_name :image_sha256 :image_task :image_type]]
-            (is (contains? (first body) k))))))))
+            (is (contains? (first body) k)))))))
+
+  (testing "#create"
+
+
+
+
+
+    ))

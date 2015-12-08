@@ -15,7 +15,7 @@
 (def lookup
   #(bench/lookup {:connection (con/create-connection)} % {}))
 
-(deftest nucleotides.api.benchmarks
+(comment (deftest nucleotides.api.benchmarks
 
   (testing "#show"
 
@@ -85,4 +85,4 @@
         (doall
           (for [k (keys exp)]
             (do (is (contains? body k))
-                (is (= (k exp) (k body))))))))))
+                (is (= (k exp) (k body)))))))))))
