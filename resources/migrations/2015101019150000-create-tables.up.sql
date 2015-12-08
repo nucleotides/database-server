@@ -103,3 +103,12 @@ CREATE TABLE task(
   task_type			task_type	NOT NULL,
   CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
 );
+--;;
+CREATE TABLE event(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
+  task_id	integer		NOT NULL REFERENCES task(id),
+  file_url	text,
+  log_file_url	text		NOT NULL,
+  success	bool 		NOT NULL
+);

@@ -1,16 +1,7 @@
--- name: create-benchmark-event<!
--- Create a new benchmark event
-INSERT INTO benchmark_event (
-	benchmark_instance_id,
-	benchmark_file,
-	log_file,
-	event_type,
-	success)
-VALUES (:id,
-	:benchmark_file,
-	:log_file,
-	:event_type::benchmark_event_type,
-	:success::boolean)
+-- name: create-event<!
+-- Create a new event
+INSERT INTO event (task_id, file_url, log_file_url, success)
+VALUES (:task, :file_url, :log_file_url, :success::boolean)
 
 -- name: create-metric-instance<!
 -- Create a new metric instance
