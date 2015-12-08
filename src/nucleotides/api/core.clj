@@ -12,8 +12,8 @@
 (defn api [db]
   (-> (routes
         (GET  "/tasks/show.json"      []   (partial tasks/show        db))
+        (POST "/events"               []   (partial events/create     db))
         (GET  "/benchmarks/show.json" []   (partial benchmarks/show   db))
-        (POST "/benchmarks/"          []   (partial events/create     db))
         (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup db id)))))
 
 (defn -main [& args]

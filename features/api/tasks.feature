@@ -11,19 +11,19 @@ Feature: Posting and getting tasks from the API
 
   Scenario Outline: Listing all tasks for a product-completed benchmark
     Given the database scenario with "a single incomplete task"
-    When I post to "/tasks/" with the data:
+    When I post to "/events" with the data:
       """
       {
-        "id"             : 1,
-        "log_file"       : "s3://url",
-        "success"        : <state>
-        <input_url>
+        "task"          : 1,
+        "log_file_url"  : "s3://url",
+        "success"       : <state>
+        <file_url>
       }
       """
-    Then the returned HTTP status code should be "200"
+    Then the returned HTTP status code should be "201"
 
     Examples:
-      | state | input_url                       |
-      | true  | , "benchmark_file" : "s3://url" |
-      | false |                                 |
-      | false | , "benchmark_file" : null       |
+      | state | file_url                  |
+      | true  | , "file_url" : "s3://url" |
+      | false |                           |
+      | false | , "file_url" : null       |

@@ -10,6 +10,12 @@
             [helper                           :as help]))
 
 
+(def valid-event
+  {:task          1
+   :success       true
+   :log_file_url  "s3://url"
+   :file_url      "s3://url"})
+
 (defn request
   "Create a mock request to the API"
   ([method url params]
@@ -20,6 +26,9 @@
 
 (defn is-ok-response [response]
   (is (contains? #{200 201} (:status response))))
+
+(defn has-header [response header]
+  (is (contains? (:headers response) header)))
 
 (defn is-empty-body [response]
   (is (empty? (json/read-str (:body response)))))
@@ -35,4 +44,13 @@
       (let [_   (help/load-fixture "a_single_incomplete_task")
             res (f)]
         (is-ok-response res)
-        (is-not-empty-body res)))))
+        (is-not-empty-body res))))
+
+  (testing "POST /events"
+    (let [f (partial request :post "/events")]
+
+      (let [_   (help/load-fixture "a_single_incomplete_task")
+            res (f valid-event)]
+        (is-ok-response res)
+        (has-header res "Location")
+        (is (= 1 (help/table-length "event")))))))
