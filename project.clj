@@ -26,7 +26,8 @@
                  [ring/ring-json             "0.4.0"]
                  [yesql                      "0.5.1"]]
 
-  :plugins      [[lein-ring "0.9.0"]]
+  :plugins      [[lein-ring                          "0.9.0"]
+                 [com.jakemccrary/lein-test-refresh  "0.11.0"]]
 
   :local-repo  "vendor/maven"
 
