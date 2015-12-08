@@ -35,7 +35,7 @@ data_set_ AS (
 
 data_record_ AS (
 	INSERT INTO data_record (data_set_id, entry_id, replicate, reads, input_url, reference_url, input_md5, reference_md5, active)
-	VALUES((SELECT id FROM data_set_), 1, 1, 200000, 's3://url', 's3://url', 'abcedf', 'abcedf', true) RETURNING id
+	VALUES((SELECT id FROM data_set_), 1, 1, 200000, 's3://url', 's3://url', 'abcdef', 'abcdef', true) RETURNING id
 ),
 
 benchmark_type_ AS (
