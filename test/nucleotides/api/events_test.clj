@@ -1,26 +1,32 @@
 (ns nucleotides.api.events-test
-  (:require [clojure.test                     :refer :all]
-            [nucleotides.database.connection  :as con]
+  (:require [clojure.test          :refer :all]
+            [helper.event          :refer :all]
+            [helper.http-response  :refer :all]
+            [helper                :refer :all]
+
             [clojure.data.json                :as json]
+            [nucleotides.database.connection  :as con]
             [nucleotides.api.events           :as event]
-            [helper                           :as help]))
+            ))
 
 (def create
   #(event/create {:connection (con/create-connection)} {:params %}))
-
-(def valid-event
-  {:task          1
-   :success       true
-   :log_file_url  "s3://url"
-   :file_url      "s3://url"})
 
 (deftest nucleotides.api.events
 
   (testing "#create"
 
-    (testing "create an event"
-      (let [_                        (help/load-fixture "a_single_incomplete_task")
-            {:keys [status headers]} (create valid-event)]
-        (is (= 201 status))
-        (is (contains? headers "Location"))
-        (is (= 1 (help/table-length "event")))))))
+    (testing "with a successful event"
+      (let [_        (load-fixture "a_single_incomplete_task")
+            response (create (mock-event :success))
+            {:keys [status headers]} response ]
+        (is-ok-response response)
+        (has-header response "Location")
+        (is (= 1 (table-length "event")))))
+
+    (testing "with an unsuccessful event"
+      (let [_        (load-fixture "a_single_incomplete_task")
+            response (create (mock-event :failure))]
+        (is-ok-response response)
+        (has-header response "Location")
+        (is (= 1 (table-length "event")))))))
