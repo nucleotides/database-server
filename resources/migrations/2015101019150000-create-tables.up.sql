@@ -109,6 +109,7 @@ CREATE TABLE event(
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
   task_id	integer		NOT NULL REFERENCES task(id),
   file_url	text,
+  file_md5	text,
   log_file_url	text		NOT NULL,
   success	bool 		NOT NULL
 );

@@ -2,8 +2,7 @@
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
             [clojure.string      :as st]
-            [ring.util.response  :as ring]
-            ))
+            [ring.util.response  :as ring]))
 
 (defqueries "nucleotides/api/events.sql")
 
@@ -26,5 +25,7 @@
 (defn create
   "Creates a new event from the given parameters"
   [db-client {params :params}]
-  (let [id (:id (create-event<! (merge {:file_url nil} params) db-client))]
-    (ring/created (str "/events/" id))))
+  (let [entry (-> {:file_url nil, :file_md5 nil}
+                  (merge params)
+                  (create-event<! db-client))]
+    (ring/created (str "/events/" (:id entry)))))
