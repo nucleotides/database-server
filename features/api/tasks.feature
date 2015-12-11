@@ -36,9 +36,15 @@ Feature: Posting and getting tasks from the API
         "file_md5"      : "123",
         "success"       : true }
       """
+    And I successfully post to "/events" with the data:
+      """
+      { "task"          : 2,
+        "log_file_url"  : "log_url",
+        "file_url"      : "eval_url",
+        "file_md5"      : "123",
+        "success"       : true }
+      """
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
-    And the returned JSON should contain the entries:
-      | image_name      | image_sha256 | image_task | input_url   | input_md5 | task_type | image_type          |
-      | bioboxes/quast  | 123abc       | default    | product_url | 123       | evaluate  | assembly_evaluation |
+    And the returned JSON should be empty

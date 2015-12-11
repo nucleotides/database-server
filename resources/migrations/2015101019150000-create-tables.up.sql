@@ -103,6 +103,7 @@ CREATE TABLE task(
   task_type			task_type	NOT NULL,
   CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
 );
+CREATE INDEX task_type_idx ON task (task_type);
 --;;
 CREATE TABLE event(
   id		serial		PRIMARY KEY,

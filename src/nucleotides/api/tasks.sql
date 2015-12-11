@@ -9,6 +9,15 @@ WITH successful_prod_event AS (
 	WHERE event.success = TRUE
 	AND task.task_type = 'produce'
 ),
+successful_eval_event AS (
+	SELECT DISTINCT ON (task.id)
+	event.*,
+	task.benchmark_instance_id
+	FROM event
+	LEFT JOIN task ON task.id = event.task_id
+	WHERE event.success = TRUE
+	AND task.task_type = 'evaluate'
+),
 task_ AS (
 	SELECT
 	task.id,
@@ -52,7 +61,9 @@ evaluate_task AS (
 	successful_prod_event.file_md5 AS input_md5
 	FROM task_
 	LEFT JOIN successful_prod_event ON successful_prod_event.benchmark_instance_id = task_.benchmark_instance_id
+	LEFT JOIN successful_eval_event ON successful_eval_event.task_id = task_.id
 	WHERE task_.task_type = 'evaluate'
+	AND successful_eval_event.id IS NULL
 )
 SELECT * FROM product_task
 UNION
