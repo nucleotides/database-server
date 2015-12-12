@@ -1,13 +1,11 @@
 (ns nucleotides.database.migrate-test
-  (:require [clojure.test :refer :all]
-            [clojure.java.jdbc               :as db]
-            [yesql.core                      :refer [defqueries]]
-            [helper                          :as help]
-            [nucleotides.database.migrate    :as migrate]
-            [nucleotides.database.connection :as con]
-            [nucleotides.util                :as util]))
+  (:require [clojure.test     :refer :all]
+            [helper.fixture   :refer :all]
+            [helper.database  :refer :all]
 
-(use-fixtures :each (fn [f] (help/drop-tables) (f)))
+            [nucleotides.database.migrate  :as migrate]))
+
+(use-fixtures :each (fn [f] (drop-tables) (f)))
 
 (def tables
   [:image-type
@@ -22,11 +20,11 @@
    :task])
 
 (do
-  (help/drop-tables)
-  (migrate/migrate help/test-data-directory))
+  (drop-tables)
+  (migrate/migrate (test-directory :data)))
 
 (deftest migrate
   (testing "-main"
-    (migrate/migrate help/test-data-directory)
+    (migrate/migrate (test-directory :data))
     (dorun (for [table-name tables]
-             (is (not (= 0 (help/table-length table-name))) (str table-name))))))
+             (is (not (= 0 (table-length table-name))) (str table-name))))))

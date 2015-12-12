@@ -4,7 +4,8 @@
 
             [helper.event          :refer :all]
             [helper.http-response  :refer :all]
-            [helper                :refer :all]
+            [helper.fixture        :refer :all]
+            [helper.database       :refer :all]
 
             [nucleotides.database.connection  :as con]
             [nucleotides.database.load        :as db]

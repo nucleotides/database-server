@@ -1,13 +1,13 @@
 (ns nucleotides.api.events-test
   (:require [clojure.test          :refer :all]
             [helper.event          :refer :all]
+            [helper.fixture        :refer :all]
+            [helper.database       :refer :all]
             [helper.http-response  :refer :all]
-            [helper                :refer :all]
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.events           :as event]
-            ))
+            [nucleotides.api.events           :as event]))
 
 (def create
   #(event/create {:connection (con/create-connection)} {:params %}))
