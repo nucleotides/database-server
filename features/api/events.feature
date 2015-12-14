@@ -32,7 +32,8 @@ Feature: Posting and getting events from the API
     And the returned body should be a valid JSON document
     And the returned JSON should contain:
       | key          | value       |
-      | task         | 1           |
+      | id           | 1           |
+      | task_id      | 1           |
       | log_file_url | log_url     |
       | file_url     | product_url |
       | file_md5     | 123         |

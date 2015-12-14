@@ -29,3 +29,11 @@
                   (merge params)
                   (create-event<! db-client))]
     (ring/created (str "/events/" (:id entry)))))
+
+(defn lookup
+  "Finds an event by ID"
+  [db-client id _]
+  (-> {:id id}
+      (get-event db-client)
+      (first)
+      (ring/response)))

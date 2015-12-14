@@ -8,6 +8,9 @@
 (defn has-header [response header]
   (is (contains? (:headers response) header)))
 
+(defn has-body-entry [response k]
+  (is (contains? (json/read-str (:body response)) k)))
+
 (defn is-empty-body [response]
   (is (empty? (json/read-str (:body response)))))
 

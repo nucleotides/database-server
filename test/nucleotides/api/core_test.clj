@@ -10,8 +10,7 @@
             [nucleotides.database.connection  :as con]
             [nucleotides.database.load        :as db]
             [nucleotides.api.middleware       :as md]
-            [nucleotides.api.core             :as app]
-            ))
+            [nucleotides.api.core             :as app]))
 
 
 (defn request
@@ -39,4 +38,13 @@
             res (f (mock-event :success))]
         (is-ok-response res)
         (has-header res "Location")
-        (is (= 1 (table-length "event")))))))
+        (is (= 1 (table-length "event"))))))
+
+  (testing "GET /events/:id"
+    (let [f #(request :get (str "/events/" %))]
+
+      (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
+            res (f 1)]
+        (is-ok-response res)
+        (is-not-empty-body res)
+        (has-body-entry res "id")))))
