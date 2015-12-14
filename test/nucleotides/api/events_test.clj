@@ -16,23 +16,32 @@
 (def lookup
   #(event/lookup {:connection (con/create-connection)} % {}))
 
+
 (deftest nucleotides.api.events
 
   (testing "#create"
 
-    (testing "with a successful event"
+    (testing "with a successful produce event"
       (let [_   (load-fixture "a_single_incomplete_task")
-            res (create (mock-event :success))]
+            res (create (mock-event :produce :success))]
         (is-ok-response res)
         (has-header res "Location")
         (is (= 1 (table-length "event")))))
 
-    (testing "with an unsuccessful event"
+    (testing "with an unsuccessful produce event"
       (let [_   (load-fixture "a_single_incomplete_task")
-            res (create (mock-event :failure))]
+            res (create (mock-event :produce :failure))]
         (is-ok-response res)
         (has-header res "Location")
-        (is (= 1 (table-length "event"))))))
+        (is (= 1 (table-length "event")))))
+
+    (testing "with a successful evaluate event"
+      (let [_   (load-fixture "a_single_incomplete_task")
+            res (create (mock-event :evaluate :success))]
+        (is-ok-response res)
+        (has-header res "Location")
+        (is (= 1 (table-length "event")))
+        (is (= 2 (table-length "metric-instance"))))))
 
   (testing "#get"
 

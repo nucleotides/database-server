@@ -35,7 +35,7 @@
     (let [f (partial request :post "/events")]
 
       (let [_   (load-fixture "a_single_incomplete_task")
-            res (f (mock-event :success))]
+            res (f (mock-event :produce :success))]
         (is-ok-response res)
         (has-header res "Location")
         (is (= 1 (table-length "event"))))))

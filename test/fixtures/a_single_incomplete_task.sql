@@ -56,4 +56,8 @@ benchmark_instance_ AS (
 )
 INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
 VALUES ((SELECT id FROM benchmark_instance_), (SELECT id FROM product_image_instance_task_), 'produce'),
-       ((SELECT id FROM benchmark_instance_), (SELECT id FROM eval_image_instance_task_), 'evaluate')
+       ((SELECT id FROM benchmark_instance_), (SELECT id FROM eval_image_instance_task_), 'evaluate');
+--;;
+INSERT INTO metric_type (name, description)
+VALUES ('ng50', 'An assembly metric'),
+       ('lg50', 'Another assembly metric');

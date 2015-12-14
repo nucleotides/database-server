@@ -14,8 +14,8 @@
             (interleave [:name :value])
             (apply hash-map)))))
 
-(defn- create-metrics [db-client id {:keys [event_type success metrics]}]
-  (if (and (= event_type "evaluation") (= success "true"))
+(defn- create-metrics [db-client id {:keys [success metrics]}]
+  (if (and (= success "true") (not (nil? metrics)))
     (->> metrics
          (wide->long)
          (map #(assoc % :id id))
@@ -25,10 +25,12 @@
 (defn create
   "Creates a new event from the given parameters"
   [db-client {params :params}]
-  (let [entry (-> {:file_url nil, :file_md5 nil}
+  (let [id (-> {:file_url nil, :file_md5 nil}
                   (merge params)
-                  (create-event<! db-client))]
-    (ring/created (str "/events/" (:id entry)))))
+                  (create-event<! db-client)
+                  (:id))
+        _  (create-metrics db-client id params)]
+    (ring/created (str "/events/" id))))
 
 (defn lookup
   "Finds an event by ID"
