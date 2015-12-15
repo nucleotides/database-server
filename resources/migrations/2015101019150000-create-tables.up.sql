@@ -1,13 +1,4 @@
 --;;
---;; Metric types
---;;
-CREATE TABLE metric_type(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	DEFAULT current_timestamp,
-  name		varchar(80)	UNIQUE NOT NULL,
-  description	text 		NOT NULL
-);
---;;
 --;; Docker images
 --;;
 CREATE TABLE image_type(
@@ -102,4 +93,33 @@ CREATE TABLE task(
   image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
   task_type			task_type	NOT NULL,
   CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
+);
+CREATE INDEX task_type_idx ON task (task_type);
+--;;
+CREATE TABLE event(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
+  task_id	integer		NOT NULL REFERENCES task(id),
+  file_url	text,
+  file_md5	text,
+  log_file_url	text		NOT NULL,
+  success	bool 		NOT NULL
+);
+--;;
+--;; Metrics
+--;;
+CREATE TABLE metric_type(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	DEFAULT current_timestamp,
+  name		varchar(80)	UNIQUE NOT NULL,
+  description	text 		NOT NULL
+);
+--;;
+CREATE TABLE metric_instance(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
+  event_id		integer		NOT NULL REFERENCES event(id),
+  value			float 		NOT NULL,
+  CONSTRAINT metric_to_event UNIQUE(metric_type_id, event_id)
 );

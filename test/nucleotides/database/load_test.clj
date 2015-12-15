@@ -4,46 +4,48 @@
             [clojure.pprint                  :as pp]
             [clojure.java.jdbc               :as db]
             [clojure.set                     :as st]
-            [com.rpl.specter :refer :all]
-            [helper                          :as help]
+
+            [helper.database  :refer :all]
+            [helper.fixture   :refer :all]
+
             [nucleotides.database.load       :as ld]
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
-(use-fixtures :each (fn [f] (help/empty-database) (f)))
+(use-fixtures :each (fn [f] (empty-database) (f)))
 
 (defn run-loader [f file]
-  (f (con/create-connection) (help/fetch-test-data file)))
+  (f (con/create-connection) (fetch-test-data file)))
 
 (deftest load-image-types
   (let [_  (run-loader ld/image-types :image)]
-    (is (= 4 (help/table-length :image-type)))))
+    (is (= 4 (table-length :image-type)))))
 
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)]
-    (is (= 5 (help/table-length :image-instance)))))
+    (is (= 5 (table-length :image-instance)))))
 
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)]
-    (is (= 6 (help/table-length :image-instance-task)))))
+    (is (= 6 (table-length :image-instance-task)))))
 
 (deftest load-data-sets
   (let [_  (run-loader ld/data-sets :data)]
-    (is (= 1 (help/table-length :data-set)))))
+    (is (= 1 (table-length :data-set)))))
 
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/data-records :data)]
-    (is (= 3 (help/table-length :data-record)))))
+    (is (= 3 (table-length :data-record)))))
 
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/benchmark-types :benchmark_type)]
-    (is (= 2 (help/table-length :benchmark-type)))))
+    (is (= 2 (table-length :benchmark-type)))))
 
 (deftest load-benchmark-instances
   (let [_  (run-loader ld/data-sets :data)
@@ -53,9 +55,9 @@
         _  (run-loader ld/image-tasks :image)
         _  (run-loader ld/benchmark-types :benchmark_type)
         _  (ld/rebuild-benchmark-task (con/create-connection))]
-    (is (not (= 0 (help/table-length :benchmark-instance))))
-    (is (not (= 0 (help/table-length :task))))))
+    (is (not (= 0 (table-length :benchmark-instance))))
+    (is (not (= 0 (table-length :task))))))
 
 (deftest load-metric-types
   (let [_  (run-loader ld/metric-types :metric_type)]
-    (is (= 2 (help/table-length :metric-type)))))
+    (is (= 2 (table-length :metric-type)))))
