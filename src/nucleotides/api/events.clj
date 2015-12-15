@@ -14,6 +14,13 @@
             (interleave [:name :value])
             (apply hash-map)))))
 
+(def long->wide
+  (comp
+    #(dissoc % nil)
+    (partial apply hash-map)
+    flatten
+    (partial map vals)))
+
 (defn- create-metrics [db-client id {:keys [success metrics]}]
   (if (and (= success "true") (not (nil? metrics)))
     (->> metrics
@@ -24,7 +31,7 @@
 
 (defn create
   "Creates a new event from the given parameters"
-  [db-client {params :params}]
+  [db-client {:keys [params] :as request}]
   (let [id (-> {:file_url nil, :file_md5 nil}
                   (merge params)
                   (create-event<! db-client)
@@ -35,7 +42,12 @@
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
-  (-> {:id id}
-      (get-event db-client)
-      (first)
-      (ring/response)))
+  (let [metrics (->> (metrics-by-event-id {:id id} db-client)
+                     (long->wide)
+                     (future))] ; I put this here because I wanted to experiment
+                                ; with clojure futures. This may not be optimal.
+    (-> {:id id}
+        (get-event db-client)
+        (first)
+        (assoc :metrics @metrics)
+        (ring/response))))

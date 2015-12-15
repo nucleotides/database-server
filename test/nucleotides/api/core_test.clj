@@ -34,11 +34,20 @@
   (testing "POST /events"
     (let [f (partial request :post "/events")]
 
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (f (mock-event :produce :success))]
-        (is-ok-response res)
-        (has-header res "Location")
-        (is (= 1 (table-length "event"))))))
+      (testing "with a successful produce event"
+        (let [_   (load-fixture "a_single_incomplete_task")
+              res (f (event-as-http-params (mock-event :produce :success)))]
+          (is-ok-response res)
+          (has-header res "Location")
+          (is (= 1 (table-length "event")))))
+
+      (comment (testing "with a successful evaluate event"
+        (let [_   (load-fixture "a_single_incomplete_task")
+              res (f (event-as-http-params (mock-event :evaluate :success)))]
+          (is-ok-response res)
+          (has-header res "Location")
+          (is (= 1 (table-length "event")))
+          (is (= 2 (table-length "metric_instance"))))))))
 
   (testing "GET /events/:id"
     (let [f #(request :get (str "/events/" %))]

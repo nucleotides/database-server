@@ -45,9 +45,18 @@
 
   (testing "#get"
 
-    (testing "an event"
+    (testing "a product event"
       (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
             res (lookup 1)]
         (is-ok-response res)
-        (is (contains? (:body res) :id))))))
+        (is (contains? (:body res) :id))))
+
+    (testing "a product event"
+      (let [_   (load-fixture "a_single_incomplete_task"
+                              "a_successful_product_event"
+                              "a_successful_evaluate_event")
+            res (lookup 2)]
+        (is-ok-response res)
+        (is (contains? (:body res) :id))
+        (is (contains? (:body res) :metrics))))))
 
