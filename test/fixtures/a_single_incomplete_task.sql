@@ -47,9 +47,8 @@ benchmark_type_ AS (
 ),
 
 benchmark_instance_ AS (
-	INSERT INTO benchmark_instance (external_id, benchmark_type_id, data_record_id, product_image_instance_task_id)
-	VALUES('abcdef',
-		(SELECT id FROM benchmark_type_),
+	INSERT INTO benchmark_instance (benchmark_type_id, data_record_id, product_image_instance_task_id)
+	VALUES ((SELECT id FROM benchmark_type_),
 		(SELECT id FROM data_record_),
 		(SELECT id FROM product_image_instance_task_)
 	) RETURNING id

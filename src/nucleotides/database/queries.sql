@@ -66,12 +66,10 @@ VALUES((SELECT id FROM data_set WHERE name = :data_set_name),
 -- name: populate-benchmark-instance!
 -- Populates benchmark instance table with combinations of data record and image task
 INSERT INTO benchmark_instance(
-	external_id,
 	benchmark_type_id,
 	data_record_id,
 	product_image_instance_task_id)
 SELECT
-md5(data_record.id || '-' || image_instance_task.id) AS external_id,
 benchmark_type.id,
 data_record.id,
 image_instance_task.id

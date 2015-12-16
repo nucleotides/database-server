@@ -81,6 +81,12 @@ CREATE TABLE benchmark_instance(
   product_image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
   CONSTRAINT benchmark_instance_idx UNIQUE(data_record_id, product_image_instance_task_id)
 );
+CREATE OR REPLACE FUNCTION benchmark_instance_external_id() RETURNS trigger AS '
+BEGIN
+	NEW.external_id := md5(NEW.benchmark_type_id || ''-'' || NEW.data_record_id || ''-'' || NEW.product_image_instance_task_id);
+	RETURN NEW;
+END;' LANGUAGE plpgsql;
+CREATE TRIGGER benchmark_instance_insert BEFORE INSERT OR UPDATE ON benchmark_instance FOR EACH ROW EXECUTE PROCEDURE benchmark_instance_external_id();
 --;;
 --;; Evaluation tasks
 --;;
