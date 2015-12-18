@@ -14,7 +14,6 @@
         (GET  "/tasks/show.json"      []   (partial tasks/show        db))
         (GET  "/events/:id"           [id] (partial events/lookup     db id))
         (POST "/events"               []   (partial events/create     db))
-        (GET  "/benchmarks/show.json" []   (partial benchmarks/show   db))
         (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup db id)))))
 
 (defn -main [& args]

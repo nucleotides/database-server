@@ -40,7 +40,7 @@ data_record_ AS (
 
 benchmark_type_ AS (
 	INSERT INTO benchmark_type (name, product_image_type_id, evaluation_image_type_id, active)
-	VALUES('benchmark',
+	VALUES('benchmark_name',
 		(SELECT id FROM product_image_type_),
 		(SELECT id FROM eval_image_type_),
 		true) RETURNING id

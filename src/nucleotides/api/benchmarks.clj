@@ -1,38 +1,37 @@
 (ns nucleotides.api.benchmarks
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
-            [clojure.string      :as st]
+            [clojure.set         :as st]
             [ring.util.response  :as ring]
             [taoensso.timbre     :as log]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
-(def long->wide
-  (comp
-    #(dissoc % nil)
-    (partial apply hash-map)
-    flatten
-    (partial map vals)))
+(defn create-submap [kvs ks k]
+  (apply dissoc
+         (->> (map (fn [[k v]] [v (k kvs)]) ks)
+              (into {})
+              (assoc kvs k))
+         (keys ks)))
 
-(defn show
-  "Returns all benchmarks, can be parameterised by product/evaluation completed or
-  not."
-  [db-client {params :params}]
-  (ring/response
-    ((cond
-       (contains? params :evaluation) benchmarks-by-eval
-       (contains? params :product)    benchmarks-by-product
-       :else                          benchmarks)
-     params db-client)))
+(def image-keys
+  {:image_name    :name,
+   :image_sha256  :sha256,
+   :image_task    :task})
+
+(def product-keys
+  {:product_file_url  :url,
+   :product_file_md5  :md5,
+   :product_log_url   :log})
+
 
 (defn lookup
   "Finds a benchmark instance by ID"
   [db-client id _]
-  (let [metrics (->> (metrics-by-benchmark-id {:id id} db-client)
-                     (long->wide)
-                     (future))] ; I put this here because I wanted to experiment
-                                ; with clojure futures. This may not be optimal.
-   (-> (benchmark-by-id {:id id} db-client)
-       (first)
-       (assoc :metrics @metrics)
-       (ring/response))))
+  (-> (benchmark-by-id {:id id} db-client)
+      (first)
+      (st/rename-keys {:external_id :id})
+      (dissoc :external_id)
+      (create-submap image-keys :image)
+      (create-submap product-keys :product)
+      (ring/response)))
