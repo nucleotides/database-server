@@ -40,7 +40,10 @@
             res  (lookup benchmark-id)]
         (is-ok-response res)
         (has-image-metadata res)
-        (is (= benchmark-id (get-in res [:body :id])))))
+        (is (= benchmark-id (get-in res [:body :id])))
+        (is (= nil (get-in res [:body :product])))
+        (is (= []  (get-in res [:body :evaluate])))
+        (is (= {}  (get-in res [:body :metrics])))))
 
     (testing "an benchmark with a successful product event"
       (let [_    (load-fixture "a_single_incomplete_task"
