@@ -7,6 +7,7 @@
             [helper.http-response  :refer :all]
 
             [nucleotides.database.connection  :as con]
+            [nucleotides.api.events           :as event]
             [nucleotides.api.benchmarks       :as bench]))
 
 (def lookup
@@ -56,7 +57,9 @@
                                "a_successful_evaluate_event")
             res  (lookup benchmark-id)]
         (is-ok-response res)
+        (is (= benchmark-id (get-in res [:body :id])))
         (has-image-metadata res)
         (has-file res :product)
         (has-file res :evaluate 0)
-        (is (= benchmark-id (get-in res [:body :id])))))))
+        (is (= 5.0 (get-in res [:body :metrics "ng50"])))
+        (is (= 20000.0 (get-in res [:body :metrics "lg50"])))))))

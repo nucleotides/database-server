@@ -49,3 +49,16 @@ LEFT JOIN event	ON event.task_id = task.id
 WHERE benchmark_instance.external_id = :id
 AND task.task_type = 'evaluate'
 AND event.success = TRUE
+
+-- name: benchmark-metrics-by-id
+-- Get metrics for a benchmark entry by ID
+SELECT DISTINCT ON (metric_type.id)
+metric_type.name,
+metric_instance.value
+FROM benchmark_instance
+LEFT JOIN task			ON task.benchmark_instance_id = benchmark_instance.id
+LEFT JOIN event			ON event.task_id = task.id
+RIGHT JOIN metric_instance	ON metric_instance.event_id = event.id
+LEFT JOIN metric_type		ON metric_type.id = metric_instance.metric_type_id
+WHERE benchmark_instance.external_id = :id
+AND event.success = TRUE

@@ -1,9 +1,10 @@
 (ns nucleotides.api.benchmarks
-  (:require [yesql.core          :refer [defqueries]]
-            [clojure.walk        :as walk]
-            [clojure.set         :as st]
-            [ring.util.response  :as ring]
-            [taoensso.timbre     :as log]))
+  (:require [yesql.core             :refer [defqueries]]
+            [clojure.walk           :as walk]
+            [clojure.set            :as st]
+            [ring.util.response     :as ring]
+            [taoensso.timbre        :as log]
+            [nucleotides.api.events :as event]))
 
 (def image-keys
   {:image_name    :name,
@@ -34,6 +35,10 @@
        (map #(st/rename-keys % evaluate-keys))
        (into [])))
 
+(defn lookup-metrics [db-client id]
+  (->> (benchmark-metrics-by-id {:id id} db-client)
+       (event/long->wide)))
+
 (defn lookup
   "Finds a benchmark instance by ID"
   [db-client id _]
@@ -44,4 +49,5 @@
       (create-submap image-keys :image)
       (create-submap product-keys :product)
       (assoc :evaluate (lookup-evaluations db-client id))
+      (assoc :metrics  (lookup-metrics db-client id))
       (ring/response)))
