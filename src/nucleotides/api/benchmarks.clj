@@ -5,15 +5,6 @@
             [ring.util.response  :as ring]
             [taoensso.timbre     :as log]))
 
-(defqueries "nucleotides/api/benchmarks.sql")
-
-(defn create-submap [kvs ks k]
-  (apply dissoc
-         (->> (map (fn [[k v]] [v (k kvs)]) ks)
-              (into {})
-              (assoc kvs k))
-         (keys ks)))
-
 (def image-keys
   {:image_name    :name,
    :image_sha256  :sha256,
@@ -24,6 +15,24 @@
    :product_file_md5  :md5,
    :product_log_url   :log})
 
+(def evaluate-keys
+  {:evaluate_file_url  :url,
+   :evaluate_file_md5  :md5,
+   :evaluate_log_url   :log})
+
+(defqueries "nucleotides/api/benchmarks.sql")
+
+(defn create-submap [kvs ks k]
+  (apply dissoc
+         (->> (map (fn [[k v]] [v (k kvs)]) ks)
+              (into {})
+              (assoc kvs k))
+         (keys ks)))
+
+(defn lookup-evaluations [db-client id]
+  (->> (benchmark-evaluations-by-id {:id id} db-client)
+       (map #(st/rename-keys % evaluate-keys))
+       (into [])))
 
 (defn lookup
   "Finds a benchmark instance by ID"
@@ -34,4 +43,5 @@
       (dissoc :external_id)
       (create-submap image-keys :image)
       (create-submap product-keys :product)
+      (assoc :evaluate (lookup-evaluations db-client id))
       (ring/response)))

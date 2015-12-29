@@ -19,26 +19,44 @@
   (is (= (get-in res [:body :image :task]) "default")))
 
 
+(defn has-file [res & file-paths]
+  (let [paths {:url "s3://url", :md5 "123abc" :log "s3://url"}]
+    (dorun
+      (for [[k value] paths]
+        (is (= value
+               (->> [:body file-paths k]
+                    (flatten)
+                    (get-in res))))))))
+
+(def benchmark-id "2f221a18eb86380369570b2ed147d8b4")
+
 (deftest nucleotides.api.benchmarks
 
   (testing "#lookup"
 
     (testing "an incomplete benchmark"
       (let [_    (load-fixture "a_single_incomplete_task")
-            id   "2f221a18eb86380369570b2ed147d8b4"
-            res  (lookup id)]
+            res  (lookup benchmark-id)]
         (is-ok-response res)
         (has-image-metadata res)
-        (is (= id (get-in res [:body :id])))))
+        (is (= benchmark-id (get-in res [:body :id])))))
 
     (testing "an benchmark with a successful product event"
       (let [_    (load-fixture "a_single_incomplete_task"
                                "a_successful_product_event")
-            id   "2f221a18eb86380369570b2ed147d8b4"
-            res  (lookup id)]
+            res  (lookup benchmark-id)]
         (is-ok-response res)
         (has-image-metadata res)
-        (is (= id (get-in res [:body :id])))
-        (is (= (get-in res [:body :product :url]) "s3://url"))
-        (is (= (get-in res [:body :product :md5]) "123abc"))
-        (is (= (get-in res [:body :product :log]) "s3://url"))))))
+        (has-file res :product)
+        (is (= benchmark-id (get-in res [:body :id])))))
+
+    (testing "an benchmark with a successful evaluate event"
+      (let [_    (load-fixture "a_single_incomplete_task"
+                               "a_successful_product_event"
+                               "a_successful_evaluate_event")
+            res  (lookup benchmark-id)]
+        (is-ok-response res)
+        (has-image-metadata res)
+        (has-file res :product)
+        (has-file res :evaluate 0)
+        (is (= benchmark-id (get-in res [:body :id])))))))
