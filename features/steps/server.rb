@@ -1,43 +1,36 @@
 require 'rspec'
 require 'json'
 
-Given(/^the database contains the records:$/) do |table|
-  records = table.map_headers(&:to_sym).hashes.each_with_index.map do |r, index|
-    [index.to_s, r]
-  end
-  SDB.add_records(Hash[records])
-end
 
-Given(/^I post to url "(.*?)" with the records:$/) do |endpoint, table|
+Given(/^I post to url "(.*?)" with the entries:$/) do |endpoint, table|
   table.hashes.each do |row|
     @response = HTTP.post(endpoint, row)
   end
-  sleep 1 # Allow data to be posted
 end
 
-Given(/^I post to url "(.*?)" with the data:$/) do |endpoint, data_string|
+Given(/^I post to "(.*?)" with the data:$/) do |endpoint, data_string|
   @response = HTTP.post(endpoint, JSON.parse(data_string))
-  sleep 1 # Allow data to be posted
 end
 
-Given(/^I save the last event id$/) do
-  @event_id = @response.body
+Given(/^I successfully post to "(.*?)" with the data:$/) do |endpoint, data_string|
+  @response = HTTP.post(endpoint, JSON.parse(data_string))
+  expect(@response.status.split.first).to match(/2\d\d/)
 end
 
 When(/^I get the url "(.*?)"$/) do |endpoint|
   @response = HTTP.get(endpoint)
 end
 
-When(/^I get the url "(.*?)" with the event id$/) do |endpoint|
-  @response = HTTP.get(endpoint, {id: @response.body.strip})
-end
-
-When(/^I lookup the records using the max_id$/) do
-  step("I get the url \"/events/lookup.json?max_id=#{@event_id}\"")
+When(/^I post the url "(.*?)" with:$/) do |endpoint, table|
+  @response = HTTP.post(endpoint, table.hashes.first)
 end
 
 Then(/^the returned HTTP status code should be "(.*?)"$/) do |code|
   expect(@response.status.split.first).to eq(code)
+end
+
+Then(/^the returned body should equal "(.*?)"$/) do |body|
+  expect(@response.body.strip).to eq(body)
 end
 
 Then(/^the returned body should match "(.*?)"$/) do |re|
@@ -48,30 +41,35 @@ Then(/^the returned body should be a valid JSON document$/) do
   expect{@document = JSON.parse(@response.body)}.to_not raise_error
 end
 
-Then(/^the returned JSON document should match the key-value pairs:$/) do |table|
+Then(/^the returned JSON should contain the entries:$/) do |table|
   table.hashes.each do |row|
-    expect(@document.keys).to include(row['key'])
-    expect(@document[row['key']]).to match(Regexp.compile(row['value']))
+    unless contains_row?(@document, row)
+      difference = diff(row, @document)
+      expected = row.to_str_values.awesome_inspect
+      fail("The expected entry not found:\n#{expected}\n\nDiff:\n\n#{difference}")
+    end
   end
 end
 
-Then(/^the returned JSON document should include the key\-value pairs:$/) do |table|
+Then(/^the returned JSON should contain:$/) do |table|
   table.hashes.each do |row|
-    expect(@document.keys).to include(row['key'])
-    expect(@document[row['key']]).to eq(row['value'])
+    path = row['key'].split('.')
+    value = path.inject(@document) do |acc, key|
+      expect(acc).to include(key),
+        "Expected key #{row['key']} in: #{@document.awesome_inspect}"
+      acc[key]
+    end
+    expect(value.to_s).to eq(row['value'].to_s),
+      "Expected #{row['key']} to equal '#{row['value'].to_s}' but was '#{value.to_s}'"
+
   end
+    #expected = row.to_str_values.awesome_inspect
 end
 
-Then(/^the JSON document should include include the events:$/) do |table|
-  table.hashes.each do |row|
-    entries = @document.select{|i| i["benchmark_id"] == row['benchmark_id']}
-    expect(entries).to_not be_empty
-  end
+Then(/^the returned JSON should be empty$/) do
+  expect(@document).to be_empty
 end
 
-Then(/^the JSON document should not include include the events:$/) do |table|
-  table.hashes.each do |row|
-    entries = @document.select{|i| i["benchmark_id"] == row['benchmark_id']}
-    expect(entries).to be_empty
-  end
+Then(/^the returned JSON should not be empty$/) do
+  expect(@document).to_not be_empty
 end

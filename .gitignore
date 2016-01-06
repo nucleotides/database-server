@@ -1,3 +1,4 @@
+Gemfile.lock
 /target
 /classes
 /checkouts
@@ -8,9 +9,10 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 
-Gemfile.lock
 .aws_credentials
 .*image
 .*_container
 vendor
 .bundle
+.gems
+tmp

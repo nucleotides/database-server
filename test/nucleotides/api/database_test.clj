@@ -1,7 +1,8 @@
-(ns event-api.database-test
+(ns nucleotides.api.database-test
   (:require [clojure.test :refer :all]
-            [cemerick.rummage   :as sdb]
-            [event-api.database :as db]))
+
+            [cemerick.rummage         :as sdb]
+            [nucleotides.api.database :as db]))
 
 (def valid-request
   {:benchmark_id        "abcd"
@@ -87,8 +88,8 @@
   (testing "with a multiple query parameters"
     (is (= (db/build-query "events" {"benchmark_type_code" "0000",
                                      "status_code"         "0000"})
-           '{select * from events where (and (= :status_code         "0000")
-                                             (= :benchmark_type_code "0000"))})))
+           '{select * from events where (and (= :benchmark_type_code "0000")
+                                             (= :status_code         "0000"))})))
 
   (testing "with max_id query parameter"
     (is (= (db/build-query "events" {"max_id" "100"})
