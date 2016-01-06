@@ -2,6 +2,6 @@
 
 trap "make kill" EXIT
 
-make .dev_container
+make .api_container
 sleep 5 # Allow container to warm up
 make feature "ARGS=$@"

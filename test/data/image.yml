@@ -1,0 +1,38 @@
+---
+- image_type: short_read_assembler
+  description: |
+    Assembles paired Illumina short reads into contigs.
+  image_instances:
+    - name: bioboxes/velvet
+      sha256: digest_1
+      tasks:
+        - default
+        - careful
+    - name: bioboxes/ray
+      sha256: digest_2
+      tasks:
+        - default
+- image_type: short_read_preprocessor
+  description: |
+    Performs filtering or editting of FASTQ reads and returns a subset or changed set of reads.
+  image_instances:
+    - name: bioboxes/my-filterer
+      sha256: digest_3
+      tasks:
+        - default
+- image_type: reference_assembly_evaluation
+  description: |
+    Evaluates the quality of an assembly using a reference genome
+  image_instances:
+    - name: bioboxes/quast
+      sha256: digest_4
+      tasks:
+        - default
+- image_type: short_read_preprocessing_reference_evaluation
+  description: |
+    Evaluates the quality of short read preprocessing using a reference genome
+  image_instances:
+    - name: bioboxes/velvet-then-quast
+      sha256: digest_4
+      tasks:
+        - default
