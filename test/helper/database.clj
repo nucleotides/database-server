@@ -1,4 +1,4 @@
-(ns helper
+(ns helper.database
   (:require [clojure.java.jdbc               :as sql]
             [clojure.string                  :as string]
             [taoensso.timbre                 :as log]
@@ -32,13 +32,3 @@
 
 (def table-length
   (comp count table-entries))
-
-(def test-data-directory
-  (.getCanonicalPath (clojure.java.io/file "test/data")))
-
-(def fetch-test-data
-  (partial build/load-data-file test-data-directory))
-
-(defn load-fixture [x]
-  (do (empty-database)
-      (exec-db-command (slurp (str "test/fixtures/" x ".sql")))))

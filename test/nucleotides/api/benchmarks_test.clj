@@ -3,86 +3,66 @@
             [clojure.data.json  :as json]
             [clojure.walk       :as walk]
 
-            [nucleotides.database.connection  :as con]
-            [nucleotides.api.benchmarks       :as bench]
-            [helper                           :as help]))
+            [helper.fixture        :refer :all]
+            [helper.http-response  :refer :all]
 
-(defn show
-  ([params] (bench/show {:connection (con/create-connection)}
-                        {:params params :query-params params}))
-  ([]       (show {})))
+            [nucleotides.database.connection  :as con]
+            [nucleotides.api.events           :as event]
+            [nucleotides.api.benchmarks       :as bench]))
 
 (def lookup
   #(bench/lookup {:connection (con/create-connection)} % {}))
 
+(defn has-image-metadata [res]
+  (is (= (get-in res [:body :name]) "benchmark_name"))
+  (is (= (get-in res [:body :image :name]) "bioboxes/velvet"))
+  (is (= (get-in res [:body :image :sha256]) "123abc"))
+  (is (= (get-in res [:body :image :task]) "default")))
+
+
+(defn has-file [res & file-paths]
+  (let [paths {:url "s3://url", :md5 "123abc" :log "s3://url"}]
+    (dorun
+      (for [[k value] paths]
+        (is (= value
+               (->> [:body file-paths k]
+                    (flatten)
+                    (get-in res))))))))
+
+(def benchmark-id "2f221a18eb86380369570b2ed147d8b4")
+
 (deftest nucleotides.api.benchmarks
-
-  (testing "#show"
-
-    (testing "with a single benchmark entry"
-      (let [_ (help/load-fixture "a_single_benchmark")]
-
-        (testing "with no request parameter"
-          (let [{:keys [status body]} (show)]
-            (is (= 200 status))
-            (is (not (empty? body)))
-            (dorun
-              (for [k [:id :image_task :image_name :image_sha256
-                       :input_url :input_md5 :product :evaluation]]
-                (is (contains? (first body) k))))))
-
-        (testing "with product=false request parameter"
-          (let [{:keys [status body]} (show {:product "false"})]
-            (is (= 200 status))
-            (is (not (empty? body)))
-            (dorun
-              (for [k [:id :image_task :image_name :image_sha256
-                       :input_url :input_md5 :product :evaluation]]
-                (is (contains? (first body) k))))))
-
-        (testing "with product=true request parameter"
-          (let [{:keys [status body]} (show {:product "true"})]
-            (is (= 200   status))
-            (is (empty?  body)))))))
 
   (testing "#lookup"
 
     (testing "an incomplete benchmark"
-      (let [_   (help/load-fixture "a_single_benchmark")
-            id  "2f221a18eb86380369570b2ed147d8b4"
-            exp {:id              "2f221a18eb86380369570b2ed147d8b4"
-                 :image_name      "image"
-                 :image_sha256    "123456"
-                 :image_task      "default"
-                 :input_md5       "123456"
-                 :input_url       "s3://url"
-                 :product         false
-                 :product_url     nil
-                 :evaluation      false
-                 :metrics         {}}
-            {:keys [status body]} (lookup id)]
-        (is (= 200 status))
-        (doall
-          (for [k (keys exp)]
-            (do (is (contains? body k))
-                (is (= (k exp) (k body))))))))
+      (let [_    (load-fixture "a_single_incomplete_task")
+            res  (lookup benchmark-id)]
+        (is-ok-response res)
+        (has-image-metadata res)
+        (is (= benchmark-id (get-in res [:body :id])))
+        (is (= nil (get-in res [:body :product])))
+        (is (= []  (get-in res [:body :evaluate])))
+        (is (= {}  (get-in res [:body :metrics])))))
 
-    (testing "a complete benchmark"
-      (let [_   (help/load-fixture "a_single_benchmark_with_completed_evaluation")
-            id  "2f221a18eb86380369570b2ed147d8b4"
-            exp {:id              "2f221a18eb86380369570b2ed147d8b4"
-                 :image_name      "image"
-                 :image_sha256    "123456"
-                 :image_task      "default"
-                 :input_md5       "123456"
-                 :input_url       "s3://url"
-                 :product         true
-                 :product_url     "s3://url"
-                 :evaluation      true
-                 :metrics         {"ng50" 20000.0 "lg50" 10.0}}
-            {:keys [status body]} (lookup id)]
-        (is (= 200 status))
-        (doall
-          (for [k (keys exp)]
-            (do (is (contains? body k))
-                (is (= (k exp) (k body))))))))))
+    (testing "an benchmark with a successful product event"
+      (let [_    (load-fixture "a_single_incomplete_task"
+                               "a_successful_product_event")
+            res  (lookup benchmark-id)]
+        (is-ok-response res)
+        (has-image-metadata res)
+        (has-file res :product)
+        (is (= benchmark-id (get-in res [:body :id])))))
+
+    (testing "an benchmark with a successful evaluate event"
+      (let [_    (load-fixture "a_single_incomplete_task"
+                               "a_successful_product_event"
+                               "a_successful_evaluate_event")
+            res  (lookup benchmark-id)]
+        (is-ok-response res)
+        (is (= benchmark-id (get-in res [:body :id])))
+        (has-image-metadata res)
+        (has-file res :product)
+        (has-file res :evaluate 0)
+        (is (= 5.0 (get-in res [:body :metrics "ng50"])))
+        (is (= 20000.0 (get-in res [:body :metrics "lg50"])))))))

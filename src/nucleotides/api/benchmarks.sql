@@ -1,32 +1,61 @@
--- name: benchmarks
--- Get all benchmark entries
-SELECT * FROM benchmark_instance_status;
-
--- name: benchmarks-by-product
--- Get all benchmark entries by product status
-SELECT * FROM benchmark_instance_status
-WHERE product = :product::boolean;
-
--- name: benchmarks-by-eval
--- Get all benchmark entries by evaluation status
-SELECT * FROM benchmark_instance_status
-WHERE evaluation = :evaluation::boolean;
-
 -- name: benchmark-by-id
 -- Get a benchmark entry by ID
 SELECT
-id, image_task, image_name, image_sha256, input_url, input_md5, product_url,
-evaluation_id IS NOT NULL AS evaluation,
-product_id    IS NOT NULL AS product
-FROM benchmark_instance_status WHERE id = :id
-LIMIT 1;
+GREATEST(
+	benchmark_instance.created_at,
+	image_instance.created_at,
+	image_instance_task.created_at) AS created_at,
+benchmark_instance.external_id	AS id,
+image_instance_task.task	AS image_task,
+image_instance.name		AS image_name,
+image_instance.sha256		AS image_sha256,
+benchmark_type.name
+FROM benchmark_instance
+LEFT JOIN image_instance_task	ON image_instance_task.id = benchmark_instance.product_image_instance_task_id
+LEFT JOIN image_instance	ON image_instance.id      = image_instance_task.image_instance_id
+LEFT JOIN benchmark_type	ON benchmark_type.id      = benchmark_instance.benchmark_type_id
+WHERE external_id = :id
+LIMIT 1
 
--- name: metrics-by-benchmark-id
--- Get metrics by a given benchmark ID
+
+-- name: benchmark-product-by-id
+-- Get product for a benchmark entry by ID
 SELECT
-mt.name,
-mi.value
-FROM benchmark_instance_status AS bis
-LEFT JOIN metric_instance      AS mi ON mi.benchmark_event_id = bis.evaluation_id
-LEFT JOIN metric_type          AS mt ON mi.metric_type_id = mt.id
-WHERE bis.id = :id;
+event.file_url		AS url,
+event.file_md5		AS md5,
+event.log_file_url	AS log
+FROM event
+LEFT JOIN task			ON event.task_id = task.id
+LEFT JOIN benchmark_instance	ON benchmark_instance.id = task.benchmark_instance_id
+WHERE task.task_type = 'produce'
+AND event.success = TRUE
+AND benchmark_instance.external_id = :id
+LIMIT 1
+
+
+-- name: benchmark-evaluations-by-id
+-- Get evaluations for a benchmark entry by ID
+SELECT DISTINCT ON (task.id)
+event.file_url		AS url,
+event.file_md5		AS md5,
+event.log_file_url	AS log
+FROM benchmark_instance
+LEFT JOIN task		ON task.benchmark_instance_id = benchmark_instance.id
+LEFT JOIN event	ON event.task_id = task.id
+WHERE benchmark_instance.external_id = :id
+AND task.task_type = 'evaluate'
+AND event.success = TRUE
+
+
+-- name: benchmark-metrics-by-id
+-- Get metrics for a benchmark entry by ID
+SELECT DISTINCT ON (metric_type.id)
+metric_type.name,
+metric_instance.value
+FROM benchmark_instance
+LEFT JOIN task			ON task.benchmark_instance_id = benchmark_instance.id
+LEFT JOIN event			ON event.task_id = task.id
+RIGHT JOIN metric_instance	ON metric_instance.event_id = event.id
+LEFT JOIN metric_type		ON metric_type.id = metric_instance.metric_type_id
+WHERE benchmark_instance.external_id = :id
+AND event.success = TRUE

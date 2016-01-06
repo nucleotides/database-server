@@ -12,6 +12,11 @@ Given(/^I post to "(.*?)" with the data:$/) do |endpoint, data_string|
   @response = HTTP.post(endpoint, JSON.parse(data_string))
 end
 
+Given(/^I successfully post to "(.*?)" with the data:$/) do |endpoint, data_string|
+  @response = HTTP.post(endpoint, JSON.parse(data_string))
+  expect(@response.status.split.first).to match(/2\d\d/)
+end
+
 When(/^I get the url "(.*?)"$/) do |endpoint|
   @response = HTTP.get(endpoint)
 end

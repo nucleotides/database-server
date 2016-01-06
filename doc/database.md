@@ -1,67 +1,91 @@
 # Nucleotid.es relational data model
 
-Nucleotid.es contains data from different Docker images benchmarked on
-different sequencing data sets. These are organised using a relational
-database. In additional to the fields listed each table has a primary key named
-`id`, and a `timestamp` listing the data the row was added. The tables are
-organsised as follows:
+Nucleotid.es contains data from bioinformatics Docker images benchmarked
+against sequencing data sets. These are organised using a relational database.
+This documentation describes the fields in the tables in the nucleotid.es
+database.
+
+In additional to the fields listed below, each table has a primary key named
+`id`, and a `created_at` listing the date the row was created. The database is
+append only and rows are only added to each table, never deleted or updated.
+SQL views using the `created_at` date are used to view the most recent state of
+benchmarks. The reason for append-only is to preserve all benchmark data, such
+as metrics for old versions of images, instead of replacing with new data.
 
 ## Docker Images
 
-Tables used the store the docker images instances used in benchmarking
+The following tables used the store information about the docker images used in
+benchmarking.
 
 ### image_type
 
-Categorises the different kinds of images used for benchmarking.
+Categorises the different types of images used for benchmarking.
 
-  * **name** - TEXT. Examples are "short_read_assembler". This field is unique
-    as there should not be duplicated types.
+  * **name** - TEXT. The unique indentifer for a type of Docker image. An
+    example is "short_read_assembler".
 
-  * **description** - TEXT. A more detailed description of the image type.
+  * **description** - TEXT. A detailed description of the image type.
 
-### image_task
+### image_instance
 
-Lists the available tasks for available Docker images.
+Lists all Docker images used.
 
-  * **image_type_id** - INT. Foreign key for the image_type table.
+  * **image_type_id** - INT. Foreign key for the `image_type` table.
 
-  * **name** - VARCHAR. The name of the Docker image. examples are
+  * **name** - VARCHAR. The name of a Docker image. An example is
     "bioboxes/velvet".
 
-  * **task** - VARCHAR. The name of a task to run the image, examples are
-    "default".
-
   * **sha256** - INT. The SHA256 digest of the Docker image file system layers,
-    used to differentiate between difference versions images with the same
+    used to differentiate between different versions of images with the same
     name.
 
   * **active** - BOOLEAN. States whether the image should still be benchmarked.
     A false value indicates the image is deprecated. An image may be deprecated
-    because it is no longer support, or more likely because a new version is
-    created. Differences in versions of images with the same name are
+    because it is no longer supported, or more likely because a new version is
+    available. Differences in versions of images with the same name are
     identified by sha256 field.
 
-There is table constraint that combinations of image_type_id, name, task,
-sha256 should be unique. This ensures there are no duplicated Docker image
-tasks.
+There is table constraint that combinations of image_type_id, name, sha256
+should be unique. This ensures there are no duplicated Docker images.
 
-## Sequencing Data
+### image_instance_task
+
+  * **image_instance_id** - INT. Foreign key for the `image_instance_table`
+
+  * **task** - VARCHAR. The name of a task to run the image, examples are
+    "default" or "careful".
+
+  * **active** - BOOLEAN. Indicate whether the run mode should still be used. A
+    false value indicates this run mode is deprecated.
+
+There is table constraint that combinations of image_instance_id and task
+should be unique. This ensures there are no duplicated tasks for the same
+image.
+
+## Input Data
 
 Tables used to store the data used in benchmarking
 
-### data_type
+### data_set
 
-Categorises the different kinds of data used for benchmarking.
+Groups the different sets of data used for benchmarking by their name and
+description.
 
-  * **description** - VARCHAR. Examples are "Illumina 2x150 sequenced at the
-    JGI".
+  * **name** - VARCHAR. The name is used to indentify the data when populating
+    the database from file. Examples of this would be "jgi_isolate_microbe_2x150"
 
-### data_instance
+  * **description** - VARCHAR. Examples are "Illumina 2x150 isolated microbe
+    sequenced at the JGI".
+
+  * **active** - BOOLEAN. Indicate whether this data set should still be used.
+    A false value indicates this data set is deprecated.
+
+### data_record
 
 Lists the individual files locations which contain the data used for
 benchmarking and evaluating the output.
 
-  * **data_type_id** - INT. Foreign key to the data_type table.
+  * **data_set_id** - INT. Foreign key to the `data_set` table.
 
   * **replicate** - INT. The replicate number for this data.
 
@@ -73,41 +97,50 @@ benchmarking and evaluating the output.
 
   * **reference_md5sum** - VARCHAR. The md5sum of the reference data file.
 
+  * **active** - BOOLEAN. Indicate whether this data record should still be
+    used. A false value indicates this data record is deprecated.
+
 ## Benchmarks
 
-Tables for cross referencing the benchmarking of Docker images on data sets.
+Tables to cross reference the data sets with the Docker images, and record the
+results of benchmarking.
 
 ### benchmark_type
 
 Maps the Docker image type to benchmark data type.
 
-  * **image_type_id** - INT. Foreign key to the image type table.
+  * **name** - TEXT. The unique text indentifer for the benchmark type. An
+    example is "short_read_assembler".
 
-  * **data_type_id** - INT. Foreign key to the data type table.
+  * **product_image_type_id** - INT. Foreign key to the `image_type` table for
+    the Docker image being benchmarked.
+
+  * **evaluation_image_type_id** - INT. Foreign key to the `image_type` table
+    for the Docker images being used to evaluated the produced data.
+
+  * **data_set_id** - INT. Foreign key to the `data_set` table.
+
+  * **active** - BOOLEAN. Indicate whether this data record should still be
+    used. A false value indicates this data record is deprecated.
+
 
 ### benchmark_instance
 
-Maps individual Docker image tasks to individual data files.
+A materialise view created from mapping each Docker `image_instance_task` to
+each `data_record` via the m:n mappings in the `benchmark_type` table.
 
-  * **benchmark_type_id** - INT. Foreign key to the benchmark type table.
+  * **benchmark_type_id** - INT. Foreign key to the `benchmark_type` table.
 
-  * **image_task_id** - INT. Foreign key to the image task table.
+  * **data_instance_id** - INT. Foreign key to the `data_instance` table.
 
-  * **data_instance_id** - INT. Foreign key to the data instance table.
+  * **image_instance_task_id** - INT. Foreign key to the `image_instance_task`
+    table.
 
 ## Benchmarking Events
 
-Tables for recording the results of benchmarking datasets.
+Tables for recording the results of benchmarking.
 
-### benchmark_event_status
-
-Description of the status of benchmarking events.
-
-  * **name** - VARCHAR. Short name for the status.
-
-  * **description** - INT. Description of this status.
-
-### benchmark_event
+### event
 
 Record benchmark events as they occur.
 

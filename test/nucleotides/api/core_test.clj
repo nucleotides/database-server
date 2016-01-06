@@ -1,13 +1,16 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
-            [clojure.data.json  :as json]
             [ring.mock.request  :as mock]
+
+            [helper.event          :refer :all]
+            [helper.http-response  :refer :all]
+            [helper.fixture        :refer :all]
+            [helper.database       :refer :all]
 
             [nucleotides.database.connection  :as con]
             [nucleotides.database.load        :as db]
             [nucleotides.api.middleware       :as md]
-            [nucleotides.api.core             :as app]
-            [helper                           :as help]))
+            [nucleotides.api.core             :as app]))
 
 
 (defn request
@@ -18,81 +21,39 @@
   ([method url]
    (request method url {})))
 
-(defn is-ok-response [response]
-  (is (contains? #{200 201} (:status response))))
-
-(defn is-empty-body [response]
-  (is (empty? (json/read-str (:body response)))))
-
-(defn is-not-empty-body [response]
-  (is (not (empty? (json/read-str (:body response))))))
-
 (deftest app
 
-  (testing "GET /benchmarks/show.json"
-    (let [f (comp (partial request :get) (partial str "/benchmarks/show.json"))]
+  (testing "GET /tasks/show.json"
+    (let [f (comp (partial request :get) (partial str "/tasks/show.json"))]
 
-      (let [_ (help/load-fixture "a_single_benchmark_with_completed_product")]
+      (let [_   (load-fixture "a_single_incomplete_task")
+            res (f)]
+        (is-ok-response res)
+        (is-not-empty-body res))))
 
-        (let [response (f "?product=true")]
-          (is-ok-response response)
-          (is-not-empty-body response))
+  (testing "POST /events"
+    (let [f (partial request :post "/events")]
 
-        (let [response (f "?product=false")]
-          (is-ok-response response)
-          (is-empty-body response)))
+      (testing "with a successful produce event"
+        (let [_   (load-fixture "a_single_incomplete_task")
+              res (f (event-as-http-params (mock-event :produce :success)))]
+          (is-ok-response res)
+          (has-header res "Location")
+          (is (= 1 (table-length "event")))))
 
-      (let [_ (help/load-fixture "a_single_benchmark_with_completed_evaluation")]
+      (comment (testing "with a successful evaluate event"
+        (let [_   (load-fixture "a_single_incomplete_task")
+              res (f (event-as-http-params (mock-event :evaluate :success)))]
+          (is-ok-response res)
+          (has-header res "Location")
+          (is (= 1 (table-length "event")))
+          (is (= 2 (table-length "metric_instance"))))))))
 
-        (let [response (f)]
-          (is-ok-response response)
-          (is-not-empty-body response))
+  (testing "GET /events/:id"
+    (let [f #(request :get (str "/events/" %))]
 
-        (let [response (f "?product=true")]
-          (is-ok-response response)
-          (is-not-empty-body response))
-
-        (let [response (f "?product=false")]
-          (is-ok-response response)
-          (is-empty-body response))
-
-        (let [response (f "?evaluation=true")]
-          (is-ok-response response)
-          (is-not-empty-body response))
-
-        (let [response (f "?product=true&evaluation=false")]
-          (is-ok-response response)
-          (is-empty-body response)))))
-
-  (testing "POST /benchmarks/"
-    (let [f (partial request :post "/benchmarks/")]
-
-      (let [ _ (help/load-fixture "a_single_benchmark")
-            params {:id              "2f221a18eb86380369570b2ed147d8b4"
-                    :benchmark_file  "s3://url"
-                    :log_file        "s3://url"
-                    :event_type      "product"
-                    :success         "true"}]
-        (let [response (f params)]
-          (is-ok-response response)
-          (is (= 1 (help/table-length "benchmark-event")))))
-
-      (let [ _ (help/load-fixture "a_single_benchmark_with_completed_product")
-            params {:id              "2f221a18eb86380369570b2ed147d8b4"
-                    :benchmark_file  "s3://url"
-                    :log_file        "s3://url"
-                    :event_type      "evaluation"
-                    :success         "true"
-                    "metrics[lg50]"   10
-                    "metrics[ng50]"   20000}]
-        (let [response (f params)]
-          (is-ok-response response)
-          (is (= 2 (help/table-length "benchmark-event")))
-          (is (= 2 (help/table-length "metric-instance")))))))
-
-  (testing "GET /benchmarks/:id"
-    (let [f #(request :get (str "/benchmarks/" %))
-          _ (help/load-fixture "a_single_benchmark")
-          response (f "2f221a18eb86380369570b2ed147d8b4")]
-        (is-ok-response response)
-        (is (not (empty? (json/read-str (:body response))))))))
+      (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
+            res (f 1)]
+        (is-ok-response res)
+        (is-not-empty-body res)
+        (has-body-entry res "id")))))

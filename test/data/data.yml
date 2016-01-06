@@ -1,7 +1,5 @@
 ---
 - name: jgi_isolate_2x150
-  library: Illumina 2x150 paired reads
-  type: short_read_isolate
   description: Verbose description
   entries:
     - reads: 2000000

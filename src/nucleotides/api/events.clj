@@ -2,8 +2,7 @@
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
             [clojure.string      :as st]
-            [ring.util.response  :as ring]
-            ))
+            [ring.util.response  :as ring]))
 
 (defqueries "nucleotides/api/events.sql")
 
@@ -15,14 +14,15 @@
             (interleave [:name :value])
             (apply hash-map)))))
 
-(defn- create-event [db-client params]
-  (let [f #(create-benchmark-event<! % db-client)]
-   (if-not (contains? params :benchmark_file)
-    (f (assoc params :benchmark_file nil))
-    (f params))))
+(def long->wide
+  (comp
+    #(dissoc % nil)
+    (partial apply hash-map)
+    flatten
+    (partial map vals)))
 
-(defn- create-metrics [db-client id {:keys [event_type success metrics]}]
-  (if (and (= event_type "evaluation") (= success "true"))
+(defn- create-metrics [db-client id {:keys [success metrics]}]
+  (if (and (= success "true") (not (nil? metrics)))
     (->> metrics
          (wide->long)
          (map #(assoc % :id id))
@@ -30,8 +30,24 @@
          (dorun))))
 
 (defn create
-  "Creates a new benchmark event from the given parameters"
-  [db-client {params :params}]
-  (let [id (:id (create-event db-client params))
+  "Creates a new event from the given parameters"
+  [db-client {:keys [params] :as request}]
+  (let [id (-> {:file_url nil, :file_md5 nil}
+                  (merge params)
+                  (create-event<! db-client)
+                  (:id))
         _  (create-metrics db-client id params)]
-    (ring/response (str id))))
+    (ring/created (str "/events/" id))))
+
+(defn lookup
+  "Finds an event by ID"
+  [db-client id _]
+  (let [metrics (->> (metrics-by-event-id {:id id} db-client)
+                     (long->wide)
+                     (future))] ; I put this here because I wanted to experiment
+                                ; with clojure futures. This may not be optimal.
+    (-> {:id id}
+        (get-event db-client)
+        (first)
+        (assoc :metrics @metrics)
+        (ring/response))))

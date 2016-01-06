@@ -1,3 +1,6 @@
+--;;
+--;; Docker images
+--;;
 CREATE TABLE image_type(
   id		serial 		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
@@ -5,30 +8,39 @@ CREATE TABLE image_type(
   description	text		NOT NULL
 );
 --;;
-CREATE TABLE image_task(
+CREATE TABLE image_instance(
   id		serial 		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
   name		text	        NOT NULL,
-  task		text 		NOT NULL,
   sha256	text 		NOT NULL,
   active	bool 		NOT NULL,
-  CONSTRAINT image UNIQUE(image_type_id, name, task, sha256)
+  CONSTRAINT image_instance_idx UNIQUE(image_type_id, name, sha256)
 );
 --;;
-CREATE TABLE data_type(
+CREATE TABLE image_instance_task(
+  id			serial 		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
+  task			text 		NOT NULL,
+  active		bool 		NOT NULL,
+  CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
+);
+--;;
+--;; Data sets
+--;;
+CREATE TABLE data_set(
   id		serial 		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
   name		text		UNIQUE NOT NULL,
-  library	text		NOT NULL,
   description	text		NOT NULL,
-  type		text		NOT NULL
+  active	bool 		NOT NULL
 );
 --;;
-CREATE TABLE data_instance(
+CREATE TABLE data_record(
   id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
-  data_type_id	integer		NOT NULL REFERENCES data_type(id),
+  data_set_id	integer		NOT NULL REFERENCES data_set(id),
   entry_id	integer         NOT NULL,
   replicate	integer 	NOT NULL,
   reads		integer		NOT NULL,
@@ -36,79 +48,71 @@ CREATE TABLE data_instance(
   reference_url	text 		NOT NULL,
   input_md5	text 		NOT NULL,
   reference_md5	text 		NOT NULL,
-  CONSTRAINT data_replicates UNIQUE(data_type_id, entry_id, replicate)
+  active	bool 		NOT NULL,
+  CONSTRAINT data_replicates UNIQUE(data_set_id, entry_id, replicate)
 );
+--;;
+--;; Benchmarks
 --;;
 CREATE TABLE benchmark_type(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	NOT NULL DEFAULT current_timestamp,
+  name				text		UNIQUE NOT NULL,
+  product_image_type_id		integer		NOT NULL REFERENCES image_type(id),
+  evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
+  active			bool 		NOT NULL
+);
+--;;
+CREATE TABLE benchmark_data(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	NOT NULL DEFAULT current_timestamp,
+  data_set_id		integer		NOT NULL REFERENCES data_set(id),
+  benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
+  active		bool 		NOT NULL,
+  CONSTRAINT benchmark_data_idx UNIQUE(data_set_id, benchmark_type_id)
+);
+--;;
+CREATE TABLE benchmark_instance(
+  id					serial		PRIMARY KEY,
+  created_at				timestamp	NOT NULL DEFAULT current_timestamp,
+  external_id				text		UNIQUE NOT NULL,
+  benchmark_type_id			integer		NOT NULL REFERENCES benchmark_type(id),
+  data_record_id			integer		NOT NULL REFERENCES data_record(id),
+  product_image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
+  CONSTRAINT benchmark_instance_idx UNIQUE(data_record_id, product_image_instance_task_id)
+);
+CREATE OR REPLACE FUNCTION benchmark_instance_external_id() RETURNS trigger AS '
+BEGIN
+	NEW.external_id := md5(NEW.benchmark_type_id || ''-'' || NEW.data_record_id || ''-'' || NEW.product_image_instance_task_id);
+	RETURN NEW;
+END;' LANGUAGE plpgsql;
+CREATE TRIGGER benchmark_instance_insert BEFORE INSERT OR UPDATE ON benchmark_instance FOR EACH ROW EXECUTE PROCEDURE benchmark_instance_external_id();
+--;;
+--;; Evaluation tasks
+--;;
+CREATE TYPE task_type AS ENUM ('produce', 'evaluate');
+--;;
+CREATE TABLE task(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	NOT NULL DEFAULT current_timestamp,
+  benchmark_instance_id		integer		NOT NULL REFERENCES benchmark_instance(id),
+  image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
+  task_type			task_type	NOT NULL,
+  CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
+);
+CREATE INDEX task_type_idx ON task (task_type);
+--;;
+CREATE TABLE event(
   id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
-  name		text		UNIQUE NOT NULL,
-  data_type_id	integer		NOT NULL REFERENCES data_type(id),
-  image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  CONSTRAINT data_image UNIQUE(data_type_id, image_type_id)
+  task_id	integer		NOT NULL REFERENCES task(id),
+  file_url	text,
+  file_md5	text,
+  log_file_url	text		NOT NULL,
+  success	bool 		NOT NULL
 );
 --;;
-CREATE MATERIALIZED VIEW benchmark_instance AS
-SELECT
-  md5(bt.id || '-' || di.id || '-' || it.id) AS id,
-  bt.id AS benchmark_type_id,
-  di.id AS data_instance_id,
-  it.id AS image_task_id,
-  bt.data_type_id,
-  bt.image_type_id
-FROM benchmark_type     AS bt
-LEFT JOIN data_instance AS di ON bt.data_type_id  = di.data_type_id
-LEFT JOIN image_task    AS it ON it.image_type_id = bt.image_type_id;
---;;
-CREATE UNIQUE INDEX primary_key   ON benchmark_instance (id);
---;;
-CREATE INDEX data_instance_id_idx ON benchmark_instance (data_instance_id);
---;;
-CREATE INDEX image_task_id_idx    ON benchmark_instance (image_task_id);
---;;
-CREATE TYPE benchmark_event_type AS ENUM ('product', 'evaluation');
---;;
-CREATE TABLE benchmark_event(
-  id				serial			PRIMARY KEY,
-  created_at			timestamp		DEFAULT current_timestamp,
-  benchmark_instance_id		text			NOT NULL,
-  benchmark_file		text			,
-  log_file			text			NOT NULL,
-  event_type			benchmark_event_type	NOT NULL,
-  success			boolean			NOT NULL
-);
---;;
-CREATE INDEX benchmark_instance_id_idx ON benchmark_event (benchmark_instance_id);
---;;
-CREATE VIEW benchmark_successful_product_event AS SELECT
-*
-FROM benchmark_event AS be
-WHERE be.success = true
-AND be.event_type = 'product';
---;;
-CREATE VIEW benchmark_successful_evaluation_event AS SELECT
-*
-FROM benchmark_event AS be
-WHERE be.success = true
-AND be.event_type = 'evaluation';
---;;
-CREATE VIEW benchmark_instance_status AS SELECT
-bi.id  AS id,
-task   AS image_task,
-name   AS image_name,
-sha256 AS image_sha256,
-input_url,
-input_md5,
-prd.benchmark_file AS product_url,
-prd.id AS product_id,
-evl.id AS evaluation_id,
-(prd.id IS NOT NULL) AS product,
-(evl.id IS NOT NULL) AS evaluation
-FROM benchmark_instance                         AS bi
-LEFT JOIN image_task                            AS it  ON bi.image_task_id    = it.id
-LEFT JOIN data_instance                         AS di  ON bi.data_instance_id = di.id
-LEFT JOIN benchmark_successful_product_event    AS prd ON bi.id = prd.benchmark_instance_id
-LEFT JOIN benchmark_successful_evaluation_event AS evl ON bi.id = evl.benchmark_instance_id;
+--;; Metrics
 --;;
 CREATE TABLE metric_type(
   id		serial		PRIMARY KEY,
@@ -121,7 +125,7 @@ CREATE TABLE metric_instance(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
-  benchmark_event_id	integer		NOT NULL REFERENCES benchmark_event(id),
+  event_id		integer		NOT NULL REFERENCES event(id),
   value			float 		NOT NULL,
-  CONSTRAINT metric_to_event UNIQUE(metric_type_id, benchmark_event_id)
+  CONSTRAINT metric_to_event UNIQUE(metric_type_id, event_id)
 );
