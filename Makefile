@@ -1,4 +1,4 @@
-name        := target
+name        := nucleotides-api
 credentials := .aws_credentials
 
 fetch_cred  = $$(./script/get_credential $(credentials) $(1))
@@ -17,7 +17,7 @@ endif
 
 params := $(db_user) $(db_pass) $(db_name) $(db_host)
 
-jar := target/nucleotides-api-0.2.0-standalone.jar
+jar := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
 
 ################################################
 #
@@ -31,7 +31,6 @@ repl: $(credentials)
 irb: $(credentials)
 	@$(params) bundle exec ./script/irb
 
-
 ssh: .rdm_container .api_image $(credentials)
 	@docker run \
 	  --tty \
@@ -42,6 +41,17 @@ ssh: .rdm_container .api_image $(credentials)
 	  --env="$(db_name)" \
 	  $(name) \
 	  /bin/bash
+
+################################################
+#
+# Deploy project
+#
+################################################
+
+deploy: .api_image
+	docker login --username=$$DOCKER_USER --password=$$DOCKER_PASS --email=$$DOCKER_EMAIL
+	docker tag $(name) nucleotides/api:staging
+	docker push nucleotides/api:staging
 
 ################################################
 #
@@ -74,13 +84,18 @@ kill:
 
 ################################################
 #
-# Build the project jars
+# Build the project
 #
 ################################################
 
 build: $(jar)
 
-$(jar): project.clj VERSION $(shell find resources) $(shell find src)
+.api_image: $(find image src) $(jar)
+	docker build --tag=$(name) .
+	touch $@
+
+
+$(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.clj' -o -name '*.sql')
 	lein uberjar
 
 ################################################
@@ -100,10 +115,6 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container
           --publish=5433:5432 \
 	  --detach=true \
 	  postgres > $@
-
-.api_image: $(shell find image) $(jar)
-	docker build --tag=$(name) .
-	touch $@
 
 .rdm_image:
 	docker pull postgres
