@@ -22,3 +22,9 @@ test:
     - ./script/test
     - ./script/build
     - ./script/feature '--format json --out $$CIRCLE_TEST_REPORTS/cucumber/tests.cucumber --format pretty'
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - make deploy
