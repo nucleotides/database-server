@@ -5,5 +5,6 @@ RUN mkdir -p ${DIR}/bin ${DIR}/target
 COPY bin ${DIR}/bin
 COPY target ${DIR}/target
 COPY VERSION ${DIR}/VERSION
+ADD image/migrate /usr/local/bin/
 ADD image/start /usr/local/bin/
 CMD ["start"]

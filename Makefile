@@ -90,7 +90,7 @@ kill:
 
 build: $(jar)
 
-.api_image: $(find image src) $(jar)
+.api_image: $(shell find image src resources/migrations bin) $(jar)
 	docker build --tag=$(name) .
 	touch $@
 
