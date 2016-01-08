@@ -91,7 +91,17 @@ Feature: Migrating and loading input data for the database
       - name: lg50
         description: L50 normalised by reference genome length
       """
-    When I run `./bin/migrate data`
+    When in bash I successfully run:
+      """
+      docker run \
+        --link $(cat ../../.rdm_container):postgres \
+        --env=POSTGRES_USER=${POSTGRES_USER} \
+        --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=POSTGRES_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        nucleotides-api \
+        migrate
+      """
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
     And the table "data_set" should have the entries:
