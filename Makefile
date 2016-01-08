@@ -76,7 +76,8 @@ autotest:
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
 	  --env="$(db_name)" \
-	  $(name) > $@
+	  $(name) \
+	  server > $@
 
 kill:
 	docker kill $(shell cat .api_container)
@@ -90,7 +91,7 @@ kill:
 
 build: $(jar)
 
-.api_image: $(find image src) $(jar)
+.api_image: $(shell find image src resources/migrations bin) $(jar)
 	docker build --tag=$(name) .
 	touch $@
 

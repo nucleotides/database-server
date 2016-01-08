@@ -1,7 +1,4 @@
 #!/bin/bash
 
-if [ -z "${POSTGRES_HOST}" ]; then
-	export POSTGRES_HOST=$(echo $POSTGRES_PORT_5432_TCP | sed 's/tcp://')
-fi
-
-/nucleotides-api/bin/server
+migrate
+server
