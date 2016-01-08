@@ -76,7 +76,8 @@ autotest:
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
 	  --env="$(db_name)" \
-	  $(name) > $@
+	  $(name) \
+	  server > $@
 
 kill:
 	docker kill $(shell cat .api_container)
