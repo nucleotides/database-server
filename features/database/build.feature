@@ -94,12 +94,12 @@ Feature: Migrating and loading input data for the database
     When in bash I successfully run:
       """
       docker run \
-        --env=POSTGRES_HOST=//localhost:5432 \
+        --env=POSTGRES_HOST=//localhost:5433 \
         --env=POSTGRES_USER=${POSTGRES_USER} \
         --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
         --env=POSTGRES_NAME=${POSTGRES_NAME} \
         --volume=$(realpath data):/data:ro \
-        --net=container:$(cat ../../.rdm_container) \
+        --net=host \
         nucleotides-api \
         migrate
       """

@@ -70,12 +70,13 @@ autotest:
 
 .api_container: .rdm_container .api_image $(credentials)
 	@docker run \
-	  --publish=80:80 \
 	  --detach=true \
-	  --link $(shell cat $<):postgres \
 	  --env="$(db_user)" \
 	  --env="$(db_pass)" \
 	  --env="$(db_name)" \
+	  --env=POSTGRES_HOST=//localhost:5433 \
+	  --net=host \
+	  --publish 80:80 \
 	  $(name) \
 	  server > $@
 
