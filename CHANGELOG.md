@@ -3,13 +3,20 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## [v0.2.1] - date
+## [v0.2.2] - 2015-01-13
 
 ### Added
 
-  * Added a script within the docker image to start the migrations. The image
-    CMD now runs the migrations and then launches the server. This means
-    migrations will be run everytime the container is restarted.
+  * Initialisation scripts can optionally use RDS environment variables as set
+    by elastic beanstalk.
+
+## [v0.2.1] - 2015-01-08
+
+### Added
+
+  * Added a script within the docker image to start the migrations. The Docker
+    image CMD now runs the migrations and then launches the server. This means
+    migrations will be run everytime the container is restarted or launched.
 
 ## [v0.2.0] - 2015-01-06
 
