@@ -6,4 +6,5 @@ COPY bin ${DIR}/bin
 COPY target ${DIR}/target
 COPY VERSION ${DIR}/VERSION
 ADD image /usr/local/bin/
+EXPOSE 80
 CMD ["start"]
