@@ -1,9 +1,9 @@
 Feature: Migrating and loading input data for the database
 
-  Scenario: Building the database with postgres variables
+  Scenario: Migrating and loading the database using POSTGRES_* ENV variables
     Given an empty database without any tables
     And I copy the directory "../../test/data" to "data"
-    When in bash I successfully run:
+    When in bash I run:
       """
       docker run \
         --env=POSTGRES_HOST=//localhost:5433 \
@@ -46,10 +46,10 @@ Feature: Migrating and loading input data for the database
       | ng50 | N50 normalised by reference genome length |
 
 
-  Scenario: Building the database with RDS variables
+  Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables
     And I copy the directory "../../test/data" to "data"
-    When in bash I successfully run:
+    When in bash I run:
       """
       docker run \
         --env=RDS_PORT=5433 \
@@ -57,6 +57,36 @@ Feature: Migrating and loading input data for the database
         --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
         --env=RDS_HOSTNAME=localhost \
         --env=RDS_DB_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    Then the stderr excluding logging info should not contain anything
+    And the exit status should be 0
+
+  Scenario: Loading and then reloading the database with the same data
+    Given an empty database without any tables
+    And I copy the directory "../../test/data" to "data"
+    And in bash I successfully run:
+      """
+      docker run \
+        --env=POSTGRES_HOST=//localhost:5433 \
+        --env=POSTGRES_USER=${POSTGRES_USER} \
+        --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=POSTGRES_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    When in bash I run:
+      """
+      docker run \
+        --env=POSTGRES_HOST=//localhost:5433 \
+        --env=POSTGRES_USER=${POSTGRES_USER} \
+        --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=POSTGRES_NAME=${POSTGRES_NAME} \
         --volume=$(realpath data):/data:ro \
         --net=host \
         nucleotides-api \
