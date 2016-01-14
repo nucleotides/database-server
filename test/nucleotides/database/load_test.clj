@@ -71,10 +71,19 @@
           (f)
           (is (= 1 (table-length :data-set)))))))
 
+
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)
-        _  (run-loader ld/data-records :data)]
-    (is (= 3 (table-length :data-record)))))
+        f  #(run-loader ld/data-records :data)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 3 (table-length :data-record)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 3 (table-length :data-record)))))))
 
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)

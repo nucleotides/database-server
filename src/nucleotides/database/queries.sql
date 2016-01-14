@@ -36,13 +36,11 @@ INSERT INTO data_set (name, description)
 SELECT :name, :description
 WHERE NOT EXISTS (SELECT 1 FROM data_set WHERE name = :name);
 
--- name: save-metric-type<!
--- Creates a new data type entry
-INSERT INTO metric_type (name, description)
-VALUES (:name, :description);
-
 -- name: save-data-record<!
 -- Creates a new data instance entry
+WITH _dset AS (
+	SELECT id FROM data_set WHERE name = :name
+)
 INSERT INTO data_record (
 	data_set_id,
 	entry_id,
@@ -51,17 +49,20 @@ INSERT INTO data_record (
 	input_url,
 	reference_url,
 	input_md5,
-	reference_md5,
-	active)
-VALUES ((SELECT id FROM data_set WHERE name = :name),
+	reference_md5)
+SELECT (SELECT id FROM _dset),
 	:entry_id,
 	:replicate,
 	:reads,
 	:input_url,
 	:reference_url,
 	:input_md5,
-	:reference_md5,
-        true);
+	:reference_md5
+WHERE NOT EXISTS (
+	SELECT 1 FROM data_record
+	WHERE data_set_id = (SELECT id FROM _dset)
+	AND entry_id      = :entry_id
+	AND replicate     = :replicate);
 
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry
@@ -122,3 +123,8 @@ EXCEPT
 	image_instance_task_id,
 	task_type
 	FROM task
+
+-- name: save-metric-type<!
+-- Creates a new data type entry
+INSERT INTO metric_type (name, description)
+VALUES (:name, :description);

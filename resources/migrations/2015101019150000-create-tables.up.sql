@@ -49,7 +49,7 @@ CREATE TABLE data_record(
   reference_url	text 		NOT NULL,
   input_md5	text 		NOT NULL,
   reference_md5	text 		NOT NULL,
-  active	bool 		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true,
   CONSTRAINT data_replicates UNIQUE(data_set_id, entry_id, replicate)
 );
 --;;
