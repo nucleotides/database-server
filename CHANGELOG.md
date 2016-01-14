@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.2.3] - 2015-01-13
+
+### Fixed
+
+  * Don't show evaluation tasks in `/tasks/show.json` for which there are no
+    produced input data available.
+
 ## [v0.2.2] - 2015-01-13
 
 ### Added
