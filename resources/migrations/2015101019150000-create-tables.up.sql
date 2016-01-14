@@ -5,7 +5,8 @@ CREATE TABLE image_type(
   id		serial 		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   name          text            UNIQUE NOT NULL,
-  description	text		NOT NULL
+  description	text		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE image_instance(
