@@ -88,8 +88,16 @@
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
-        _  (run-loader ld/benchmark-types :benchmark_type)]
-    (is (= 2 (table-length :benchmark-type)))))
+        f  #(run-loader ld/benchmark-types :benchmark_type)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 2 (table-length :benchmark-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 2 (table-length :benchmark-type)))))))
 
 (deftest load-benchmark-instances
   (let [_  (run-loader ld/data-sets :data)
