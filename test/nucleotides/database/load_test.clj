@@ -29,6 +29,7 @@
           (f)
           (is (= 4 (table-length :image-type)))))))
 
+
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
         f  #(run-loader ld/image-instances :image)]
@@ -41,6 +42,7 @@
       (do (f)
           (f)
           (is (= 5 (table-length :image-instance)))))))
+
 
 (deftest load-image-tasks
   (let [_  (run-loader ld/image-types :image)
@@ -56,9 +58,18 @@
           (f)
           (is (= 6 (table-length :image-instance-task)))))))
 
+
 (deftest load-data-sets
-  (let [_  (run-loader ld/data-sets :data)]
-    (is (= 1 (table-length :data-set)))))
+  (let [f  #(run-loader ld/data-sets :data)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 1 (table-length :data-set)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 1 (table-length :data-set)))))))
 
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)

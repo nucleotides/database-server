@@ -32,8 +32,9 @@ WHERE NOT EXISTS (
 
 -- name: save-data-set<!
 -- Creates a new data type entry
-INSERT INTO data_set (name, description, active)
-VALUES (:name, :description, true);
+INSERT INTO data_set (name, description)
+SELECT :name, :description
+WHERE NOT EXISTS (SELECT 1 FROM data_set WHERE name = :name);
 
 -- name: save-metric-type<!
 -- Creates a new data type entry
