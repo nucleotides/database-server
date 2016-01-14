@@ -14,7 +14,7 @@ CREATE TABLE image_instance(
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
   name		text	        NOT NULL,
   sha256	text 		NOT NULL,
-  active	bool 		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_idx UNIQUE(image_type_id, name, sha256)
 );
 --;;
@@ -23,7 +23,7 @@ CREATE TABLE image_instance_task(
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
   task			text 		NOT NULL,
-  active		bool 		NOT NULL,
+  active		bool 		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
 );
 --;;
