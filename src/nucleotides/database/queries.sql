@@ -149,4 +149,5 @@ EXCEPT
 -- name: save-metric-type<!
 -- Creates a new data type entry
 INSERT INTO metric_type (name, description)
-VALUES (:name, :description);
+SELECT :name, :description
+WHERE NOT EXISTS (SELECT 1 FROM metric_type WHERE name = :name);

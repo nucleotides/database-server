@@ -85,6 +85,7 @@
           (f)
           (is (= 3 (table-length :data-record)))))))
 
+
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
@@ -120,5 +121,13 @@
           (is (not (= 0 (table-length :task))))))))
 
 (deftest load-metric-types
-  (let [_  (run-loader ld/metric-types :metric_type)]
-    (is (= 2 (table-length :metric-type)))))
+  (let [f  #(run-loader ld/metric-types :metric_type)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 2 (table-length :metric-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 2 (table-length :metric-type)))))))
