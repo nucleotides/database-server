@@ -60,7 +60,7 @@ evaluate_task AS (
 	successful_prod_event.file_url AS input_url,
 	successful_prod_event.file_md5 AS input_md5
 	FROM task_
-	LEFT JOIN successful_prod_event ON successful_prod_event.benchmark_instance_id = task_.benchmark_instance_id
+	RIGHT JOIN successful_prod_event ON successful_prod_event.benchmark_instance_id = task_.benchmark_instance_id
 	LEFT JOIN successful_eval_event ON successful_eval_event.task_id = task_.id
 	WHERE task_.task_type = 'evaluate'
 	AND successful_eval_event.id IS NULL
