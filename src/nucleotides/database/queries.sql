@@ -6,9 +6,16 @@ WHERE NOT EXISTS (SELECT 1 FROM image_type WHERE image_type.name = :name);
 
 -- name: save-image-instance<!
 -- Creates a new Docker image instance entry
+WITH _instance AS (
+	SELECT id FROM image_type WHERE name = :image_type
+)
 INSERT INTO image_instance (image_type_id, name, sha256, active)
-VALUES ((SELECT id FROM image_type WHERE name = :image_type),
-	:name, :sha256, true);
+SELECT (SELECT id FROM _instance), :name, :sha256, true
+WHERE NOT EXISTS (
+	SELECT 1 FROM image_instance
+	WHERE image_type_id = (SELECT id FROM _instance)
+	AND name            = :name
+	AND sha256          = :sha256);
 
 -- name: save-image-task<!
 -- Creates a new image task entry

@@ -31,10 +31,18 @@
 
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)]
-    (is (= 5 (table-length :image-instance)))))
+        f  #(run-loader ld/image-instances :image)]
 
-(deftest load-image-instances
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 5 (table-length :image-instance)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 5 (table-length :image-instance)))))))
+
+(deftest load-image-tasks
   (let [_  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)]
