@@ -106,9 +106,18 @@
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)
         _  (run-loader ld/benchmark-types :benchmark_type)
-        _  (ld/rebuild-benchmark-task (con/create-connection))]
-    (is (not (= 0 (table-length :benchmark-instance))))
-    (is (not (= 0 (table-length :task))))))
+        f  #(ld/rebuild-benchmark-task (con/create-connection))]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (not (= 0 (table-length :benchmark-instance))))
+          (is (not (= 0 (table-length :task))))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (not (= 0 (table-length :benchmark-instance))))
+          (is (not (= 0 (table-length :task))))))))
 
 (deftest load-metric-types
   (let [_  (run-loader ld/metric-types :metric_type)]
