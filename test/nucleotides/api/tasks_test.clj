@@ -13,7 +13,7 @@
       (let [_                     (fix/load-fixture "a_single_incomplete_task")
             {:keys [status body]} (task/show {:connection (con/create-connection)} {})]
         (is (= 200 status))
-        (is (= 2 (count body)))
+        (is (= 1 (count body)))
         (dorun
           (for [k [:id :input_url :input_md5 :task_type
                    :image_name :image_sha256 :image_task :image_type]]
