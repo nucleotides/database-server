@@ -18,8 +18,16 @@
   (f (con/create-connection) (fetch-test-data file)))
 
 (deftest load-image-types
-  (let [_  (run-loader ld/image-types :image)]
-    (is (= 4 (table-length :image-type)))))
+  (let [f  #(run-loader ld/image-types :image)]
+
+    (testing "loading with into an empty database"
+      (do (f)
+          (is (= 4 (table-length :image-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 4 (table-length :image-type)))))))
 
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)

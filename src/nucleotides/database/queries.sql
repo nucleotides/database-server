@@ -1,7 +1,8 @@
 -- name: save-image-type<!
--- Creates a new Docker image type entry
+-- Creates a new Docker image type entry if not already exists
 INSERT INTO image_type (name, description)
-VALUES (:name, :description);
+SELECT :name, :description
+WHERE NOT EXISTS (SELECT 1 FROM image_type WHERE image_type.name = :name);
 
 -- name: save-image-instance<!
 -- Creates a new Docker image instance entry
