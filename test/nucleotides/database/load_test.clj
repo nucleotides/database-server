@@ -18,34 +18,87 @@
   (f (con/create-connection) (fetch-test-data file)))
 
 (deftest load-image-types
-  (let [_  (run-loader ld/image-types :image)]
-    (is (= 4 (table-length :image-type)))))
+  (let [f  #(run-loader ld/image-types :image)]
+
+    (testing "loading with into an empty database"
+      (do (f)
+          (is (= 4 (table-length :image-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 4 (table-length :image-type)))))))
+
 
 (deftest load-image-instances
   (let [_  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)]
-    (is (= 5 (table-length :image-instance)))))
+        f  #(run-loader ld/image-instances :image)]
 
-(deftest load-image-instances
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 5 (table-length :image-instance)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 5 (table-length :image-instance)))))))
+
+
+(deftest load-image-tasks
   (let [_  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)
-        _  (run-loader ld/image-tasks :image)]
-    (is (= 6 (table-length :image-instance-task)))))
+        f  #(run-loader ld/image-tasks :image)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 6 (table-length :image-instance-task)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 6 (table-length :image-instance-task)))))))
+
 
 (deftest load-data-sets
-  (let [_  (run-loader ld/data-sets :data)]
-    (is (= 1 (table-length :data-set)))))
+  (let [f  #(run-loader ld/data-sets :data)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 1 (table-length :data-set)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 1 (table-length :data-set)))))))
+
 
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)
-        _  (run-loader ld/data-records :data)]
-    (is (= 3 (table-length :data-record)))))
+        f  #(run-loader ld/data-records :data)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 3 (table-length :data-record)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 3 (table-length :data-record)))))))
+
 
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
-        _  (run-loader ld/benchmark-types :benchmark_type)]
-    (is (= 2 (table-length :benchmark-type)))))
+        f  #(run-loader ld/benchmark-types :benchmark_type)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 2 (table-length :benchmark-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 2 (table-length :benchmark-type)))))))
 
 (deftest load-benchmark-instances
   (let [_  (run-loader ld/data-sets :data)
@@ -54,10 +107,27 @@
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)
         _  (run-loader ld/benchmark-types :benchmark_type)
-        _  (ld/rebuild-benchmark-task (con/create-connection))]
-    (is (not (= 0 (table-length :benchmark-instance))))
-    (is (not (= 0 (table-length :task))))))
+        f  #(ld/rebuild-benchmark-task (con/create-connection))]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (not (= 0 (table-length :benchmark-instance))))
+          (is (not (= 0 (table-length :task))))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (not (= 0 (table-length :benchmark-instance))))
+          (is (not (= 0 (table-length :task))))))))
 
 (deftest load-metric-types
-  (let [_  (run-loader ld/metric-types :metric_type)]
-    (is (= 2 (table-length :metric-type)))))
+  (let [f  #(run-loader ld/metric-types :metric_type)]
+
+    (testing "loading into an empty database"
+      (do (f)
+          (is (= 2 (table-length :metric-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 2 (table-length :metric-type)))))))

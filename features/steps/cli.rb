@@ -8,5 +8,9 @@ Then(/^the stderr excluding logging info should not contain anything$/) do
 end
 
 When(/^in bash I successfully run:$/) do |string|
-    run_simple(unescape_text("bash -c '#{string}'"))
+    run_simple(unescape_text("bash -c '#{string}'"), fail_on_error = true)
+end
+
+When(/^in bash I run:$/) do |string|
+    run_simple(unescape_text("bash -c '#{string}'"), fail_on_error = false)
 end
