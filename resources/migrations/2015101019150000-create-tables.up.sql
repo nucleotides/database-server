@@ -5,7 +5,8 @@ CREATE TABLE image_type(
   id		serial 		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   name          text            UNIQUE NOT NULL,
-  description	text		NOT NULL
+  description	text		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE image_instance(
@@ -14,7 +15,7 @@ CREATE TABLE image_instance(
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
   name		text	        NOT NULL,
   sha256	text 		NOT NULL,
-  active	bool 		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_idx UNIQUE(image_type_id, name, sha256)
 );
 --;;
@@ -23,7 +24,7 @@ CREATE TABLE image_instance_task(
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
   task			text 		NOT NULL,
-  active		bool 		NOT NULL,
+  active		bool 		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
 );
 --;;
@@ -34,7 +35,7 @@ CREATE TABLE data_set(
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
   name		text		UNIQUE NOT NULL,
   description	text		NOT NULL,
-  active	bool 		NOT NULL
+  active	bool 		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE data_record(
@@ -48,7 +49,7 @@ CREATE TABLE data_record(
   reference_url	text 		NOT NULL,
   input_md5	text 		NOT NULL,
   reference_md5	text 		NOT NULL,
-  active	bool 		NOT NULL,
+  active	bool 		NOT NULL DEFAULT true,
   CONSTRAINT data_replicates UNIQUE(data_set_id, entry_id, replicate)
 );
 --;;
@@ -60,7 +61,7 @@ CREATE TABLE benchmark_type(
   name				text		UNIQUE NOT NULL,
   product_image_type_id		integer		NOT NULL REFERENCES image_type(id),
   evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  active			bool 		NOT NULL
+  active			bool 		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE benchmark_data(
@@ -68,7 +69,7 @@ CREATE TABLE benchmark_data(
   created_at		timestamp	NOT NULL DEFAULT current_timestamp,
   data_set_id		integer		NOT NULL REFERENCES data_set(id),
   benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
-  active		bool 		NOT NULL,
+  active		bool 		NOT NULL DEFAULT true,
   CONSTRAINT benchmark_data_idx UNIQUE(data_set_id, benchmark_type_id)
 );
 --;;

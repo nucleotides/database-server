@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## [v0.3.0] - date
+
+### Fixed
+
+  * Running migrations with files containing same data and images in the input
+    files no longer creates an SQL error from trying to insert a duplicate row
+    with index constraints. Instead the duplicate rows are skipped. This allows
+    migrations to be run repeatedly, the intended behaviour, when adding new
+    data and images to the input files.
+
 ## [v0.2.3] - 2015-01-13
 
 ### Fixed
