@@ -51,3 +51,19 @@ Feature: Posting and getting tasks from the API
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the returned JSON should be empty
+
+  Scenario: Getting a task by ID
+    Given the database scenario with "a single incomplete task"
+    When I get the url "/tasks/1"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the returned JSON should contain:
+       | key          | value                |
+       | id           | 1                    |
+       | task_type    | produce              |
+       | image_task   | default              |
+       | image_name   | bioboxes/velvet      |
+       | image_type   | short_read_assembler |
+       | image_sha256 | 123abc               |
+       | input_url    | s3://url             |
+       | input_md5    | abcdef               |

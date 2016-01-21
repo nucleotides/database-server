@@ -1,3 +1,49 @@
+-- name: task-by-id
+-- Look up a single task
+WITH task_ AS (
+	SELECT
+	task.id,
+	task.task_type           AS task_type,
+	image_instance_task.task AS image_task,
+	image_instance.sha256    AS image_sha256,
+	image_instance.name      AS image_name,
+	image_type.name          AS image_type,
+	task.benchmark_instance_id
+	FROM task
+	LEFT JOIN image_instance_task ON image_instance_task.id   = task.image_instance_task_id
+	LEFT JOIN image_instance      ON image_instance.id        = image_instance_task.image_instance_id
+	LEFT JOIN image_type          ON image_type.id            = image_instance.image_type_id
+	WHERE task.id = :id::int
+),
+product_task AS (
+	SELECT
+	task_.*,
+	data_record.input_url,
+	data_record.input_md5
+	FROM task_
+	LEFT JOIN benchmark_instance    ON benchmark_instance.id = task_.benchmark_instance_id
+	LEFT JOIN data_record           ON data_record.id        = benchmark_instance.data_record_id
+	WHERE task_.task_type = 'produce'
+),
+evaluate_task AS (
+	SELECT
+	task_.*,
+	event_.file_url AS input_url,
+	event_.file_md5 AS input_md5
+	FROM task_
+	LEFT JOIN (
+		SELECT DISTINCT ON (event.task_id)
+		*
+		FROM event
+		WHERE event.success = TRUE
+		AND event.task_id = :id::int
+	) AS event_ ON task_.id = event_.task_id
+	WHERE task_.task_type = 'evaluate'
+)
+SELECT * FROM product_task
+UNION
+SELECT * FROM evaluate_task
+
 -- name: incomplete-tasks
 -- Get all incomplete tasks
 WITH successful_prod_event AS (

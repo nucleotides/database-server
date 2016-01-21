@@ -8,3 +8,8 @@
   "Returns all incomplete tasks"
   [db-client _]
   (ring/response (incomplete-tasks {} db-client)))
+
+(defn lookup
+  "Gets a single task entry by its ID"
+  [db-client id _]
+  (ring/response (first (task-by-id {:id id} db-client))))
