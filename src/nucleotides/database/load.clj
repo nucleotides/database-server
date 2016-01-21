@@ -43,6 +43,9 @@
   ([save]
    (load-entries identity save)))
 
+(def file-types
+  "Load file types into the database"
+  (load-entries save-file-type<!))
 
 (def image-types
   "Select the image types and load into the database"

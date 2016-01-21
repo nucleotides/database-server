@@ -17,6 +17,19 @@
 (defn run-loader [f file]
   (f (con/create-connection) (fetch-test-data file)))
 
+(deftest load-file-types
+  (let [f  #(run-loader ld/file-types :file_type)]
+
+    (testing "loading with into an empty database"
+      (do (f)
+          (is (= 2 (table-length :file-type)))))
+
+    (testing "reloading the same data"
+      (do (f)
+          (f)
+          (is (= 2 (table-length :file-type)))))))
+
+
 (deftest load-image-types
   (let [f  #(run-loader ld/image-types :image)]
 

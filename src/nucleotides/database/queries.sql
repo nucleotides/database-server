@@ -1,3 +1,9 @@
+-- name: save-file-type<!
+-- Creates a new data type entry
+INSERT INTO file_type (name, description)
+SELECT :name, :description
+WHERE NOT EXISTS (SELECT 1 FROM file_type WHERE name = :name);
+
 -- name: save-image-type<!
 -- Creates a new Docker image type entry if not already exists
 INSERT INTO image_type (name, description)
