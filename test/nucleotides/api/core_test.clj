@@ -31,6 +31,15 @@
         (is-ok-response res)
         (is-not-empty-body res))))
 
+  (testing "GET /tasks/:id"
+    (let [f #(request :get (str "/tasks/" %))]
+
+      (let [_   (load-fixture "a_single_incomplete_task")
+            res (f 1)]
+        (is-ok-response res)
+        (is-not-empty-body res)
+        (has-body-entry res "id"))))
+
   (testing "POST /events"
     (let [f (partial request :post "/events")]
 
