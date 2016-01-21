@@ -1,9 +1,16 @@
 # Change Log
 
 All notable changes to this project will be documented in this file. This
-project adheres to [Semantic Versioning](http://semver.org/).
+project adheres to Semantic Versioning(http://semver.org/).
 
-## [v0.3.0] - date
+## v0.4.0 - 2015-01-20
+
+### Added
+
+  * Added `/tasks/:id` - this provides a url for getting metadata about a
+    single task.
+
+## v0.3.0 - 2015-01-14
 
 ### Fixed
 
@@ -13,21 +20,21 @@ project adheres to [Semantic Versioning](http://semver.org/).
     migrations to be run repeatedly, the intended behaviour, when adding new
     data and images to the input files.
 
-## [v0.2.3] - 2015-01-13
+## v0.2.3 - 2015-01-13
 
 ### Fixed
 
   * Don't show evaluation tasks in `/tasks/show.json` for which there are no
     produced input data available.
 
-## [v0.2.2] - 2015-01-13
+## v0.2.2 - 2015-01-13
 
 ### Added
 
   * Initialisation scripts can optionally use RDS environment variables as set
     by elastic beanstalk.
 
-## [v0.2.1] - 2015-01-08
+## v0.2.1 - 2015-01-08
 
 ### Added
 
@@ -35,7 +42,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
     image CMD now runs the migrations and then launches the server. This means
     migrations will be run everytime the container is restarted or launched.
 
-## [v0.2.0] - 2015-01-06
+## v0.2.0 - 2015-01-06
 
 ### Changed
 
