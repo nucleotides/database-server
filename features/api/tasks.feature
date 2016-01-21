@@ -84,8 +84,30 @@ Feature: Posting and getting tasks from the API
        | input_url    |                      |
        | input_md5    |                      |
 
+  Scenario: Getting an evaluate task with failed product inputs
+    Given the database scenario with "a single incomplete task"
+    And I successfully post to "/events" with the data:
+      """
+      { "task"          : 1,
+        "log_file_url"  : "log_url",
+        "success"       : false }
+      """
+    When I get the url "/tasks/2"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the returned JSON should contain:
+       | key          | value                |
+       | id           | 2                    |
+       | task_type    | evaluate             |
+       | image_task   | default              |
+       | image_name   | bioboxes/quast       |
+       | image_type   | assembly_evaluation  |
+       | image_sha256 | 123abc               |
+       | input_url    |                      |
+       | input_md5    |                      |
 
-  Scenario: Getting an evaluate task with inputs by ID
+
+  Scenario: Getting an evaluate task with successful product inputs
     Given the database scenario with "a single incomplete task"
     And I successfully post to "/events" with the data:
       """
