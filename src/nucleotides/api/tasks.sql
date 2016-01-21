@@ -25,19 +25,22 @@ product_task AS (
 	LEFT JOIN data_record           ON data_record.id        = benchmark_instance.data_record_id
 	WHERE task_.task_type = 'produce'
 ),
+produce_event AS(
+	SELECT DISTINCT ON (event.task_id)
+	*
+	FROM event
+	LEFT JOIN task ON task.id = event.task_id
+	WHERE task.benchmark_instance_id = (SELECT benchmark_instance_id FROM task_)
+	AND task.task_type = 'produce'
+	AND event.success = TRUE
+),
 evaluate_task AS (
 	SELECT
 	task_.*,
-	event_.file_url AS input_url,
-	event_.file_md5 AS input_md5
+	produce_event.file_url AS input_url,
+	produce_event.file_md5 AS input_md5
 	FROM task_
-	LEFT JOIN (
-		SELECT DISTINCT ON (event.task_id)
-		*
-		FROM event
-		WHERE event.success = TRUE
-		AND event.task_id = :id::int
-	) AS event_ ON task_.id = event_.task_id
+	LEFT JOIN produce_event ON produce_event.benchmark_instance_id = task_.benchmark_instance_id
 	WHERE task_.task_type = 'evaluate'
 )
 SELECT * FROM product_task
