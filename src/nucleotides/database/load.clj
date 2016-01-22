@@ -98,14 +98,14 @@
     (apply populate-task! args)))
 
 (def loaders
-  [[file-types       :file_type]
+  [[file-types       :file-type]
    [data-sets        :data]
    [data-records     :data]
    [image-types      :image]
    [image-instances  :image]
    [image-tasks      :image]
-   [benchmark-types  :benchmark_type]
-   [metric-types     :metric_type]])
+   [benchmark-types  :benchmark-type]
+   [metric-types     :metric-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"
