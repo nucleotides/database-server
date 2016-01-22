@@ -43,6 +43,9 @@
   ([save]
    (load-entries identity save)))
 
+(def file-types
+  "Load file types into the database"
+  (load-entries save-file-type<!))
 
 (def image-types
   "Select the image types and load into the database"
@@ -95,7 +98,8 @@
     (apply populate-task! args)))
 
 (def loaders
-  [[data-sets        :data]
+  [[file-types       :file_type]
+   [data-sets        :data]
    [data-records     :data]
    [image-types      :image]
    [image-instances  :image]

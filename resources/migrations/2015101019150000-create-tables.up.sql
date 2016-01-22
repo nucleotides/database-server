@@ -1,55 +1,71 @@
 --;;
+--;; Files
+--;;
+CREATE TABLE file_type(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	DEFAULT current_timestamp,
+  name		text		UNIQUE NOT NULL,
+  description	text		NOT NULL
+);
+CREATE TABLE file_instance(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	DEFAULT current_timestamp,
+  file_type_id	integer		NOT NULL REFERENCES file_type(id),
+  md5		text		NOT NULL,
+  url		text		NOT NULL
+);
+--;;
 --;; Docker images
 --;;
 CREATE TABLE image_type(
-  id		serial 		PRIMARY KEY,
+  id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
-  name          text            UNIQUE NOT NULL,
+  name		text		UNIQUE NOT NULL,
   description	text		NOT NULL,
-  active	bool 		NOT NULL DEFAULT true
+  active	bool		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE image_instance(
-  id		serial 		PRIMARY KEY,
+  id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  name		text	        NOT NULL,
-  sha256	text 		NOT NULL,
-  active	bool 		NOT NULL DEFAULT true,
+  name		text		NOT NULL,
+  sha256	text		NOT NULL,
+  active	bool		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_idx UNIQUE(image_type_id, name, sha256)
 );
 --;;
 CREATE TABLE image_instance_task(
-  id			serial 		PRIMARY KEY,
+  id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
-  task			text 		NOT NULL,
-  active		bool 		NOT NULL DEFAULT true,
+  task			text		NOT NULL,
+  active		bool		NOT NULL DEFAULT true,
   CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
 );
 --;;
 --;; Data sets
 --;;
 CREATE TABLE data_set(
-  id		serial 		PRIMARY KEY,
+  id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
   name		text		UNIQUE NOT NULL,
   description	text		NOT NULL,
-  active	bool 		NOT NULL DEFAULT true
+  active	bool		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE data_record(
   id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
   data_set_id	integer		NOT NULL REFERENCES data_set(id),
-  entry_id	integer         NOT NULL,
-  replicate	integer 	NOT NULL,
+  entry_id	integer		NOT NULL,
+  replicate	integer		NOT NULL,
   reads		integer		NOT NULL,
-  input_url	text 		NOT NULL,
-  reference_url	text 		NOT NULL,
-  input_md5	text 		NOT NULL,
-  reference_md5	text 		NOT NULL,
-  active	bool 		NOT NULL DEFAULT true,
+  input_url	text		NOT NULL,
+  reference_url	text		NOT NULL,
+  input_md5	text		NOT NULL,
+  reference_md5	text		NOT NULL,
+  active	bool		NOT NULL DEFAULT true,
   CONSTRAINT data_replicates UNIQUE(data_set_id, entry_id, replicate)
 );
 --;;
@@ -61,7 +77,7 @@ CREATE TABLE benchmark_type(
   name				text		UNIQUE NOT NULL,
   product_image_type_id		integer		NOT NULL REFERENCES image_type(id),
   evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  active			bool 		NOT NULL DEFAULT true
+  active			bool		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE benchmark_data(
@@ -69,7 +85,7 @@ CREATE TABLE benchmark_data(
   created_at		timestamp	NOT NULL DEFAULT current_timestamp,
   data_set_id		integer		NOT NULL REFERENCES data_set(id),
   benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
-  active		bool 		NOT NULL DEFAULT true,
+  active		bool		NOT NULL DEFAULT true,
   CONSTRAINT benchmark_data_idx UNIQUE(data_set_id, benchmark_type_id)
 );
 --;;
@@ -110,7 +126,7 @@ CREATE TABLE event(
   file_url	text,
   file_md5	text,
   log_file_url	text		NOT NULL,
-  success	bool 		NOT NULL
+  success	bool		NOT NULL
 );
 --;;
 --;; Metrics
@@ -119,7 +135,7 @@ CREATE TABLE metric_type(
   id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   name		varchar(80)	UNIQUE NOT NULL,
-  description	text 		NOT NULL
+  description	text		NOT NULL
 );
 --;;
 CREATE TABLE metric_instance(
@@ -127,6 +143,6 @@ CREATE TABLE metric_instance(
   created_at		timestamp	DEFAULT current_timestamp,
   metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
   event_id		integer		NOT NULL REFERENCES event(id),
-  value			float 		NOT NULL,
+  value			float		NOT NULL,
   CONSTRAINT metric_to_event UNIQUE(metric_type_id, event_id)
 );

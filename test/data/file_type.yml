@@ -1,0 +1,5 @@
+---
+- name: genomic_short_reads
+  description: Short reads sequences in FASTQ format from genomic origin
+- name: reference_genome
+  description: Reference genome sequence in FASTA format

@@ -11,6 +11,7 @@
   [:image-type
    :image-instance
    :image-instance-task
+   :file-type
    :data-set
    :data-record
    :benchmark-type
