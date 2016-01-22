@@ -98,7 +98,8 @@
     (apply populate-task! args)))
 
 (def loaders
-  [[data-sets        :data]
+  [[file-types       :file_type]
+   [data-sets        :data]
    [data-records     :data]
    [image-types      :image]
    [image-instances  :image]
