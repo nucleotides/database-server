@@ -1,5 +1,0 @@
----
-- name: ng50
-  description: N50 normalised by reference genome length
-- name: lg50
-  description: L50 normalised by reference genome length

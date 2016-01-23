@@ -21,6 +21,7 @@ Feature: Migrating and loading input data for the database
       | name          |
       | platform_type |
       | file_type     |
+      | metric_type   |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables

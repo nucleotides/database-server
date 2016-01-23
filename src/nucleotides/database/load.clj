@@ -84,10 +84,6 @@
   "Load data records into the database"
   (load-entries unfold-data-replicates save-data-record<!))
 
-(def metric-types
-  "Load metric types into the database"
-  (load-entries save-metric-type<!))
-
 (def benchmark-types
   "Load benchmark types into the database"
   (let [f (fn [acc entry]
@@ -104,7 +100,7 @@
     (apply populate-task! args)))
 
 (def metadata-entries
-  [:platform :file])
+  [:platform :file :metric])
 
 (def loaders
   [[data-sets        :data]
@@ -112,8 +108,7 @@
    [image-types      :image]
    [image-instances  :image]
    [image-tasks      :image]
-   [benchmark-types  :benchmark-type]
-   [metric-types     :metric-type]])
+   [benchmark-types  :benchmark-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"

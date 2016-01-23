@@ -22,7 +22,7 @@
   (f (con/create-connection) (data-key input-data)))
 
 (deftest load-metadata-types
-  (dorun (for [data-key [:platform :file]]
+  (dorun (for [data-key [:platform :file :metric]]
 
     (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
 
@@ -138,15 +138,3 @@
           (f)
           (is (not (= 0 (table-length :benchmark-instance))))
           (is (not (= 0 (table-length :task))))))))
-
-(deftest load-metric-types
-  (let [f  #(run-loader ld/metric-types :metric-type)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 2 (table-length :metric-type)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 2 (table-length :metric-type)))))))

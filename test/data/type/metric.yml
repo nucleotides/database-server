@@ -1,0 +1,5 @@
+---
+- name: ng50
+  desc: N50 normalised by reference genome length
+- name: lg50
+  desc: L50 normalised by reference genome length
