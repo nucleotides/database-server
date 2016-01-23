@@ -10,9 +10,6 @@
        (concat ["test"])
        (st/join "/")))
 
-(defn fetch-test-data [x]
-  (build/load-data-file (test-directory :data) x))
-
 (defn load-fixture [& fixtures]
   (db/empty-database)
   (dorun
