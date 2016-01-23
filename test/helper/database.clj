@@ -3,8 +3,9 @@
             [clojure.string                  :as string]
             [taoensso.timbre                 :as log]
             [migratus.core                   :as mg]
-            [nucleotides.database.migrate    :as build]
-            [nucleotides.database.connection :as con]))
+            [camel-snake-kebab.core          :as ksk]
+            [nucleotides.database.connection :as con]
+            [nucleotides.database.migrate    :as build]))
 
 (log/set-config! [:appenders :standard-out :enabled? false])
 
@@ -24,11 +25,9 @@
     (mg/migrate (build/create-migratus-spec (con/create-connection)))))
 
 (defn table-entries [table-name]
-  (let [con            (con/create-connection)
-        formatted-name (-> (str table-name)
-                           (string/replace  "-" "_")
-                           (string/replace  ":" ""))]
-    (sql/query con (apply str "select * from " formatted-name))))
+  (sql/query
+    (con/create-connection)
+    (apply str "select * from " (ksk/->snake_case_string table-name))))
 
 (def table-length
   (comp count table-entries))
