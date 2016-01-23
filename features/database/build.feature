@@ -20,6 +20,7 @@ Feature: Migrating and loading input data for the database
     And the following tables should not be empty :
       | name          |
       | platform_type |
+      | file_type     |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables

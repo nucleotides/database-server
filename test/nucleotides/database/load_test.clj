@@ -22,7 +22,7 @@
   (f (con/create-connection) (data-key input-data)))
 
 (deftest load-metadata-types
-  (dorun (for [data-key [:platform]]
+  (dorun (for [data-key [:platform :file]]
 
     (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
 

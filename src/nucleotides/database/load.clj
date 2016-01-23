@@ -53,10 +53,6 @@
                (format query (str (name table-name) "_type") (:name entry) (:desc entry))))]
     (dorun (map save! data))))
 
-(def file-types
-  "Load file types into the database"
-  (load-entries save-file-type<!))
-
 (def image-types
   "Select the image types and load into the database"
   (let [transform (fn [entry] (-> entry
@@ -108,11 +104,10 @@
     (apply populate-task! args)))
 
 (def metadata-entries
-  [:platform])
+  [:platform :file])
 
 (def loaders
-  [[file-types       :file-type]
-   [data-sets        :data]
+  [[data-sets        :data]
    [data-records     :data]
    [image-types      :image]
    [image-instances  :image]
