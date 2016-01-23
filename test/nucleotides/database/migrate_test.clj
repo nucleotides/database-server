@@ -8,10 +8,11 @@
 (use-fixtures :each (fn [f] (drop-tables) (f)))
 
 (def tables
-  [:image-type
+  [:platform-type
+   :file-type
+   :image-type
    :image-instance
    :image-instance-task
-   :file-type
    :data-set
    :data-record
    :benchmark-type

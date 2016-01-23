@@ -1,0 +1,3 @@
+---
+- name: microbial_isolate
+  desc: A microbe isolated from culture and then DNA extracted.

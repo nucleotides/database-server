@@ -51,7 +51,7 @@
       save! (fn [entry]
               (sql/query connection
                (format query (str (name table-name) "_type") (:name entry) (:desc entry))))]
-    (doall (map save! data))))
+    (dorun (map save! data))))
 
 (def file-types
   "Load file types into the database"
@@ -107,6 +107,9 @@
     (apply populate-benchmark-instance! args)
     (apply populate-task! args)))
 
+(def metadata-entries
+  [:platform])
+
 (def loaders
   [[file-types       :file-type]
    [data-sets        :data]
@@ -120,7 +123,9 @@
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
-  (let [load_ (fn [[f k]] (f connection (k data)))]
+  (let [load_         (fn [[f k]] (f connection (k data)))
+        load-metadata #(metadata-types connection % (% data))]
     (do
+      (dorun (map load-metadata metadata-entries))
       (dorun (map load_ loaders))
       (rebuild-benchmark-task connection))))

@@ -1,0 +1,3 @@
+---
+- name: 2x150
+  desc: Paired insert reads sequenced to 150bp
