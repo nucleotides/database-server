@@ -108,7 +108,7 @@
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
-        f  #(run-loader ld/benchmark-types :benchmark_type)]
+        f  #(run-loader ld/benchmark-types :benchmark-type)]
 
     (testing "loading into an empty database"
       (do (f)
@@ -125,7 +125,7 @@
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)
-        _  (run-loader ld/benchmark-types :benchmark_type)
+        _  (run-loader ld/benchmark-types :benchmark-type)
         f  #(ld/rebuild-benchmark-task (con/create-connection))]
 
     (testing "loading into an empty database"
@@ -140,7 +140,7 @@
           (is (not (= 0 (table-length :task))))))))
 
 (deftest load-metric-types
-  (let [f  #(run-loader ld/metric-types :metric_type)]
+  (let [f  #(run-loader ld/metric-types :metric-type)]
 
     (testing "loading into an empty database"
       (do (f)
