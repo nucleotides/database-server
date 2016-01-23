@@ -16,12 +16,6 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
-(defn load-data-file [directory file]
-  (->> (str (name file) ".yml")
-       (io/file directory)
-       (slurp)
-       (yaml/parse-string)))
-
 (defn load-yml-files-from [directory]
   "Loads all nucleotides YAML files from a directory"
   (let [f #(-> (.getName %)
