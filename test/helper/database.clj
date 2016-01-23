@@ -29,10 +29,10 @@
     (con/create-connection)
     (apply str "select * from " (ksk/->snake_case_string table-name))))
 
-(defn metadata-entries [metadata-name]
+(defn metadata-entries [table-name]
   (sql/query
     (con/create-connection)
-    (apply str "select * from metadata where category = '" (ksk/->snake_case_string metadata-name) "'")))
+    (apply str "select * from " (ksk/->snake_case_string table-name) "_type")))
 
 (def table-length
   (comp count table-entries))

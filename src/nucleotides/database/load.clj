@@ -43,6 +43,16 @@
   ([save]
    (load-entries identity save)))
 
+(defn metadata-types [connection table-name data]
+  (let [query "INSERT INTO %1$s (name, description)
+               SELECT '%2$s', '%3$s'
+               WHERE NOT EXISTS (SELECT id FROM %1$s WHERE name = '%2$s')
+               RETURNING id;"
+      save! (fn [entry]
+              (sql/query connection
+               (format query (str (name table-name) "_type") (:name entry) (:desc entry))))]
+    (doall (map save! data))))
+
 (def file-types
   "Load file types into the database"
   (load-entries save-file-type<!))

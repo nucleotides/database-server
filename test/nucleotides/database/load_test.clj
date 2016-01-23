@@ -2,32 +2,38 @@
   (:require [clojure.test                    :refer :all]
             [clojure.walk                    :as walk]
             [clojure.pprint                  :as pp]
-            [clojure.java.jdbc               :as db]
+            [clojure.java.jdbc               :as sql]
             [clojure.set                     :as st]
 
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
+            [nucleotides.database.migrate    :as mg]
             [nucleotides.database.load       :as ld]
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
 (use-fixtures :each (fn [f] (empty-database) (f)))
 
-(defn run-loader [f file]
-  (f (con/create-connection) (fetch-test-data file)))
+(def input-data
+  (mg/load-data-files (test-directory :data)))
 
-(deftest load-file-types
-  (let [f  #(run-loader ld/file-types :file_type)]
+(defn run-loader [f data-key]
+  (f (con/create-connection) (data-key input-data)))
 
-    (testing "loading with into an empty database"
-      (do (f)
-          (is (= 2 (table-length :file-type)))))
+(deftest load-metadata-types
+  (dorun (for [data-key [:platform]]
 
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 2 (table-length :file-type)))))))
+    (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
+
+      (testing "loading with into an empty database"
+        (do (f)
+            (is (not (= 0 (metadata-length data-key))))))
+
+      (testing "reloading the same data"
+        (do (f)
+            (f)
+            (is (not (= 0 (metadata-length data-key))))))))))
 
 
 (deftest load-image-types
