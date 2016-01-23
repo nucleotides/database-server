@@ -20,10 +20,6 @@
    :metric-type
    :task])
 
-(do
-  (drop-tables)
-  (migrate/migrate (test-directory :data)))
-
 (deftest migrate
   (testing "-main"
     (migrate/migrate (test-directory :data))
