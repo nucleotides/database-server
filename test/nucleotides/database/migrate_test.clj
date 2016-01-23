@@ -9,7 +9,11 @@
 
 (def tables
   [:platform-type
+   :protocol-type
+   :product-type
    :file-type
+   :metric-type
+   :run-mode-type
    :image-type
    :image-instance
    :image-instance-task
@@ -18,7 +22,6 @@
    :benchmark-type
    :benchmark-instance
    :benchmark-data
-   :metric-type
    :task])
 
 (deftest migrate

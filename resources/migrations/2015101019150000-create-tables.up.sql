@@ -19,10 +19,14 @@ $func$ LANGUAGE plpgsql;
 --;;
 DO $$
 BEGIN
-	PERFORM create_metadata_table('platform');
 	PERFORM create_metadata_table('metric');
 	PERFORM create_metadata_table('file');
 	PERFORM create_metadata_table('image');
+
+	PERFORM create_metadata_table('platform');
+	PERFORM create_metadata_table('product');
+	PERFORM create_metadata_table('run_mode');
+	PERFORM create_metadata_table('protocol');
 END$$;
 --;;
 --;; Files

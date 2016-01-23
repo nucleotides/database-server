@@ -20,6 +20,9 @@ Feature: Migrating and loading input data for the database
     And the following tables should not be empty :
       | name          |
       | platform_type |
+      | protocol_type |
+      | platform_type |
+      | run_mode_type |
       | file_type     |
       | metric_type   |
 

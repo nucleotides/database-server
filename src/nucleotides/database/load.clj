@@ -3,6 +3,7 @@
     [clojure.set              :as st]
     [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
+    [camel-snake-kebab.core   :as ksk]
     [yesql.core               :refer [defqueries]]
     [nucleotides.database.connection :as con]))
 
@@ -50,7 +51,10 @@
                RETURNING id;"
       save! (fn [entry]
               (sql/query connection
-               (format query (str (name table-name) "_type") (:name entry) (:desc entry))))]
+               (format query
+                       (str (ksk/->snake_case_string table-name) "_type")
+                       (:name entry)
+                       (:desc entry))))]
     (dorun (map save! data))))
 
 (def image-types
@@ -100,7 +104,7 @@
     (apply populate-task! args)))
 
 (def metadata-entries
-  [:platform :file :metric])
+  [:platform :file :metric :protocol :product :run-mode])
 
 (def loaders
   [[data-sets        :data]
