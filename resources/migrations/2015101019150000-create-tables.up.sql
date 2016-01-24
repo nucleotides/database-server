@@ -1,12 +1,36 @@
 --;;
+--;; Metadata Types
+--;;
+--;; Copied from http://dba.stackexchange.com/questions/42924
+CREATE OR REPLACE FUNCTION create_metadata_table(metadata_name varchar(30))
+  RETURNS VOID AS
+$func$
+BEGIN
+EXECUTE format('
+  CREATE TABLE IF NOT EXISTS %I (
+    id		serial		PRIMARY KEY,
+    created_at	timestamp	DEFAULT current_timestamp,
+    name	text		UNIQUE NOT NULL,
+    description	text		NOT NULL,
+    active	bool		NOT NULL DEFAULT true
+  );', metadata_name || '_type');
+END
+$func$ LANGUAGE plpgsql;
+--;;
+DO $$
+BEGIN
+	PERFORM create_metadata_table('metric');
+	PERFORM create_metadata_table('file');
+	PERFORM create_metadata_table('image');
+
+	PERFORM create_metadata_table('platform');
+	PERFORM create_metadata_table('product');
+	PERFORM create_metadata_table('run_mode');
+	PERFORM create_metadata_table('protocol');
+END$$;
+--;;
 --;; Files
 --;;
-CREATE TABLE file_type(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	DEFAULT current_timestamp,
-  name		text		UNIQUE NOT NULL,
-  description	text		NOT NULL
-);
 CREATE TABLE file_instance(
   id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
@@ -16,14 +40,6 @@ CREATE TABLE file_instance(
 );
 --;;
 --;; Docker images
---;;
-CREATE TABLE image_type(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	DEFAULT current_timestamp,
-  name		text		UNIQUE NOT NULL,
-  description	text		NOT NULL,
-  active	bool		NOT NULL DEFAULT true
-);
 --;;
 CREATE TABLE image_instance(
   id		serial		PRIMARY KEY,
@@ -47,11 +63,11 @@ CREATE TABLE image_instance_task(
 --;; Data sets
 --;;
 CREATE TABLE data_set(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
-  name		text		UNIQUE NOT NULL,
-  description	text		NOT NULL,
-  active	bool		NOT NULL DEFAULT true
+  id           serial          PRIMARY KEY,
+  created_at   timestamp       NOT NULL DEFAULT current_timestamp,
+  name         text            UNIQUE NOT NULL,
+  description  text            NOT NULL,
+  active       bool            NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE data_record(
@@ -130,13 +146,6 @@ CREATE TABLE event(
 );
 --;;
 --;; Metrics
---;;
-CREATE TABLE metric_type(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	DEFAULT current_timestamp,
-  name		varchar(80)	UNIQUE NOT NULL,
-  description	text		NOT NULL
-);
 --;;
 CREATE TABLE metric_instance(
   id			serial		PRIMARY KEY,

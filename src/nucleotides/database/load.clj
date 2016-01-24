@@ -3,6 +3,7 @@
     [clojure.set              :as st]
     [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
+    [camel-snake-kebab.core   :as ksk]
     [yesql.core               :refer [defqueries]]
     [nucleotides.database.connection :as con]))
 
@@ -43,9 +44,18 @@
   ([save]
    (load-entries identity save)))
 
-(def file-types
-  "Load file types into the database"
-  (load-entries save-file-type<!))
+(defn metadata-types [connection table-name data]
+  (let [query "INSERT INTO %1$s (name, description)
+               SELECT '%2$s', '%3$s'
+               WHERE NOT EXISTS (SELECT id FROM %1$s WHERE name = '%2$s')
+               RETURNING id;"
+      save! (fn [entry]
+              (sql/query connection
+               (format query
+                       (str (ksk/->snake_case_string table-name) "_type")
+                       (:name entry)
+                       (:desc entry))))]
+    (dorun (map save! data))))
 
 (def image-types
   "Select the image types and load into the database"
@@ -78,10 +88,6 @@
   "Load data records into the database"
   (load-entries unfold-data-replicates save-data-record<!))
 
-(def metric-types
-  "Load metric types into the database"
-  (load-entries save-metric-type<!))
-
 (def benchmark-types
   "Load benchmark types into the database"
   (let [f (fn [acc entry]
@@ -97,20 +103,23 @@
     (apply populate-benchmark-instance! args)
     (apply populate-task! args)))
 
+(def metadata-entries
+  [:platform :file :metric :protocol :product :run-mode])
+
 (def loaders
-  [[file-types       :file_type]
-   [data-sets        :data]
+  [[data-sets        :data]
    [data-records     :data]
    [image-types      :image]
    [image-instances  :image]
    [image-tasks      :image]
-   [benchmark-types  :benchmark_type]
-   [metric-types     :metric_type]])
+   [benchmark-types  :benchmark-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"
   [connection data]
-  (let [load_ (fn [[f k]] (f connection (k data)))]
+  (let [load_         (fn [[f k]] (f connection (k data)))
+        load-metadata #(metadata-types connection % (% data))]
     (do
+      (dorun (map load-metadata metadata-entries))
       (dorun (map load_ loaders))
       (rebuild-benchmark-task connection))))

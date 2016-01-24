@@ -2,6 +2,7 @@ require 'pg'
 require 'awesome_print'
 require 'diffy'
 
+
 Given(/^an empty database without any tables$/) do
   drop_all_tables
 end
@@ -15,6 +16,12 @@ Given(/^the database scenario with "(.*?)"$/) do |scenario_name|
   drop_all_tables
   create_tables
   execute_sql_fixture(scenario_name.strip.gsub(" ", "_"))
+end
+
+Then(/^the following tables should not be empty :$/) do |table|
+  table.hashes.each do |row|
+    expect(table_entries(row['name']).length).to_not be(0)
+  end
 end
 
 Then(/^the table "(.*?)" should have the entries:$/) do |name, table|

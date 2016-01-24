@@ -17,33 +17,14 @@ Feature: Migrating and loading input data for the database
       """
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
-    And the table "data_set" should have the entries:
-      | name              | description         |
-      | jgi_isolate_2x150 | Verbose description |
-    And the table "data_record" should have the entries:
-      | entry_id | replicate | input_md5 | input_url  | reference_md5 | reference_url | reads   |
-      | 1        | 1         | eaa53     | s3://url_1 | hexad         | s3://url_3    | 2000000 |
-      | 1        | 2         | f01d2     | s3://url_2 | hexad         | s3://url_3    | 2000000 |
-      | 2        | 1         | 42325     | s3://url_4 | hexad         | s3://url_5    | 2000000 |
-    And the table "image_type" should have the entries:
-      | name                    | description                                                                                 |
-      | short_read_assembler    | Assembles paired Illumina short reads into contigs.                                         |
-      | short_read_preprocessor | Performs filtering or editting of FASTQ reads and returns a subset or changed set of reads. |
-    And the table "image_instance" should have the entries:
-      | name                 | sha256   | active |
-      | bioboxes/velvet      | digest_1 | t      |
-      | bioboxes/velvet      | digest_1 | t      |
-      | bioboxes/my-filterer | digest_3 | t      |
-    And the table "benchmark_type" should have the entries:
-      | name                                           |
-      | illumina_isolate_reference_assembly            |
-      | short_read_preprocessing_reference_evaluation  |
-    And the table "benchmark_instance" should have the entries:
-      | data_record_id                        | benchmark_type_id                                          |
-      | $data_record?entry_id=2&replicate=1   | $benchmark_type?name='illumina_isolate_reference_assembly' |
-    And the table "metric_type" should have the entries:
-      | name | description                               |
-      | ng50 | N50 normalised by reference genome length |
+    And the following tables should not be empty :
+      | name          |
+      | platform_type |
+      | protocol_type |
+      | platform_type |
+      | run_mode_type |
+      | file_type     |
+      | metric_type   |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables

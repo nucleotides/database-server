@@ -8,21 +8,21 @@
 (use-fixtures :each (fn [f] (drop-tables) (f)))
 
 (def tables
-  [:image-type
+  [:platform-type
+   :protocol-type
+   :product-type
+   :file-type
+   :metric-type
+   :run-mode-type
+   :image-type
    :image-instance
    :image-instance-task
-   :file-type
    :data-set
    :data-record
    :benchmark-type
    :benchmark-instance
    :benchmark-data
-   :metric-type
    :task])
-
-(do
-  (drop-tables)
-  (migrate/migrate (test-directory :data)))
 
 (deftest migrate
   (testing "-main"

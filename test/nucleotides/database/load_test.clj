@@ -2,32 +2,38 @@
   (:require [clojure.test                    :refer :all]
             [clojure.walk                    :as walk]
             [clojure.pprint                  :as pp]
-            [clojure.java.jdbc               :as db]
+            [clojure.java.jdbc               :as sql]
             [clojure.set                     :as st]
 
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
+            [nucleotides.database.migrate    :as mg]
             [nucleotides.database.load       :as ld]
             [nucleotides.database.connection :as con]
             [nucleotides.util                :as util]))
 
 (use-fixtures :each (fn [f] (empty-database) (f)))
 
-(defn run-loader [f file]
-  (f (con/create-connection) (fetch-test-data file)))
+(def input-data
+  (mg/load-data-files (test-directory :data)))
 
-(deftest load-file-types
-  (let [f  #(run-loader ld/file-types :file_type)]
+(defn run-loader [f data-key]
+  (f (con/create-connection) (data-key input-data)))
 
-    (testing "loading with into an empty database"
-      (do (f)
-          (is (= 2 (table-length :file-type)))))
+(deftest load-metadata-types
+  (dorun (for [data-key [:platform :file :metric :product :protocol]]
 
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 2 (table-length :file-type)))))))
+    (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
+
+      (testing "loading with into an empty database"
+        (do (f)
+            (is (not (= 0 (metadata-length data-key))))))
+
+      (testing "reloading the same data"
+        (do (f)
+            (f)
+            (is (not (= 0 (metadata-length data-key))))))))))
 
 
 (deftest load-image-types
@@ -102,7 +108,7 @@
 (deftest load-benchmark-types
   (let [_  (run-loader ld/data-sets :data)
         _  (run-loader ld/image-types :image)
-        f  #(run-loader ld/benchmark-types :benchmark_type)]
+        f  #(run-loader ld/benchmark-types :benchmark-type)]
 
     (testing "loading into an empty database"
       (do (f)
@@ -119,7 +125,7 @@
         _  (run-loader ld/image-types :image)
         _  (run-loader ld/image-instances :image)
         _  (run-loader ld/image-tasks :image)
-        _  (run-loader ld/benchmark-types :benchmark_type)
+        _  (run-loader ld/benchmark-types :benchmark-type)
         f  #(ld/rebuild-benchmark-task (con/create-connection))]
 
     (testing "loading into an empty database"
@@ -132,15 +138,3 @@
           (f)
           (is (not (= 0 (table-length :benchmark-instance))))
           (is (not (= 0 (table-length :task))))))))
-
-(deftest load-metric-types
-  (let [f  #(run-loader ld/metric-types :metric_type)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 2 (table-length :metric-type)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 2 (table-length :metric-type)))))))
