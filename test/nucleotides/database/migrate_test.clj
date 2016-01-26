@@ -15,6 +15,9 @@
    :file-type
    :metric-type
    :run-mode-type
+
+   :input-data-source
+
    :image-type
    :image-instance
    :image-instance-task

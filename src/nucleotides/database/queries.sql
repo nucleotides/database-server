@@ -1,3 +1,9 @@
+-- name: save-input-data-source<!
+-- Creates a new data type entry
+INSERT INTO input_data_source (name, description)
+SELECT :name, :description
+WHERE NOT EXISTS (SELECT 1 FROM input_data_source WHERE name = :name);
+
 -- name: save-file-type<!
 -- Creates a new data type entry
 INSERT INTO file_type (name, description)

@@ -40,6 +40,16 @@ CREATE TABLE file_instance(
   url		text		NOT NULL
 );
 --;;
+--;; Input Data
+--;;
+CREATE TABLE input_data_source(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  name			text		UNIQUE NOT NULL,
+  description		text		NOT NULL,
+  active		bool		NOT NULL DEFAULT true
+);
+--;;
 --;; Docker images
 --;;
 CREATE TABLE image_instance(

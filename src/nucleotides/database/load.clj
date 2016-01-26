@@ -32,18 +32,6 @@
             replicates)))
       (select-fields entries))))
 
-
-(defn- load-entries
-  "Creates a function that transforms and saves data with a given
-  DB connection"
-  ([transform save]
-   (fn [connection data]
-     (->> (transform data)
-          (map #(save % {:connection connection}))
-          (dorun))))
-  ([save]
-   (load-entries identity save)))
-
 (defn metadata-types [connection table-name data]
   (let [query "INSERT INTO %1$s (name, description)
                SELECT '%2$s', '%3$s'
@@ -56,6 +44,23 @@
                        (:name entry)
                        (:desc entry))))]
     (dorun (map save! data))))
+
+(defn- load-entries
+  "Creates a function that transforms and saves data with a given
+  DB connection"
+  ([transform save]
+   (fn [connection data]
+     (->> (transform data)
+          (map #(save % {:connection connection}))
+          (dorun))))
+  ([save]
+   (load-entries identity save)))
+
+(def input-data-sources
+  "Loads input data sources into the database"
+  (load-entries save-input-data-source<!))
+
+
 
 (def image-types
   "Select the image types and load into the database"
@@ -107,12 +112,13 @@
   [:platform :file :metric :protocol :product :run-mode :source])
 
 (def loaders
-  [[data-sets        :data]
-   [data-records     :data]
-   [image-types      :image]
-   [image-instances  :image]
-   [image-tasks      :image]
-   [benchmark-types  :benchmark-type]])
+  [[input-data-sources :data-source]
+   [data-sets          :data]
+   [data-records       :data]
+   [image-types        :image]
+   [image-instances    :image]
+   [image-tasks        :image]
+   [benchmark-types    :benchmark-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"

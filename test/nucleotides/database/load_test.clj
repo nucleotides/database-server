@@ -21,19 +21,29 @@
 (defn run-loader [f data-key]
   (f (con/create-connection) (data-key input-data)))
 
+(defn test-data-loader [loader-func db-table-func]
+  (testing "loading with into an empty database"
+    (do (loader-func)
+        (is (not (empty? (db-table-func))))))
+
+  (testing "reloading the same data"
+    (do (loader-func)
+        (loader-func)
+        (is (not (empty? (db-table-func)))))))
+
+
 (deftest load-metadata-types
   (dorun (for [data-key [:platform :file :metric :product :protocol :source]]
+           (test-data-loader
+             #(ld/metadata-types (con/create-connection) data-key (data-key input-data))
+             #(metadata-entries data-key)))))
 
-    (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
+(deftest load-input-data-source
+  (test-data-loader
+    #(ld/input-data-sources (con/create-connection) (:data-source input-data))
+    #(table-entries :input-data-source)))
 
-      (testing "loading with into an empty database"
-        (do (f)
-            (is (not (= 0 (metadata-length data-key))))))
 
-      (testing "reloading the same data"
-        (do (f)
-            (f)
-            (is (not (= 0 (metadata-length data-key))))))))))
 
 
 (deftest load-image-types

@@ -26,6 +26,10 @@ Feature: Migrating and loading input data for the database
       | file_type     |
       | metric_type   |
       | source_type   |
+    And the table "input_data_source" should have the entries:
+      | name             |
+      | ecoli_k12        |
+      | kansas_farm_soil |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables

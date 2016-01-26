@@ -30,7 +30,8 @@
 (defn load-data-files [directory]
   (merge
     (load-yml-files-from directory)
-    (load-yml-files-from (str directory "/type"))))
+    (load-yml-files-from (str directory "/type"))
+    (load-yml-files-from (str directory "/input_data"))))
 
 (defn migrate [directory]
   (let [data (load-data-files directory)
