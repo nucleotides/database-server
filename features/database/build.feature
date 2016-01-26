@@ -27,9 +27,9 @@ Feature: Migrating and loading input data for the database
       | metric_type   |
       | source_type   |
     And the table "input_data_source" should have the entries:
-      | name             |
-      | ecoli_k12        |
-      | kansas_farm_soil |
+      | name             | source_type_id                 |
+      | ecoli_k12        | $source_type?name='microbe'    |
+      | kansas_farm_soil | $source_type?name='metagenome' |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables

@@ -39,12 +39,10 @@
              #(metadata-entries data-key)))))
 
 (deftest load-input-data-source
+  (let [_ (ld/metadata-types (con/create-connection) :source (:source input-data))]
   (test-data-loader
     #(ld/input-data-sources (con/create-connection) (:data-source input-data))
-    #(table-entries :input-data-source)))
-
-
-
+    #(table-entries :input-data-source))))
 
 (deftest load-image-types
   (let [f  #(run-loader ld/image-types :image)]

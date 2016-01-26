@@ -1,5 +1,5 @@
 ---
 - name: metagenome
   desc: A mixture of multiple genomes
-- name: microbial_genome
+- name: microbe
   desc: A single isolated microbe

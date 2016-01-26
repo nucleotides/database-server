@@ -47,7 +47,8 @@ CREATE TABLE input_data_source(
   created_at		timestamp	DEFAULT current_timestamp,
   name			text		UNIQUE NOT NULL,
   description		text		NOT NULL,
-  active		bool		NOT NULL DEFAULT true
+  active		bool		NOT NULL DEFAULT true,
+  source_type_id	integer		NOT NULL REFERENCES source_type(id)
 );
 --;;
 --;; Docker images
