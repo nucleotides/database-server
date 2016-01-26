@@ -104,7 +104,7 @@
     (apply populate-task! args)))
 
 (def metadata-entries
-  [:platform :file :metric :protocol :product :run-mode])
+  [:platform :file :metric :protocol :product :run-mode :source])
 
 (def loaders
   [[data-sets        :data]

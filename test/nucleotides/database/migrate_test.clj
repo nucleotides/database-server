@@ -11,6 +11,7 @@
   [:platform-type
    :protocol-type
    :product-type
+   :source-type
    :file-type
    :metric-type
    :run-mode-type

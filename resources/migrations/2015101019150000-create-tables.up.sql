@@ -27,6 +27,7 @@ BEGIN
 	PERFORM create_metadata_table('product');
 	PERFORM create_metadata_table('run_mode');
 	PERFORM create_metadata_table('protocol');
+	PERFORM create_metadata_table('source');
 END$$;
 --;;
 --;; Files

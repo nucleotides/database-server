@@ -17,7 +17,7 @@ Feature: Migrating and loading input data for the database
       """
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
-    And the following tables should not be empty :
+    And the following tables should not be empty:
       | name          |
       | platform_type |
       | protocol_type |
@@ -25,6 +25,7 @@ Feature: Migrating and loading input data for the database
       | run_mode_type |
       | file_type     |
       | metric_type   |
+      | source_type   |
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
