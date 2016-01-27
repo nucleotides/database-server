@@ -41,16 +41,14 @@
              #(metadata-entries data-key)))))
 
 (deftest load-input-data-source
-  (let [_ (ld/metadata-types (con/create-connection) :source (:source input-data))]
-  (test-data-loader
-    #(ld/input-data-sources (con/create-connection) (:data-source input-data))
-    #(table-entries :input-data-source))))
+  (let [_ (load-fixture :source-type)]
+    (test-data-loader
+      #(ld/input-data-sources (con/create-connection) (:data-source input-data))
+      #(table-entries :input-data-source))))
 
 
 (deftest load-input-data-source-files
-  (let [_ (ld/metadata-types (con/create-connection) :source (:source input-data))
-        _ (ld/metadata-types (con/create-connection) :file   (:file input-data))
-        _ (ld/input-data-sources (con/create-connection)     (:data-source input-data))]
+  (let [_ (load-fixture :source-type :file-type :input-data-source)]
     (test-data-loader
       #(ld/input-data-source-files (con/create-connection) (:data-source input-data))
       #(table-entries :input-data-source-reference-file))))

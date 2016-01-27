@@ -10,8 +10,14 @@
        (concat ["test"])
        (st/join "/")))
 
+(defn fixture-file [fixture]
+  (test-directory "fixtures" (str (ksk/->snake_case_string fixture) ".sql")))
+
 (defn load-fixture [& fixtures]
   (db/empty-database)
   (dorun
     (for [f fixtures]
-      (db/exec-db-command (slurp (str "test/fixtures/" f ".sql"))))))
+      (->> f
+           (fixture-file)
+           (slurp)
+           (db/exec-db-command)))))
