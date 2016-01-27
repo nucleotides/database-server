@@ -60,6 +60,15 @@
   "Loads input data sources into the database"
   (load-entries save-input-data-source<!))
 
+(def input-data-source-files
+  "Loads references into file_instance and links to input_data_source"
+  (let [transform (fn [x]
+                    (->> x
+                         (mapcat (partial select [(collect-one :name) (keypath :references) ALL]))
+                         (remove empty?)
+                         (map #(assoc (last %) :source_name (first %)))))]
+  (load-entries transform save-input-data-source-file<!)))
+
 
 
 (def image-types
@@ -112,13 +121,14 @@
   [:platform :file :metric :protocol :product :run-mode :source])
 
 (def loaders
-  [[input-data-sources :data-source]
-   [data-sets          :data]
-   [data-records       :data]
-   [image-types        :image]
-   [image-instances    :image]
-   [image-tasks        :image]
-   [benchmark-types    :benchmark-type]])
+  [[input-data-sources       :data-source]
+   [input-data-source-files  :data-source]
+   [data-sets                :data]
+   [data-records             :data]
+   [image-types              :image]
+   [image-instances          :image]
+   [image-tasks              :image]
+   [benchmark-types          :benchmark-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"

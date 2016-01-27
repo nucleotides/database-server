@@ -36,7 +36,7 @@ CREATE TABLE file_instance(
   id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   file_type_id	integer		NOT NULL REFERENCES file_type(id),
-  md5		text		NOT NULL,
+  sha256	text		UNIQUE NOT NULL,
   url		text		NOT NULL
 );
 --;;
@@ -49,6 +49,15 @@ CREATE TABLE input_data_source(
   description		text		NOT NULL,
   active		bool		NOT NULL DEFAULT true,
   source_type_id	integer		NOT NULL REFERENCES source_type(id)
+);
+--;;
+CREATE TABLE input_data_source_reference_file(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  active		bool		NOT NULL DEFAULT true,
+  input_data_source_id	integer		NOT NULL REFERENCES input_data_source(id),
+  file_instance_id	integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT unique_reference_files_per_source_idx UNIQUE(input_data_source_id, file_instance_id)
 );
 --;;
 --;; Docker images

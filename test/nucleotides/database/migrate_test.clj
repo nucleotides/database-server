@@ -17,6 +17,7 @@
    :run-mode-type
 
    :input-data-source
+   :input-data-source-reference-file
 
    :image-type
    :image-instance

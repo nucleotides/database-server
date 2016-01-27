@@ -5,6 +5,8 @@
             [clojure.java.jdbc               :as sql]
             [clojure.set                     :as st]
 
+            [com.rpl.specter          :refer :all]
+
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
@@ -43,6 +45,16 @@
   (test-data-loader
     #(ld/input-data-sources (con/create-connection) (:data-source input-data))
     #(table-entries :input-data-source))))
+
+
+(deftest load-input-data-source-files
+  (let [_ (ld/metadata-types (con/create-connection) :source (:source input-data))
+        _ (ld/metadata-types (con/create-connection) :file   (:file input-data))
+        _ (ld/input-data-sources (con/create-connection)     (:data-source input-data))]
+    (test-data-loader
+      #(ld/input-data-source-files (con/create-connection) (:data-source input-data))
+      #(table-entries :input-data-source-reference-file))))
+
 
 (deftest load-image-types
   (let [f  #(run-loader ld/image-types :image)]

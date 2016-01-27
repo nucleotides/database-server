@@ -4,7 +4,7 @@
   source_type: microbe
   references:
   - file_type: reference_fasta
-    md5sum: eaa5305f8d0debbce934975c3ec6c14b
+    sha256: eaa53
     url: s3://nucleotid-es/reference/0001/genome.fa
 - name: kansas_farm_soil
   description: A soil sample from a kansas farm

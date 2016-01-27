@@ -1,8 +1,37 @@
 -- name: save-input-data-source<!
--- Creates a new data type entry
+-- Creates a new input data source entry
 INSERT INTO input_data_source (name, description, source_type_id)
 SELECT :name, :description, (SELECT id FROM source_type WHERE name = :source_type)
 WHERE NOT EXISTS (SELECT 1 FROM input_data_source WHERE name = :name);
+
+-- name: save-input-data-source-file<!
+-- Creates link between input_data_source and reference file_instance
+WITH _existing_file AS (
+  SELECT id FROM file_instance WHERE sha256 = :sha256
+),
+_new_file AS (
+  INSERT INTO file_instance (file_type_id, sha256, url)
+  SELECT (SELECT id FROM file_type WHERE name = :file_type), :sha256, :url
+  WHERE NOT EXISTS (SELECT 1 FROM _existing_file)
+  RETURNING id
+),
+_file AS (
+  SELECT * FROM _existing_file
+  UNION ALL
+  SELECT * FROM _new_file
+),
+_input_data_source AS (
+  SELECT * FROM input_data_source WHERE name = :source_name
+)
+INSERT INTO input_data_source_reference_file (input_data_source_id, file_instance_id)
+SELECT (SELECT id FROM _input_data_source), (SELECT id FROM _file)
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM input_data_source_reference_file
+  WHERE input_data_source_id = (SELECT id FROM _input_data_source)
+  AND file_instance_id = (SELECT id FROM _file)
+)
+
 
 -- name: save-file-type<!
 -- Creates a new data type entry

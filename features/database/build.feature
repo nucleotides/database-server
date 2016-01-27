@@ -30,6 +30,10 @@ Feature: Migrating and loading input data for the database
       | name             | source_type_id                 |
       | ecoli_k12        | $source_type?name='microbe'    |
       | kansas_farm_soil | $source_type?name='metagenome' |
+    And the table "input_data_source_reference_file" should have the entries:
+      | input_data_source_id                | file_instance_id              |
+      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='eaa53' |
+
 
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
