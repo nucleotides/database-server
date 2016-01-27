@@ -23,35 +23,37 @@
 (defn run-loader [f data-key]
   (f (con/create-connection) (data-key input-data)))
 
-(defn test-data-loader [loader-func db-table-func]
+(defn test-data-loader [{:keys [loader table fixtures]}]
   (testing "loading with into an empty database"
-    (do (loader-func)
-        (is (not (empty? (db-table-func))))))
+    (do (apply load-fixture fixtures)
+        (loader (con/create-connection))
+        (is (not (empty? (table-entries table))))))
 
   (testing "reloading the same data"
-    (do (loader-func)
-        (loader-func)
-        (is (not (empty? (db-table-func)))))))
-
+    (do (apply load-fixture fixtures)
+        (loader (con/create-connection))
+        (loader (con/create-connection))
+        (is (not (empty? (table-entries table)))))))
 
 (deftest load-metadata-types
-  (dorun (for [data-key [:platform :file :metric :product :protocol :source]]
-           (test-data-loader
-             #(ld/metadata-types (con/create-connection) data-key (data-key input-data))
-             #(metadata-entries data-key)))))
+  (dorun
+    (for [data-key [:platform :file :metric :product :protocol :source]]
+      (test-data-loader
+        {:fixtures []
+         :loader   #(ld/metadata-types % data-key (data-key input-data))
+         :table    (str (name data-key) "-type")}))))
 
 (deftest load-input-data-source
-  (let [_ (load-fixture :source-type)]
-    (test-data-loader
-      #(ld/input-data-sources (con/create-connection) (:data-source input-data))
-      #(table-entries :input-data-source))))
-
+  (test-data-loader
+    {:fixtures [:source-type]
+     :loader   #(ld/input-data-sources % (:data-source input-data))
+     :table    :input-data-source}))
 
 (deftest load-input-data-source-files
-  (let [_ (load-fixture :source-type :file-type :input-data-source)]
-    (test-data-loader
-      #(ld/input-data-source-files (con/create-connection) (:data-source input-data))
-      #(table-entries :input-data-source-reference-file))))
+  (test-data-loader
+    {:fixtures [:source-type :file-type :input-data-source]
+     :loader   #(ld/input-data-source-files % (:data-source input-data))
+     :table    :input-data-source-reference-file}))
 
 
 (deftest load-image-types
