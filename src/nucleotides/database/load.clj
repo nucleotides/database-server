@@ -79,16 +79,6 @@
   "Loads entries into 'file_instance' and links to 'input_data_file_set'"
   (load-entries (partial select-file-entries :replicates) save-input-data-file<!))
 
-
-
-
-(def image-types
-  "Select the image types and load into the database"
-  (let [transform (fn [entry] (-> entry
-                                  (select-keys [:image_type, :description])
-                                  (st/rename-keys {:image_type :name})))]
-    (load-entries (partial map transform) save-image-type<!)))
-
 (def image-instances
   "Select the image instances and load into the database"
   (let [transform (partial select [ALL (collect-one :image_type) (keypath :image_instances)
@@ -129,7 +119,7 @@
     (apply populate-task! args)))
 
 (def metadata-entries
-  [:platform :file :metric :protocol :product :run-mode :source])
+  [:platform :file :metric :protocol :product :run-mode :source :image])
 
 (def loaders
   [[input-data-sources       :data-source]
@@ -138,9 +128,8 @@
    [input-data-files         :data-file]
    [data-sets                :data]
    [data-records             :data]
-   [image-types              :image]
-   [image-instances          :image]
-   [image-tasks              :image]
+   [image-instances          :image-instance]
+   [image-tasks              :image-instance]
    [benchmark-types          :benchmark-type]])
 
 (defn load-data

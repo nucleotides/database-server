@@ -37,7 +37,7 @@
 
 (deftest load-metadata-types
   (dorun
-    (for [data-key [:platform :file :metric :product :protocol :source]]
+    (for [data-key [:platform :file :metric :product :protocol :source :image]]
       (test-data-loader
         {:fixtures []
          :loader   #(ld/metadata-types % data-key (data-key input-data))
@@ -67,22 +67,9 @@
      :loader   #(ld/input-data-files % (:data-file input-data))
      :table    :input-data-file}))
 
-(deftest load-image-types
-  (let [f  #(run-loader ld/image-types :image)]
-
-    (testing "loading with into an empty database"
-      (do (f)
-          (is (= 4 (table-length :image-type)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 4 (table-length :image-type)))))))
-
-
 (deftest load-image-instances
-  (let [_  (run-loader ld/image-types :image)
-        f  #(run-loader ld/image-instances :image)]
+  (let [_  (load-fixture :metadata)
+        f  #(run-loader ld/image-instances :image-instance)]
 
     (testing "loading into an empty database"
       (do (f)
@@ -95,9 +82,9 @@
 
 
 (deftest load-image-tasks
-  (let [_  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)
-        f  #(run-loader ld/image-tasks :image)]
+  (let [_  (load-fixture :metadata)
+        _  (run-loader ld/image-instances :image-instance)
+        f  #(run-loader ld/image-tasks :image-instance)]
 
     (testing "loading into an empty database"
       (do (f)
@@ -137,8 +124,8 @@
 
 
 (deftest load-benchmark-types
-  (let [_  (run-loader ld/data-sets :data)
-        _  (run-loader ld/image-types :image)
+  (let [_  (load-fixture :metadata)
+        _  (run-loader ld/data-sets :data)
         f  #(run-loader ld/benchmark-types :benchmark-type)]
 
     (testing "loading into an empty database"
@@ -151,11 +138,11 @@
           (is (= 2 (table-length :benchmark-type)))))))
 
 (deftest load-benchmark-instances
-  (let [_  (run-loader ld/data-sets :data)
+  (let [_  (load-fixture :metadata)
+        _  (run-loader ld/data-sets :data)
         _  (run-loader ld/data-records :data)
-        _  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)
-        _  (run-loader ld/image-tasks :image)
+        _  (run-loader ld/image-instances :image-instance)
+        _  (run-loader ld/image-tasks :image-instance)
         _  (run-loader ld/benchmark-types :benchmark-type)
         f  #(ld/rebuild-benchmark-task (con/create-connection))]
 

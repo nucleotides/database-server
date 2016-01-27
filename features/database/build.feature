@@ -26,6 +26,7 @@ Feature: Migrating and loading input data for the database
       | file_type     |
       | metric_type   |
       | source_type   |
+      | image_type    |
     And the table "input_data_source" should have the entries:
       | name             | source_type_id                 |
       | ecoli_k12        | $source_type?name='microbe'    |
