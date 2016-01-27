@@ -33,6 +33,9 @@ Feature: Migrating and loading input data for the database
     And the table "input_data_source_reference_file" should have the entries:
       | input_data_source_id                | file_instance_id              |
       | $input_data_source?name='ecoli_k12' | $file_instance?sha256='eaa53' |
+    And the table "input_data_file_set" should have the entries:
+      | name                        | input_data_source_id                |
+      | jgi_isolate_microbe_2x150_1 | $input_data_source?name='ecoli_k12' |
 
 
 

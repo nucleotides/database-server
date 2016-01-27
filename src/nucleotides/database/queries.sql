@@ -32,6 +32,25 @@ WHERE NOT EXISTS (
   AND file_instance_id = (SELECT id FROM _file)
 )
 
+-- name: save-input-data-file-set<!
+-- Creates a new input_data_file_set entry
+INSERT INTO input_data_file_set (
+  name,
+  description,
+  platform_type_id,
+  product_type_id,
+  protocol_type_id,
+  run_mode_type_id,
+  input_data_source_id)
+ SELECT
+  :name,
+  :description,
+  (SELECT id FROM platform_type WHERE name = :platform),
+  (SELECT id FROM product_type WHERE name = :product),
+  (SELECT id FROM protocol_type WHERE name = :protocol),
+  (SELECT id FROM run_mode_type WHERE name = :run_mode),
+  (SELECT id FROM input_data_source WHERE name = :input_data_source)
+WHERE NOT EXISTS (SELECT id FROM input_data_file_set WHERE name = :name)
 
 -- name: save-file-type<!
 -- Creates a new data type entry

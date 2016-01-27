@@ -69,6 +69,11 @@
                          (map #(assoc (last %) :source_name (first %)))))]
   (load-entries transform save-input-data-source-file<!)))
 
+(def input-data-file-set
+  "Load entries into the 'input_data_file_set' table"
+  (load-entries save-input-data-file-set<!))
+
+
 
 
 (def image-types
@@ -123,6 +128,7 @@
 (def loaders
   [[input-data-sources       :data-source]
    [input-data-source-files  :data-source]
+   [input-data-file-set      :data-file]
    [data-sets                :data]
    [data-records             :data]
    [image-types              :image]

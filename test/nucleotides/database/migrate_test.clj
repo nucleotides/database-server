@@ -18,6 +18,7 @@
 
    :input-data-source
    :input-data-source-reference-file
+   :input-data-file-set
 
    :image-type
    :image-instance
