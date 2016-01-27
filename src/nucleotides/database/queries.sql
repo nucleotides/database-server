@@ -52,6 +52,35 @@ INSERT INTO input_data_file_set (
   (SELECT id FROM input_data_source WHERE name = :input_data_source)
 WHERE NOT EXISTS (SELECT id FROM input_data_file_set WHERE name = :name)
 
+-- name: save-input-data-file<!
+-- Creates link between 'input_data_file_set' and 'file_instance'
+WITH _existing_file AS (
+  SELECT id FROM file_instance WHERE sha256 = :sha256
+),
+_new_file AS (
+  INSERT INTO file_instance (file_type_id, sha256, url)
+  SELECT (SELECT id FROM file_type WHERE name = :file_type), :sha256, :url
+  WHERE NOT EXISTS (SELECT 1 FROM _existing_file)
+  RETURNING id
+),
+_file AS (
+  SELECT * FROM _existing_file
+  UNION ALL
+  SELECT * FROM _new_file
+),
+_input_data_file_set AS (
+  SELECT * FROM input_data_file_set WHERE name = :source_name
+)
+INSERT INTO input_data_file (input_data_file_set_id, file_instance_id)
+SELECT (SELECT id FROM _input_data_file_set), (SELECT id FROM _file)
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM input_data_file
+  WHERE input_data_file_set_id = (SELECT id FROM _input_data_file_set)
+  AND file_instance_id = (SELECT id FROM _file)
+)
+
+
 -- name: save-file-type<!
 -- Creates a new data type entry
 INSERT INTO file_type (name, description)

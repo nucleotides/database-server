@@ -61,6 +61,12 @@
      :loader   #(ld/input-data-file-set % (:data-file input-data))
      :table    :input-data-file-set}))
 
+(deftest load-input-data-file
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source :input-data-file-set]
+     :loader   #(ld/input-data-files % (:data-file input-data))
+     :table    :input-data-file}))
+
 (deftest load-image-types
   (let [f  #(run-loader ld/image-types :image)]
 

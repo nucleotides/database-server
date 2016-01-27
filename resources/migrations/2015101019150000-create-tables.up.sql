@@ -73,6 +73,15 @@ CREATE TABLE input_data_file_set(
   run_mode_type_id	integer		NOT NULL REFERENCES run_mode_type(id)
 );
 --;;
+CREATE TABLE input_data_file(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	DEFAULT current_timestamp,
+  active			bool		NOT NULL DEFAULT true,
+  input_data_file_set_id	integer		NOT NULL REFERENCES input_data_source(id),
+  file_instance_id		integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT unique_file_per_file_set_idx UNIQUE(input_data_file_set_id, file_instance_id)
+);
+--;;
 --;; Docker images
 --;;
 CREATE TABLE image_instance(

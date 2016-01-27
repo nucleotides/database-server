@@ -36,8 +36,10 @@ Feature: Migrating and loading input data for the database
     And the table "input_data_file_set" should have the entries:
       | name                        | input_data_source_id                |
       | jgi_isolate_microbe_2x150_1 | $input_data_source?name='ecoli_k12' |
-
-
+    And the table "input_data_file" should have the entries:
+      | input_data_file_set_id                                  | file_instance_id              |
+      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='7673a' |
+      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='c1f0f' |
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables

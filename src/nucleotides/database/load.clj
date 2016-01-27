@@ -45,6 +45,13 @@
                        (:desc entry))))]
     (dorun (map save! data))))
 
+(defn select-file-entries [k entries]
+  (->> entries
+       (mapcat (partial select [(collect-one :name) (keypath k) ALL]))
+       (remove empty?)
+       (map #(assoc (last %) :source_name (first %)))))
+
+
 (defn- load-entries
   "Creates a function that transforms and saves data with a given
   DB connection"
@@ -62,16 +69,15 @@
 
 (def input-data-source-files
   "Loads references into file_instance and links to input_data_source"
-  (let [transform (fn [x]
-                    (->> x
-                         (mapcat (partial select [(collect-one :name) (keypath :references) ALL]))
-                         (remove empty?)
-                         (map #(assoc (last %) :source_name (first %)))))]
-  (load-entries transform save-input-data-source-file<!)))
+  (load-entries (partial select-file-entries :references) save-input-data-source-file<!))
 
 (def input-data-file-set
   "Load entries into the 'input_data_file_set' table"
   (load-entries save-input-data-file-set<!))
+
+(def input-data-files
+  "Loads entries into 'file_instance' and links to 'input_data_file_set'"
+  (load-entries (partial select-file-entries :replicates) save-input-data-file<!))
 
 
 
@@ -129,6 +135,7 @@
   [[input-data-sources       :data-source]
    [input-data-source-files  :data-source]
    [input-data-file-set      :data-file]
+   [input-data-files         :data-file]
    [data-sets                :data]
    [data-records             :data]
    [image-types              :image]

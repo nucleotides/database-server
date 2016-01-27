@@ -9,9 +9,9 @@
     A plain text description of where these reads came from and how they were
     produced.
   replicates:
-    - sha256: 87673a0358e2f248a4c44eccda8c46b4
+    - sha256: 7673a
       file_type: short_read_fastq
       url: s3://nucleotid-es/0001/0001/2000000/1/reads.fq.gz
-    - sha256: c1f0fb4cad045641c1bd001c2f4dbe37
+    - sha256: c1f0f
       url: s3://nucleotid-es/0001/0001/2000000/2/reads.fq.gz
       file_type: short_read_fastq
