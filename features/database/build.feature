@@ -41,6 +41,16 @@ Feature: Migrating and loading input data for the database
       | input_data_file_set_id                                  | file_instance_id              |
       | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='7673a' |
       | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='c1f0f' |
+    And the table "image_instance" should have the entries:
+      | name                 | sha256   | image_type_id                              |
+      | bioboxes/velvet      | digest_1 | $image_type?name='short_read_assembler'    |
+      | bioboxes/ray         | digest_2 | $image_type?name='short_read_assembler'    |
+      | bioboxes/my-filterer | digest_3 | $image_type?name='short_read_preprocessor' |
+    And the table "image_instance_task" should have the entries:
+      | task    | image_instance_id                           |
+      | default | $image_instance?name='bioboxes/velvet'      |
+      | careful | $image_instance?name='bioboxes/velvet'      |
+      | default | $image_instance?name='bioboxes/my-filterer' |
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables

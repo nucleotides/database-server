@@ -81,18 +81,14 @@
 
 (def image-instances
   "Select the image instances and load into the database"
-  (let [transform (partial select [ALL (collect-one :image_type) (keypath :image_instances)
-                                   ALL (collect-one :sha256) (keypath :name)])
-        zip       (partial map (partial zipmap [:image_type :sha256 :name]))]
-    (load-entries (fn [entries] (zip (transform entries))) save-image-instance<!)))
+  (let [f (fn [entry]
+            (map #(-> entry (dissoc :tasks) (assoc :task %)) (:tasks entry)))]
+    (load-entries (partial mapcat f) save-image-instance<!)))
 
-(def image-tasks
-  "Select the image tasks and load into the database"
-  (let [transform (partial select [ALL (keypath :image_instances)
-                                   ALL (collect-one :name) (collect-one :sha256) (keypath :tasks)
-                                   ALL])
-        zip       (partial map (partial zipmap [:name :sha256 :task]))]
-    (load-entries (fn [entries] (zip (transform entries))) save-image-task<!)))
+
+
+
+
 
 (def data-sets
   "Load data sets into the database"
@@ -126,10 +122,10 @@
    [input-data-source-files  :data-source]
    [input-data-file-set      :data-file]
    [input-data-files         :data-file]
+   [image-instances          :image-instance]
+
    [data-sets                :data]
    [data-records             :data]
-   [image-instances          :image-instance]
-   [image-tasks              :image-instance]
    [benchmark-types          :benchmark-type]])
 
 (defn load-data

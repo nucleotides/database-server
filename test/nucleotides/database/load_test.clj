@@ -23,17 +23,22 @@
 (defn run-loader [f data-key]
   (f (con/create-connection) (data-key input-data)))
 
-(defn test-data-loader [{:keys [loader table fixtures]}]
-  (testing "loading with into an empty database"
-    (do (apply load-fixture fixtures)
-        (loader (con/create-connection))
-        (is (not (empty? (table-entries table))))))
+(defn test-data-loader [{:keys [loader tables fixtures]}]
 
-  (testing "reloading the same data"
-    (do (apply load-fixture fixtures)
-        (loader (con/create-connection))
-        (loader (con/create-connection))
-        (is (not (empty? (table-entries table)))))))
+    (testing "loading with into an empty database"
+      (do (apply load-fixture fixtures)
+          (loader (con/create-connection))
+          (dorun
+            (for [t tables]
+              (is (not (empty? (table-entries t))))))))
+
+    (testing "reloading the same data"
+      (do (apply load-fixture fixtures)
+          (loader (con/create-connection))
+          (loader (con/create-connection))
+          (dorun
+            (for [t tables]
+              (is (not (empty? (table-entries t)))))))))
 
 (deftest load-metadata-types
   (dorun
@@ -41,60 +46,37 @@
       (test-data-loader
         {:fixtures []
          :loader   #(ld/metadata-types % data-key (data-key input-data))
-         :table    (str (name data-key) "-type")}))))
+         :tables   [(str (name data-key) "-type")]}))))
 
 (deftest load-input-data-source
   (test-data-loader
     {:fixtures [:metadata]
      :loader   #(ld/input-data-sources % (:data-source input-data))
-     :table    :input-data-source}))
+     :tables   [:input-data-source]}))
 
 (deftest load-input-data-reference-files
   (test-data-loader
     {:fixtures [:metadata :input-data-source]
      :loader   #(ld/input-data-source-files % (:data-source input-data))
-     :table    :input-data-source-reference-file}))
+     :tables   [:input-data-source-reference-file]}))
 
 (deftest load-input-data-set
   (test-data-loader
     {:fixtures [:metadata :input-data-source]
      :loader   #(ld/input-data-file-set % (:data-file input-data))
-     :table    :input-data-file-set}))
+     :tables   [:input-data-file-set]}))
 
 (deftest load-input-data-file
   (test-data-loader
     {:fixtures [:metadata :input-data-source :input-data-file-set]
      :loader   #(ld/input-data-files % (:data-file input-data))
-     :table    :input-data-file}))
+     :tables   [:input-data-file]}))
 
 (deftest load-image-instances
-  (let [_  (load-fixture :metadata)
-        f  #(run-loader ld/image-instances :image-instance)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 5 (table-length :image-instance)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 5 (table-length :image-instance)))))))
-
-
-(deftest load-image-tasks
-  (let [_  (load-fixture :metadata)
-        _  (run-loader ld/image-instances :image-instance)
-        f  #(run-loader ld/image-tasks :image-instance)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 6 (table-length :image-instance-task)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 6 (table-length :image-instance-task)))))))
-
+  (test-data-loader
+    {:fixtures [:metadata]
+     :loader   #(ld/image-instances % (:image-instance input-data))
+     :tables   [:image-instance :image-instance-task]}))
 
 (deftest load-data-sets
   (let [f  #(run-loader ld/data-sets :data)]
@@ -108,7 +90,6 @@
           (f)
           (is (= 1 (table-length :data-set)))))))
 
-
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)
         f  #(run-loader ld/data-records :data)]
@@ -121,7 +102,6 @@
       (do (f)
           (f)
           (is (= 3 (table-length :data-record)))))))
-
 
 (deftest load-benchmark-types
   (let [_  (load-fixture :metadata)
@@ -138,11 +118,9 @@
           (is (= 2 (table-length :benchmark-type)))))))
 
 (deftest load-benchmark-instances
-  (let [_  (load-fixture :metadata)
+  (let [_  (load-fixture :metadata :image-instance)
         _  (run-loader ld/data-sets :data)
         _  (run-loader ld/data-records :data)
-        _  (run-loader ld/image-instances :image-instance)
-        _  (run-loader ld/image-tasks :image-instance)
         _  (run-loader ld/benchmark-types :benchmark-type)
         f  #(ld/rebuild-benchmark-task (con/create-connection))]
 

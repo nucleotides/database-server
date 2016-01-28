@@ -80,43 +80,28 @@ WHERE NOT EXISTS (
   AND file_instance_id = (SELECT id FROM _file)
 )
 
-
--- name: save-file-type<!
--- Creates a new data type entry
-INSERT INTO file_type (name, description)
-SELECT :name, :description
-WHERE NOT EXISTS (SELECT 1 FROM file_type WHERE name = :name);
-
--- name: save-image-type<!
--- Creates a new Docker image type entry if not already exists
-INSERT INTO image_type (name, description)
-SELECT :name, :description
-WHERE NOT EXISTS (SELECT 1 FROM image_type WHERE image_type.name = :name);
-
 -- name: save-image-instance<!
 -- Creates a new Docker image instance entry
-WITH _type AS (
-	SELECT id FROM image_type WHERE name = :image_type
+WITH _new_image_instance AS (
+    INSERT INTO image_instance (name, sha256, image_type_id)
+    SELECT
+      :name,
+      :sha256,
+      (SELECT id FROM image_type WHERE name = :image_type)
+    WHERE NOT EXISTS (SELECT id FROM image_instance WHERE name = :name)
+    RETURNING id
+),
+_image_instance AS (
+  SELECT id FROM image_instance WHERE name = :name
+  UNION ALL
+  SELECT * FROM _new_image_instance
 )
-INSERT INTO image_instance (image_type_id, name, sha256)
-SELECT (SELECT id FROM _type), :name, :sha256
+INSERT INTO image_instance_task (task, image_instance_id)
+SELECT :task, (SELECT id FROM _image_instance)
 WHERE NOT EXISTS (
-	SELECT 1 FROM image_instance
-	WHERE image_type_id = (SELECT id FROM _type)
-	AND name            = :name
-	AND sha256          = :sha256);
-
--- name: save-image-task<!
--- Creates a new image task entry
-WITH _instance AS (
-	SELECT id FROM image_instance WHERE name = :name AND sha256 = :sha256
-)
-INSERT INTO image_instance_task (image_instance_id, task)
-SELECT (SELECT id FROM _instance), :task
-WHERE NOT EXISTS (
-	SELECT 1 FROM image_instance_task
-	WHERE image_instance_id = (SELECT id FROM _instance)
-	AND task = :task
+  SELECT id FROM image_instance_task
+  WHERE task = :task
+  AND image_instance_id = (SELECT id FROM _image_instance)
 );
 
 -- name: save-data-set<!
