@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
+
+## Unreleased
+
+### Changed
+
+  * Refactored data model for the input data used for benchmarking. The updated
+    data model makes it simpler to describe and organise the different
+    benchmarking datasets by their metadata. A top-level entity 'data source'
+    tracks metadata and any associated reference files. All data files descend
+    from a 'data source' entity and can therefore be linked back to the
+    metadata.
+
 ## v0.4.0 - 2015-01-20
 
 ### Added
