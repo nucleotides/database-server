@@ -175,7 +175,6 @@ WHERE NOT EXISTS (
 	WHERE data_set_id     = (SELECT id FROM _dset)
 	AND benchmark_type_id = (SELECT id FROM _benchmark))
 
-
 -- name: populate-benchmark-instance!
 -- Populates benchmark instance table with combinations of data record and image task
 INSERT INTO benchmark_instance(
@@ -219,9 +218,3 @@ EXCEPT
 	image_instance_task_id,
 	task_type
 	FROM task
-
--- name: save-metric-type<!
--- Creates a new data type entry
-INSERT INTO metric_type (name, description)
-SELECT :name, :description
-WHERE NOT EXISTS (SELECT 1 FROM metric_type WHERE name = :name);
