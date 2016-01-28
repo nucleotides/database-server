@@ -78,11 +78,11 @@
      :loader   #(ld/image-instances % (:image-instance input-data))
      :tables   [:image-instance :image-instance-task]}))
 
-(deftest load-benchmark-types
+(deftest load-benchmarks
   (test-data-loader
     {:fixtures [:metadata :input-data-source :input-data-file-set]
-     :loader   #(ld/benchmark-types % (:benchmark-type input-data))
-     :tables   [:benchmark-type]}))
+     :loader   #(ld/benchmarks % (:benchmark-type input-data))
+     :tables   [:benchmark-type :benchmark-data]}))
 
 (comment (deftest load-benchmark-instances
   (let [_  (load-fixture :metadata :image-instance)

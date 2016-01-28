@@ -55,6 +55,10 @@ Feature: Migrating and loading input data for the database
       | name                                          | product_image_type_id                      |
       | illumina_isolate_reference_assembly           | $image_type?name='short_read_assembler'    |
       | short_read_preprocessing_reference_evaluation | $image_type?name='short_read_preprocessor' |
+    And the table "benchmark_data" should have the entries:
+      | benchmark_type_id                                                    | input_data_file_set_id                                  |
+      | $benchmark_type?name='illumina_isolate_reference_assembly'           | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
+      | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables

@@ -26,8 +26,8 @@
    :image-instance-task
 
    :benchmark-type
+   :benchmark-data
    ;:benchmark-instance
-   ;:benchmark-data
    ;:task
 
    ])

@@ -67,11 +67,13 @@
             (map #(-> entry (dissoc :tasks) (assoc :task %)) (:tasks entry)))]
     (load-entries (partial mapcat f) save-image-instance<!)))
 
-(def benchmark-types
+(def benchmarks
   "Load benchmark types into the database"
-  (load-entries
+  (let [save #(do (save-benchmark-type<! %1 %2)
+                  (save-benchmark-data<! %1 %2))]
+   (load-entries
     (partial mapcat (partial unfold-by-key :input_data_file_sets :input_data_file_set))
-    save-benchmark-type<!))
+    save)))
 
 (defn rebuild-benchmark-task [connection]
   (let [args [{} {:connection connection}]]
@@ -87,8 +89,7 @@
    [input-data-file-set      :data-file]
    [input-data-files         :data-file]
    [image-instances          :image-instance]
-
-   [benchmark-types          :benchmark-type]
+   [benchmarks               :benchmark-type]
 
    ])
 

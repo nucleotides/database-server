@@ -114,3 +114,12 @@ CREATE TABLE benchmark_type(
   evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
   active			bool		NOT NULL DEFAULT true
 );
+--;;
+CREATE TABLE benchmark_data(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	NOT NULL DEFAULT current_timestamp,
+  input_data_file_set_id	integer		NOT NULL REFERENCES input_data_file_set(id),
+  benchmark_type_id		integer		NOT NULL REFERENCES benchmark_type(id),
+  active			bool		NOT NULL DEFAULT true,
+  CONSTRAINT benchmark_data_idx UNIQUE(input_data_file_set_id, benchmark_type_id)
+);

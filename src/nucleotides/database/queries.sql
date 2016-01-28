@@ -113,6 +113,19 @@ SELECT :name,
 	(SELECT id FROM image_type WHERE name = :evaluation_image_type)
 WHERE NOT EXISTS (SELECT 1 FROM benchmark_type WHERE name = :name);
 
+-- name: save-benchmark-data<!
+-- Creates a new benchmark type entry
+WITH t AS (
+  SELECT (SELECT id FROM input_data_file_set WHERE name = :input_data_file_set) AS f_id,
+         (SELECT id FROM benchmark_type      WHERE name = :name) AS b_id
+)
+INSERT INTO benchmark_data (input_data_file_set_id, benchmark_type_id)
+SELECT (SELECT f_id FROM t), (SELECT b_id FROM t)
+WHERE NOT EXISTS (
+	SELECT 1 FROM benchmark_data
+	WHERE input_data_file_set_id = (SELECT f_id FROM t)
+	AND benchmark_type_id        = (SELECT b_id FROM t))
+
 -- name: populate-benchmark-instance!
 -- Populates benchmark instance table with combinations of data record and image task
 INSERT INTO benchmark_instance(
