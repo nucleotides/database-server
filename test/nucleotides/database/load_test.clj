@@ -78,46 +78,13 @@
      :loader   #(ld/image-instances % (:image-instance input-data))
      :tables   [:image-instance :image-instance-task]}))
 
-(deftest load-data-sets
-  (let [f  #(run-loader ld/data-sets :data)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 1 (table-length :data-set)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 1 (table-length :data-set)))))))
-
-(deftest load-data-records
-  (let [_  (run-loader ld/data-sets :data)
-        f  #(run-loader ld/data-records :data)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 3 (table-length :data-record)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 3 (table-length :data-record)))))))
-
 (deftest load-benchmark-types
-  (let [_  (load-fixture :metadata)
-        _  (run-loader ld/data-sets :data)
-        f  #(run-loader ld/benchmark-types :benchmark-type)]
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source :input-data-file-set]
+     :loader   #(ld/benchmark-types % (:benchmark-type input-data))
+     :tables   [:benchmark-type]}))
 
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 2 (table-length :benchmark-type)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 2 (table-length :benchmark-type)))))))
-
-(deftest load-benchmark-instances
+(comment (deftest load-benchmark-instances
   (let [_  (load-fixture :metadata :image-instance)
         _  (run-loader ld/data-sets :data)
         _  (run-loader ld/data-records :data)
@@ -133,4 +100,4 @@
       (do (f)
           (f)
           (is (not (= 0 (table-length :benchmark-instance))))
-          (is (not (= 0 (table-length :task))))))))
+          (is (not (= 0 (table-length :task)))))))))

@@ -9,29 +9,6 @@
 
 (defqueries "nucleotides/database/queries.sql")
 
-(defn unfold-data-replicates [entries]
-  (let [select-fields (partial select
-                               [ALL (collect-one :name)
-                                    (keypath :entries)
-                                ALL (collect-one :reference)
-                                    (collect-one :reads)
-                                    (collect-one :entry_id)
-                                    (keypath :replicates)])]
-    (mapcat
-      (fn [[name reference reads entry-id replicates]]
-        (let [entry-data {:reference_url (:url    reference)
-                          :reference_md5 (:md5sum reference)
-                          :name          name
-                          :reads         reads
-                          :entry_id      entry-id}]
-          (map-indexed
-            (fn [idx rep]
-              (-> (st/rename-keys rep {:md5sum :input_md5 :url :input_url})
-                  (assoc :replicate (inc idx))
-                  (merge entry-data)))
-            replicates)))
-      (select-fields entries))))
-
 (defn metadata-types [connection table-name data]
   (let [query "INSERT INTO %1$s (name, description)
                SELECT '%2$s', '%3$s'
@@ -51,6 +28,11 @@
        (remove empty?)
        (map #(assoc (last %) :source_name (first %)))))
 
+
+(defn unfold-by-key [collection-key singleton-key entry]
+  (map
+    #(-> entry (dissoc collection-key) (assoc singleton-key %))
+    (collection-key entry)))
 
 (defn- load-entries
   "Creates a function that transforms and saves data with a given
@@ -85,29 +67,11 @@
             (map #(-> entry (dissoc :tasks) (assoc :task %)) (:tasks entry)))]
     (load-entries (partial mapcat f) save-image-instance<!)))
 
-
-
-
-
-
-(def data-sets
-  "Load data sets into the database"
-  (let [transform #(select-keys % [:name, :description])]
-  (load-entries (partial map transform) save-data-set<!)))
-
-(def data-records
-  "Load data records into the database"
-  (load-entries unfold-data-replicates save-data-record<!))
-
 (def benchmark-types
   "Load benchmark types into the database"
-  (let [f (fn [acc entry]
-            (let [benchmark (dissoc entry :data_sets)]
-              (->> (:data_sets entry)
-                   (map (partial assoc benchmark :data_set_name))
-                   (concat acc))))
-        transform (partial reduce f [])]
-    (load-entries transform save-benchmark-type<!)))
+  (load-entries
+    (partial mapcat (partial unfold-by-key :input_data_file_sets :input_data_file_set))
+    save-benchmark-type<!))
 
 (defn rebuild-benchmark-task [connection]
   (let [args [{} {:connection connection}]]
@@ -124,9 +88,9 @@
    [input-data-files         :data-file]
    [image-instances          :image-instance]
 
-   [data-sets                :data]
-   [data-records             :data]
-   [benchmark-types          :benchmark-type]])
+   [benchmark-types          :benchmark-type]
+
+   ])
 
 (defn load-data
   "Load and update benchmark data in the database"
@@ -136,4 +100,6 @@
     (do
       (dorun (map load-metadata metadata-entries))
       (dorun (map load_ loaders))
-      (rebuild-benchmark-task connection))))
+      ;(rebuild-benchmark-task connection)
+
+      )))

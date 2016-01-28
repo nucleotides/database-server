@@ -51,6 +51,10 @@ Feature: Migrating and loading input data for the database
       | default | $image_instance?name='bioboxes/velvet'      |
       | careful | $image_instance?name='bioboxes/velvet'      |
       | default | $image_instance?name='bioboxes/my-filterer' |
+    And the table "benchmark_type" should have the entries:
+      | name                                          | product_image_type_id                      |
+      | illumina_isolate_reference_assembly           | $image_type?name='short_read_assembler'    |
+      | short_read_preprocessing_reference_evaluation | $image_type?name='short_read_preprocessor' |
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables
