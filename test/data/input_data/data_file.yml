@@ -1,0 +1,17 @@
+---
+- name: jgi_isolate_microbe_2x150_1
+  platform: illumina
+  product: random
+  protocol: nextera
+  run_mode: 2x150_270
+  input_data_source: ecoli_k12
+  description: >
+    A plain text description of where these reads came from and how they were
+    produced.
+  replicates:
+    - sha256: 7673a
+      file_type: short_read_fastq
+      url: s3://nucleotid-es/0001/0001/2000000/1/reads.fq.gz
+    - sha256: c1f0f
+      url: s3://nucleotid-es/0001/0001/2000000/2/reads.fq.gz
+      file_type: short_read_fastq

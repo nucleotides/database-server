@@ -5,6 +5,8 @@
             [clojure.java.jdbc               :as sql]
             [clojure.set                     :as st]
 
+            [com.rpl.specter          :refer :all]
+
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
@@ -21,62 +23,60 @@
 (defn run-loader [f data-key]
   (f (con/create-connection) (data-key input-data)))
 
-(deftest load-metadata-types
-  (dorun (for [data-key [:platform :file :metric :product :protocol]]
-
-    (let [f #(ld/metadata-types (con/create-connection) data-key (data-key input-data))]
-
-      (testing "loading with into an empty database"
-        (do (f)
-            (is (not (= 0 (metadata-length data-key))))))
-
-      (testing "reloading the same data"
-        (do (f)
-            (f)
-            (is (not (= 0 (metadata-length data-key))))))))))
-
-
-(deftest load-image-types
-  (let [f  #(run-loader ld/image-types :image)]
+(defn test-data-loader [{:keys [loader tables fixtures]}]
 
     (testing "loading with into an empty database"
-      (do (f)
-          (is (= 4 (table-length :image-type)))))
+      (do (apply load-fixture fixtures)
+          (loader (con/create-connection))
+          (dorun
+            (for [t tables]
+              (is (not (empty? (table-entries t))))))))
 
     (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 4 (table-length :image-type)))))))
+      (do (apply load-fixture fixtures)
+          (loader (con/create-connection))
+          (loader (con/create-connection))
+          (dorun
+            (for [t tables]
+              (is (not (empty? (table-entries t)))))))))
 
+(deftest load-metadata-types
+  (dorun
+    (for [data-key [:platform :file :metric :product :protocol :source :image]]
+      (test-data-loader
+        {:fixtures []
+         :loader   #(ld/metadata-types % data-key (data-key input-data))
+         :tables   [(str (name data-key) "-type")]}))))
+
+(deftest load-input-data-source
+  (test-data-loader
+    {:fixtures [:metadata]
+     :loader   #(ld/input-data-sources % (:data-source input-data))
+     :tables   [:input-data-source]}))
+
+(deftest load-input-data-reference-files
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source]
+     :loader   #(ld/input-data-source-files % (:data-source input-data))
+     :tables   [:input-data-source-reference-file]}))
+
+(deftest load-input-data-set
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source]
+     :loader   #(ld/input-data-file-set % (:data-file input-data))
+     :tables   [:input-data-file-set]}))
+
+(deftest load-input-data-file
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source :input-data-file-set]
+     :loader   #(ld/input-data-files % (:data-file input-data))
+     :tables   [:input-data-file]}))
 
 (deftest load-image-instances
-  (let [_  (run-loader ld/image-types :image)
-        f  #(run-loader ld/image-instances :image)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 5 (table-length :image-instance)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 5 (table-length :image-instance)))))))
-
-
-(deftest load-image-tasks
-  (let [_  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)
-        f  #(run-loader ld/image-tasks :image)]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (= 6 (table-length :image-instance-task)))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (= 6 (table-length :image-instance-task)))))))
-
+  (test-data-loader
+    {:fixtures [:metadata]
+     :loader   #(ld/image-instances % (:image-instance input-data))
+     :tables   [:image-instance :image-instance-task]}))
 
 (deftest load-data-sets
   (let [f  #(run-loader ld/data-sets :data)]
@@ -89,7 +89,6 @@
       (do (f)
           (f)
           (is (= 1 (table-length :data-set)))))))
-
 
 (deftest load-data-records
   (let [_  (run-loader ld/data-sets :data)
@@ -104,10 +103,9 @@
           (f)
           (is (= 3 (table-length :data-record)))))))
 
-
 (deftest load-benchmark-types
-  (let [_  (run-loader ld/data-sets :data)
-        _  (run-loader ld/image-types :image)
+  (let [_  (load-fixture :metadata)
+        _  (run-loader ld/data-sets :data)
         f  #(run-loader ld/benchmark-types :benchmark-type)]
 
     (testing "loading into an empty database"
@@ -120,11 +118,9 @@
           (is (= 2 (table-length :benchmark-type)))))))
 
 (deftest load-benchmark-instances
-  (let [_  (run-loader ld/data-sets :data)
+  (let [_  (load-fixture :metadata :image-instance)
+        _  (run-loader ld/data-sets :data)
         _  (run-loader ld/data-records :data)
-        _  (run-loader ld/image-types :image)
-        _  (run-loader ld/image-instances :image)
-        _  (run-loader ld/image-tasks :image)
         _  (run-loader ld/benchmark-types :benchmark-type)
         f  #(ld/rebuild-benchmark-task (con/create-connection))]
 

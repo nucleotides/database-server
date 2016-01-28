@@ -27,6 +27,7 @@ BEGIN
 	PERFORM create_metadata_table('product');
 	PERFORM create_metadata_table('run_mode');
 	PERFORM create_metadata_table('protocol');
+	PERFORM create_metadata_table('source');
 END$$;
 --;;
 --;; Files
@@ -35,8 +36,50 @@ CREATE TABLE file_instance(
   id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   file_type_id	integer		NOT NULL REFERENCES file_type(id),
-  md5		text		NOT NULL,
+  sha256	text		UNIQUE NOT NULL,
   url		text		NOT NULL
+);
+--;;
+--;; Input Data
+--;;
+CREATE TABLE input_data_source(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  name			text		UNIQUE NOT NULL,
+  description		text		NOT NULL,
+  active		bool		NOT NULL DEFAULT true,
+  source_type_id	integer		NOT NULL REFERENCES source_type(id)
+);
+--;;
+CREATE TABLE input_data_source_reference_file(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  active		bool		NOT NULL DEFAULT true,
+  input_data_source_id	integer		NOT NULL REFERENCES input_data_source(id),
+  file_instance_id	integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT unique_reference_files_per_source_idx UNIQUE(input_data_source_id, file_instance_id)
+);
+--;;
+CREATE TABLE input_data_file_set(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  active		bool		NOT NULL DEFAULT true,
+  name			text		UNIQUE NOT NULL,
+  description		text		NOT NULL,
+  input_data_source_id	integer		NOT NULL REFERENCES input_data_source(id),
+  platform_type_id	integer		NOT NULL REFERENCES platform_type(id),
+  product_type_id	integer		NOT NULL REFERENCES product_type(id),
+  protocol_type_id	integer		NOT NULL REFERENCES protocol_type(id),
+  run_mode_type_id	integer		NOT NULL REFERENCES run_mode_type(id)
+);
+--;;
+CREATE TABLE input_data_file(
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	DEFAULT current_timestamp,
+  active			bool		NOT NULL DEFAULT true,
+  input_data_file_set_id	integer		NOT NULL REFERENCES input_data_source(id),
+  file_instance_id		integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT unique_file_per_file_set_idx UNIQUE(input_data_file_set_id, file_instance_id)
 );
 --;;
 --;; Docker images
