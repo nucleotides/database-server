@@ -84,20 +84,8 @@
      :loader   #(ld/benchmarks % (:benchmark-type input-data))
      :tables   [:benchmark-type :benchmark-data]}))
 
-(comment (deftest load-benchmark-instances
-  (let [_  (load-fixture :metadata :image-instance)
-        _  (run-loader ld/data-sets :data)
-        _  (run-loader ld/data-records :data)
-        _  (run-loader ld/benchmark-types :benchmark-type)
-        f  #(ld/rebuild-benchmark-task (con/create-connection))]
-
-    (testing "loading into an empty database"
-      (do (f)
-          (is (not (= 0 (table-length :benchmark-instance))))
-          (is (not (= 0 (table-length :task))))))
-
-    (testing "reloading the same data"
-      (do (f)
-          (f)
-          (is (not (= 0 (table-length :benchmark-instance))))
-          (is (not (= 0 (table-length :task)))))))))
+(deftest load-benchmark-instances
+  (test-data-loader
+    {:fixtures [:metadata :input-data-source :input-data-file-set :input-data-file :image-instance :benchmarks]
+     :loader   ld/rebuild-benchmark-task
+     :tables   [:benchmark-instance]}))

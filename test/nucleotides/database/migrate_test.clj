@@ -27,7 +27,7 @@
 
    :benchmark-type
    :benchmark-data
-   ;:benchmark-instance
+   :benchmark-instance
    ;:task
 
    ])

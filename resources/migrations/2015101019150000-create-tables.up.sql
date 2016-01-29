@@ -123,3 +123,23 @@ CREATE TABLE benchmark_data(
   active			bool		NOT NULL DEFAULT true,
   CONSTRAINT benchmark_data_idx UNIQUE(input_data_file_set_id, benchmark_type_id)
 );
+--;;
+CREATE TABLE benchmark_instance(
+  id					serial		PRIMARY KEY,
+  created_at				timestamp	NOT NULL DEFAULT current_timestamp,
+  external_id				text		UNIQUE NOT NULL,
+  benchmark_type_id			integer		NOT NULL REFERENCES benchmark_type(id),
+  input_data_file_id			integer		NOT NULL REFERENCES input_data_file(id),
+  product_image_instance_id		integer		NOT NULL REFERENCES image_instance(id),
+  product_image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
+  file_instance_id			integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT benchmark_instance_idx UNIQUE(benchmark_type_id, input_data_file_id, product_image_instance_task_id)
+);
+--;;
+CREATE OR REPLACE FUNCTION benchmark_instance_external_id() RETURNS trigger AS '
+BEGIN
+	NEW.external_id := md5(NEW.benchmark_type_id || ''-'' || NEW.input_data_file_id || ''-'' || NEW.product_image_instance_task_id);
+	RETURN NEW;
+END;' LANGUAGE plpgsql;
+--;;
+CREATE TRIGGER benchmark_instance_insert BEFORE INSERT OR UPDATE ON benchmark_instance FOR EACH ROW EXECUTE PROCEDURE benchmark_instance_external_id();

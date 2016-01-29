@@ -59,6 +59,14 @@ Feature: Migrating and loading input data for the database
       | benchmark_type_id                                                    | input_data_file_set_id                                  |
       | $benchmark_type?name='illumina_isolate_reference_assembly'           | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
       | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
+    And the table "benchmark_instance" should have the entries:
+      | file_instance_id              | benchmark_type_id                                                    | product_image_instance_id                   |
+      | $file_instance?sha256='7673a' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
+      | $file_instance?sha256='c1f0f' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
+      | $file_instance?sha256='7673a' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
+      | $file_instance?sha256='c1f0f' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
+      | $file_instance?sha256='7673a' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
+      | $file_instance?sha256='c1f0f' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables

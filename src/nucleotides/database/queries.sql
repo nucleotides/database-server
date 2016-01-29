@@ -130,15 +130,21 @@ WHERE NOT EXISTS (
 -- Populates benchmark instance table with combinations of data record and image task
 INSERT INTO benchmark_instance(
 	benchmark_type_id,
-	data_record_id,
-	product_image_instance_task_id)
+	input_data_file_id,
+	product_image_instance_id,
+	product_image_instance_task_id,
+	file_instance_id)
 SELECT
 benchmark_type.id,
-data_record.id,
-image_instance_task.id
+input_data_file.id,
+image_instance.id,
+image_instance_task.id,
+file_instance.id
 FROM benchmark_type
-LEFT JOIN benchmark_data      ON benchmark_type.id = benchmark_data.benchmark_type_id
-LEFT JOIN data_record         ON benchmark_data.data_set_id = data_record.data_set_id
+LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
+LEFT JOIN input_data_file_set ON input_data_file_set.id = benchmark_data.input_data_file_set_id
+LEFT JOIN input_data_file     ON input_data_file.input_data_file_set_id = input_data_file_set.id
+LEFT JOIN file_instance       ON file_instance.id = input_data_file.file_instance_id
 LEFT JOIN image_type          ON benchmark_type.product_image_type_id = image_type.id
 LEFT JOIN image_instance      ON image_type.id = image_instance.image_type_id
 LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
