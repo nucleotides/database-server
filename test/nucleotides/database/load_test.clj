@@ -1,27 +1,14 @@
 (ns nucleotides.database.load-test
-  (:require [clojure.test                    :refer :all]
-            [clojure.walk                    :as walk]
-            [clojure.pprint                  :as pp]
-            [clojure.java.jdbc               :as sql]
-            [clojure.set                     :as st]
-
-            [com.rpl.specter          :refer :all]
-
+  (:require [clojure.test     :refer :all]
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
             [nucleotides.database.migrate    :as mg]
             [nucleotides.database.load       :as ld]
-            [nucleotides.database.connection :as con]
-            [nucleotides.util                :as util]))
-
-(use-fixtures :each (fn [f] (empty-database) (f)))
+            [nucleotides.database.connection :as con]))
 
 (def input-data
   (mg/load-data-files (test-directory :data)))
-
-(defn run-loader [f data-key]
-  (f (con/create-connection) (data-key input-data)))
 
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
@@ -88,4 +75,4 @@
   (test-data-loader
     {:fixtures [:metadata :input-data-source :input-data-file-set :input-data-file :image-instance :benchmarks]
      :loader   ld/rebuild-benchmark-task
-     :tables   [:benchmark-instance]}))
+     :tables   [:benchmark-instance :task]}))

@@ -158,16 +158,16 @@ INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
 	SELECT
 	benchmark_instance.id   AS benchmark_instance_id,
 	image_instance_task.id  AS image_instance_task_id,
-	'evaluate'::task_type AS benchmark_task_type
+	'evaluate'::task_type   AS benchmark_task_type
 	FROM benchmark_instance
-	LEFT JOIN benchmark_type      ON benchmark_type_id = benchmark_instance.benchmark_type_id
+	LEFT JOIN benchmark_type      ON benchmark_type.id = benchmark_instance.benchmark_type_id
 	LEFT JOIN image_instance      ON benchmark_type.evaluation_image_type_id = image_instance.image_type_id
 	LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
 UNION
 	SELECT
-	benchmark_instance.id	 AS benchmark_instance_id,
+	benchmark_instance.id	                          AS benchmark_instance_id,
 	benchmark_instance.product_image_instance_task_id AS image_instance_task_id,
-	'produce'::task_type AS type
+	'produce'::task_type                              AS type
 	FROM benchmark_instance
 EXCEPT
 	SELECT

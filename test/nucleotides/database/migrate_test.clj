@@ -28,9 +28,8 @@
    :benchmark-type
    :benchmark-data
    :benchmark-instance
-   ;:task
-
-   ])
+   :task
+   :task_expanded_fields])
 
 (deftest migrate
   (testing "-main"

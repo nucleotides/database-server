@@ -67,6 +67,19 @@ Feature: Migrating and loading input data for the database
       | $file_instance?sha256='c1f0f' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
       | $file_instance?sha256='7673a' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
       | $file_instance?sha256='c1f0f' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
+    And the table "task_expanded_fields" should have the entries:
+      | external_id                      | task_type | image_name                 | image_task |
+      | 0eafe866d98c59ca39715e936cfa401e | produce   | bioboxes/my-filterer       | default    |
+      | 0eafe866d98c59ca39715e936cfa401e | evaluate  | bioboxes/velvet-then-quast | default    |
+      | 2f221a18eb86380369570b2ed147d8b4 | produce   | bioboxes/velvet            | default    |
+      | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/quast             | default    |
+      | 4f57d0ecf9622a0bd8a6e3f79c71a09d | produce   | bioboxes/velvet            | careful    |
+      | 4f57d0ecf9622a0bd8a6e3f79c71a09d | evaluate  | bioboxes/quast             | default    |
+    And the table "task_expanded_fields" should not have the entries:
+      | external_id                      | task_type | image_name                 | image_task |
+      | 0eafe866d98c59ca39715e936cfa401e | evaluate  | bioboxes/quast             | default    |
+      | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/velvet-then-quast | default    |
+
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables

@@ -46,3 +46,25 @@ Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
     end
   end
 end
+
+
+Then(/^the table "(.*?)" should not have the entries:$/) do |name, table|
+  entries = table_entries(name)
+  table   = table.hashes.map do |row|
+    row = Hash[row.map do |(k, v)|
+      [k, entry_lookup(v.to_s.strip)]
+    end]
+  end
+
+  table.each do |test_row|
+    matching = entries.select do |db_row|
+      test_row.keys.all? do |key|
+        db_row.has_key?(key) and (test_row[key].to_s.strip == db_row[key].to_s.strip)
+      end
+    end
+    if not matching.empty?
+      row   = test_row.sorted_awesome_inspect
+      fail("The table '#{name}' should not include the entry:\n#{row}")
+    end
+  end
+end

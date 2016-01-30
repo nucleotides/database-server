@@ -78,9 +78,7 @@
 (defn rebuild-benchmark-task [connection]
   (let [args [{} {:connection connection}]]
     (apply populate-benchmark-instance! args)
-    ;(apply populate-task! args)
-
-    ))
+    (apply populate-task! args)))
 
 (def metadata-entries
   [:platform :file :metric :protocol :product :run-mode :source :image])
@@ -91,9 +89,7 @@
    [input-data-file-set      :data-file]
    [input-data-files         :data-file]
    [image-instances          :image-instance]
-   [benchmarks               :benchmark-type]
-
-   ])
+   [benchmarks               :benchmark-type]])
 
 (defn load-data
   "Load and update benchmark data in the database"
