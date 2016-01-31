@@ -77,8 +77,7 @@
 
 (defn rebuild-benchmark-task [connection]
   (let [args [{} {:connection connection}]]
-    (apply populate-benchmark-instance! args)
-    (apply populate-task! args)))
+    (apply populate-instance-and-task! args)))
 
 (def metadata-entries
   [:platform :file :metric :protocol :product :run-mode :source :image])
