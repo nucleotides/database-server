@@ -25,12 +25,11 @@
    :image-instance
    :image-instance-task
 
-   :data-set
-   :data-record
    :benchmark-type
-   :benchmark-instance
    :benchmark-data
-   :task])
+   :benchmark-instance
+   :task
+   :task_expanded_fields])
 
 (deftest migrate
   (testing "-main"

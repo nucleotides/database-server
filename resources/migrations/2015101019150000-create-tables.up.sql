@@ -103,49 +103,25 @@ CREATE TABLE image_instance_task(
   CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
 );
 --;;
---;; Data sets
---;;
-CREATE TABLE data_set(
-  id           serial          PRIMARY KEY,
-  created_at   timestamp       NOT NULL DEFAULT current_timestamp,
-  name         text            UNIQUE NOT NULL,
-  description  text            NOT NULL,
-  active       bool            NOT NULL DEFAULT true
-);
---;;
-CREATE TABLE data_record(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
-  data_set_id	integer		NOT NULL REFERENCES data_set(id),
-  entry_id	integer		NOT NULL,
-  replicate	integer		NOT NULL,
-  reads		integer		NOT NULL,
-  input_url	text		NOT NULL,
-  reference_url	text		NOT NULL,
-  input_md5	text		NOT NULL,
-  reference_md5	text		NOT NULL,
-  active	bool		NOT NULL DEFAULT true,
-  CONSTRAINT data_replicates UNIQUE(data_set_id, entry_id, replicate)
-);
---;;
 --;; Benchmarks
 --;;
 CREATE TABLE benchmark_type(
   id				serial		PRIMARY KEY,
   created_at			timestamp	NOT NULL DEFAULT current_timestamp,
   name				text		UNIQUE NOT NULL,
+  description			text		NOT NULL,
   product_image_type_id		integer		NOT NULL REFERENCES image_type(id),
   evaluation_image_type_id	integer		NOT NULL REFERENCES image_type(id),
   active			bool		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE benchmark_data(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	NOT NULL DEFAULT current_timestamp,
-  data_set_id		integer		NOT NULL REFERENCES data_set(id),
-  benchmark_type_id	integer		NOT NULL REFERENCES benchmark_type(id),
-  active		bool		NOT NULL DEFAULT true,
-  CONSTRAINT benchmark_data_idx UNIQUE(data_set_id, benchmark_type_id)
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	NOT NULL DEFAULT current_timestamp,
+  input_data_file_set_id	integer		NOT NULL REFERENCES input_data_file_set(id),
+  benchmark_type_id		integer		NOT NULL REFERENCES benchmark_type(id),
+  active			bool		NOT NULL DEFAULT true,
+  CONSTRAINT benchmark_data_idx UNIQUE(input_data_file_set_id, benchmark_type_id)
 );
 --;;
 CREATE TABLE benchmark_instance(
@@ -153,15 +129,19 @@ CREATE TABLE benchmark_instance(
   created_at				timestamp	NOT NULL DEFAULT current_timestamp,
   external_id				text		UNIQUE NOT NULL,
   benchmark_type_id			integer		NOT NULL REFERENCES benchmark_type(id),
-  data_record_id			integer		NOT NULL REFERENCES data_record(id),
+  input_data_file_id			integer		NOT NULL REFERENCES input_data_file(id),
+  product_image_instance_id		integer		NOT NULL REFERENCES image_instance(id),
   product_image_instance_task_id	integer		NOT NULL REFERENCES image_instance_task(id),
-  CONSTRAINT benchmark_instance_idx UNIQUE(data_record_id, product_image_instance_task_id)
+  file_instance_id			integer		NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT benchmark_instance_idx UNIQUE(benchmark_type_id, input_data_file_id, product_image_instance_task_id)
 );
+--;;
 CREATE OR REPLACE FUNCTION benchmark_instance_external_id() RETURNS trigger AS '
 BEGIN
-	NEW.external_id := md5(NEW.benchmark_type_id || ''-'' || NEW.data_record_id || ''-'' || NEW.product_image_instance_task_id);
+	NEW.external_id := md5(NEW.benchmark_type_id || ''-'' || NEW.input_data_file_id || ''-'' || NEW.product_image_instance_task_id);
 	RETURN NEW;
 END;' LANGUAGE plpgsql;
+--;;
 CREATE TRIGGER benchmark_instance_insert BEFORE INSERT OR UPDATE ON benchmark_instance FOR EACH ROW EXECUTE PROCEDURE benchmark_instance_external_id();
 --;;
 --;; Evaluation tasks
@@ -176,25 +156,75 @@ CREATE TABLE task(
   task_type			task_type	NOT NULL,
   CONSTRAINT task_idx UNIQUE(benchmark_instance_id, image_instance_task_id, task_type)
 );
+--;;
 CREATE INDEX task_type_idx ON task (task_type);
 --;;
-CREATE TABLE event(
-  id		serial		PRIMARY KEY,
-  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
-  task_id	integer		NOT NULL REFERENCES task(id),
-  file_url	text,
-  file_md5	text,
-  log_file_url	text		NOT NULL,
-  success	bool		NOT NULL
-);
+CREATE VIEW task_expanded_fields AS
+SELECT
+task.id,
+task.benchmark_instance_id,
+benchmark_instance.external_id,
+task.task_type           AS task_type,
+image_instance.name      AS image_name,
+image_instance_task.task AS image_task,
+image_instance.sha256    AS image_sha256,
+image_type.name          AS image_type
+FROM task
+LEFT JOIN image_instance_task ON image_instance_task.id   = task.image_instance_task_id
+LEFT JOIN image_instance      ON image_instance.id        = image_instance_task.image_instance_id
+LEFT JOIN image_type          ON image_type.id            = image_instance.image_type_id
+LEFT JOIN benchmark_instance  ON benchmark_instance.id    = task.benchmark_instance_id
 --;;
---;; Metrics
---;;
-CREATE TABLE metric_instance(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	DEFAULT current_timestamp,
-  metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
-  event_id		integer		NOT NULL REFERENCES event(id),
-  value			float		NOT NULL,
-  CONSTRAINT metric_to_event UNIQUE(metric_type_id, event_id)
+CREATE FUNCTION populate_benchmark_instance () RETURNS void AS $$
+BEGIN
+INSERT INTO benchmark_instance(
+	benchmark_type_id,
+	input_data_file_id,
+	product_image_instance_id,
+	product_image_instance_task_id,
+	file_instance_id)
+SELECT
+benchmark_type.id,
+input_data_file.id,
+image_instance.id,
+image_instance_task.id,
+file_instance.id
+FROM benchmark_type
+LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
+LEFT JOIN input_data_file_set ON input_data_file_set.id = benchmark_data.input_data_file_set_id
+LEFT JOIN input_data_file     ON input_data_file.input_data_file_set_id = input_data_file_set.id
+LEFT JOIN file_instance       ON file_instance.id = input_data_file.file_instance_id
+LEFT JOIN image_type          ON benchmark_type.product_image_type_id = image_type.id
+LEFT JOIN image_instance      ON image_type.id = image_instance.image_type_id
+LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
+WHERE NOT EXISTS(
+	SELECT external_id FROM benchmark_instance WHERE benchmark_instance.external_id = external_id
 );
+END; $$
+LANGUAGE PLPGSQL;
+--;;
+CREATE FUNCTION populate_task () RETURNS void AS $$
+BEGIN
+INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
+	SELECT
+	benchmark_instance.id   AS benchmark_instance_id,
+	image_instance_task.id  AS image_instance_task_id,
+	'evaluate'::task_type   AS benchmark_task_type
+	FROM benchmark_instance
+	LEFT JOIN benchmark_type      ON benchmark_type.id = benchmark_instance.benchmark_type_id
+	LEFT JOIN image_instance      ON benchmark_type.evaluation_image_type_id = image_instance.image_type_id
+	LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
+UNION
+	SELECT
+	benchmark_instance.id	                          AS benchmark_instance_id,
+	benchmark_instance.product_image_instance_task_id AS image_instance_task_id,
+	'produce'::task_type                              AS type
+	FROM benchmark_instance
+EXCEPT
+	SELECT
+	benchmark_instance_id,
+	image_instance_task_id,
+	task_type
+	FROM task;
+END; $$
+LANGUAGE PLPGSQL;
