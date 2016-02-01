@@ -1,6 +1,10 @@
 require 'rspec'
 require 'json'
 
+def last_json
+  @response.body
+end
+
 Given(/^I post to url "(.*?)" with the entries:$/) do |endpoint, table|
   table.hashes.each do |row|
     @response = HTTP.post(endpoint, row)
