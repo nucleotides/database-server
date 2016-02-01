@@ -173,7 +173,7 @@ FROM task
 LEFT JOIN image_instance_task ON image_instance_task.id   = task.image_instance_task_id
 LEFT JOIN image_instance      ON image_instance.id        = image_instance_task.image_instance_id
 LEFT JOIN image_type          ON image_type.id            = image_instance.image_type_id
-LEFT JOIN benchmark_instance  ON benchmark_instance.id    = task.benchmark_instance_id
+LEFT JOIN benchmark_instance  ON benchmark_instance.id    = task.benchmark_instance_id;
 --;;
 CREATE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
