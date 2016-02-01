@@ -1,33 +1,37 @@
 (ns nucleotides.api.tasks-test
   (:require [clojure.test                     :refer :all]
             [clojure.data.json                :as json]
+            [helper.database                  :refer :all]
+            [helper.fixture                   :refer :all]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.tasks            :as task]
-            [helper.fixture                   :as fix]))
-
-(comment (deftest nucleotides.api.tasks
-
-  (defn contains-task-entries [task]
-    (dorun
-      (for [key_ [:id :input_url :input_md5 :task_type
-                  :image_name :image_sha256 :image_task :image_type]]
-        (is (contains? task key_)))))
+            [nucleotides.api.tasks            :as task]))
 
 
-  (testing "#show"
+(defn contains-task-entries [task]
+  (dorun
+    (for [key_ [:id :input_url :input_md5 :task_type
+                :image_name :image_sha256 :image_task :image_type]]
+      (is (contains? task key_)))))
 
-    (testing "getting tasks for an incomplete benchmark"
-      (let [_                     (fix/load-fixture "a_single_incomplete_task")
-            {:keys [status body]} (task/show {:connection (con/create-connection)} {})]
-        (is (= 200 status))
-        (is (= 1 (count body)))
-        (contains-task-entries (first body)))))
+(use-fixtures :once (fn [f]
+                      (empty-database)
+                      (load-fixture :metadata :input-data-source :input-data-file-set
+                                    :input-data-file :image-instance :benchmarks :tasks)
+                      (f)))
 
+(deftest nucleotides.api.tasks
 
   (testing "#get"
 
-    (testing "finding a task by its ID"
-      (let [_                     (fix/load-fixture "a_single_incomplete_task")
-            {:keys [status body]} (task/lookup {:connection (con/create-connection)} 1 {})]
+    (testing "an incomplete produce task by its ID"
+      (let [{:keys [status body]} (task/lookup {:connection (con/create-connection)} 1 {})]
+        (is (= 200 status)))))
+
+
+  (comment (testing "#show"
+
+    (testing "getting tasks for an incomplete benchmark"
+      (let [{:keys [status body]} (task/show {:connection (con/create-connection)} {})]
         (is (= 200 status))
-        (contains-task-entries body))))))
+        (is (= 1 (count body)))
+        (contains-task-entries (first body)))))))
