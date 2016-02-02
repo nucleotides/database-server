@@ -10,7 +10,16 @@
 (defn contains-task-entries [task]
   (dorun
     (for [key_ [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type]]
-      (is (contains? task key_)))))
+      (is (contains? task key_))))
+  (is (not (contains? task :benchmark_instance_id))))
+
+(defn contains-file-entries [task]
+  (let [files (:files task)]
+    (is (not (empty? files)))
+    (dorun
+      (for [f files]
+        (for [key_ [:url :type :sha256]]
+          (is (contains? f key_)))))))
 
 (use-fixtures :once (fn [f]
                       (empty-database)
@@ -26,7 +35,7 @@
       (let [{:keys [status body]} (task/lookup {:connection (con/create-connection)} 1 {})]
         (is (= 200 status))
         (contains-task-entries body)
-        (is (not (contains? body :benchmark_instance_id))))))
+        (contains-file-entries body))))
 
 
   (comment (testing "#show"
