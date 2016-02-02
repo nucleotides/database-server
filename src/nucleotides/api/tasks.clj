@@ -1,5 +1,6 @@
 (ns nucleotides.api.tasks
-  (:require [yesql.core          :refer [defqueries]]
+  (:require [clojure.set         :as st]
+            [yesql.core          :refer [defqueries]]
             [ring.util.response  :as ring]))
 
 (defqueries "nucleotides/api/tasks.sql")
@@ -12,4 +13,8 @@
 (defn lookup
   "Gets a single task entry by its ID"
   [db-client id _]
-  (ring/response (first (task-by-id {:id id} db-client))))
+  (-> (task-by-id {:id id} db-client)
+      (first)
+      (dissoc :benchmark_instance_id)
+      (st/rename-keys {:external_id :benchmark})
+      (ring/response)))

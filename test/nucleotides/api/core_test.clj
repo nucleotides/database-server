@@ -35,7 +35,8 @@
       (let [res (f 1)]
         (is-ok-response res)
         (is-not-empty-body res)
-        (has-body-entry res "id"))))
+        (has-body-entry
+          res "id" "benchmark" "task_type" "image_name" "image_sha256" "image_task" "image_type"))))
 
   (comment (testing "GET /tasks/show.json"
     (let [f (comp (partial request :get) (partial str "/tasks/show.json"))]

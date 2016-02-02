@@ -9,8 +9,7 @@
 
 (defn contains-task-entries [task]
   (dorun
-    (for [key_ [:id :input_url :input_md5 :task_type
-                :image_name :image_sha256 :image_task :image_type]]
+    (for [key_ [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type]]
       (is (contains? task key_)))))
 
 (use-fixtures :once (fn [f]
@@ -25,7 +24,9 @@
 
     (testing "an incomplete produce task by its ID"
       (let [{:keys [status body]} (task/lookup {:connection (con/create-connection)} 1 {})]
-        (is (= 200 status)))))
+        (is (= 200 status))
+        (contains-task-entries body)
+        (is (not (contains? body :benchmark_instance_id))))))
 
 
   (comment (testing "#show"
