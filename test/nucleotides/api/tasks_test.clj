@@ -21,6 +21,9 @@
         (for [key_ [:url :type :sha256]]
           (is (contains? f key_)))))))
 
+(defn contains-no-file-entries [task]
+    (is (empty? (:files task))))
+
 (use-fixtures :once (fn [f]
                       (empty-database)
                       (load-fixture :metadata :input-data-source :input-data-file-set
@@ -37,6 +40,11 @@
         (contains-task-entries body)
         (contains-file-entries body))))
 
+    (testing "an incomplete evaluate task by its ID"
+      (let [{:keys [status body]} (task/lookup {:connection (con/create-connection)} 2 {})]
+        (is (= 200 status))
+        (contains-task-entries body)
+        (contains-no-file-entries body)))
 
   (comment (testing "#show"
 
