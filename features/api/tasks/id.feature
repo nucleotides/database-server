@@ -1,7 +1,8 @@
 Feature: Getting benchmarking tasks by ID
 
   Background:
-    Given the database fixtures:
+    Given a clean database
+    And the database fixtures:
       | fixture             |
       | metadata            |
       | input_data_source   |
@@ -23,7 +24,7 @@ Feature: Getting benchmarking tasks by ID
       | image_name     | "bioboxes/ray"                     |
       | image_type     | "short_read_assembler"             |
       | image_sha256   | "digest_2"                         |
-      | files/0/url    | "s3://url"                         |
+      | files/0/url    | "s3://reads"                       |
       | files/0/sha256 | "c1f0f"                            |
       | files/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "benchmark_instance_id"
@@ -40,5 +41,7 @@ Feature: Getting benchmarking tasks by ID
       | image_name     | "bioboxes/quast"                   |
       | image_type     | "reference_assembly_evaluation"    |
       | image_sha256   | "digest_4"                         |
-      | files          | []                                 |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
     And the JSON response should not have "benchmark_instance_id"

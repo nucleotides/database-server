@@ -19,8 +19,6 @@ Given(/^the database scenario with "(.*?)"$/) do |scenario_name|
 end
 
 Given(/^the database fixtures:$/) do |table|
-  drop_all_tables
-  create_tables
   table.hashes.each do |row|
     execute_sql_fixture(row['fixture'])
   end

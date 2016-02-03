@@ -13,16 +13,19 @@
       (is (contains? task key_))))
   (is (not (contains? task :benchmark_instance_id))))
 
-(defn contains-file-entries [task]
-  (let [files (:files task)]
+(defn contains-file-entries [task & entries]
+  (let [files (set (:files task))]
     (is (not (empty? files)))
     (dorun
       (for [f files]
         (for [key_ [:url :type :sha256]]
-          (is (contains? f key_)))))))
+          (is (contains? f key_)))))
+    (dorun
+      (for [entry entries]
+        (is (contains? files entry))))))
 
-(defn contains-no-file-entries [task]
-    (is (empty? (:files task))))
+(defn file-entry [[type_ url sha256 :as entry]]
+  (into {} (map vector [:type :url :sha256] entry)))
 
 (use-fixtures :once (fn [f]
                       (empty-database)
@@ -44,7 +47,8 @@
       (let [{:keys [status body]} (task/lookup {:connection (con/create-connection)} 2 {})]
         (is (= 200 status))
         (contains-task-entries body)
-        (contains-no-file-entries body)))
+        (contains-file-entries
+          body (file-entry ["reference_fasta" "s3://ref" "d421a4"]))))
 
   (comment (testing "#show"
 

@@ -229,3 +229,18 @@ EXCEPT
 ORDER BY benchmark_instance_id, image_instance_task_id, task_type ASC;
 END; $$
 LANGUAGE PLPGSQL;
+--;;
+CREATE TABLE event(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
+  task_id	integer		NOT NULL REFERENCES task(id),
+  success	bool 		NOT NULL
+);
+--;;
+CREATE TABLE event_file_instances(
+  id			serial		PRIMARY KEY,
+  event_id		integer		NOT NULL REFERENCES event(id),
+  file_instance_id	integer 	NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT event_file_idx UNIQUE(event_id, file_instance_id)
+);
+--;;

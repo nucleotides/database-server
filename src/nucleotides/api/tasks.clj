@@ -7,9 +7,10 @@
 (defqueries "nucleotides/api/benchmarks.sql")
 
 (defn get-task-files [db-client benchmark-instance-id task-type]
-  (if (= "produce" task-type)
-    (benchmark-produce-files-by-id {:id benchmark-instance-id} db-client)
-    (list)))
+  ((if (= "produce" task-type)
+     benchmark-produce-files-by-id
+     benchmark-evaluate-files-by-id)
+     {:id benchmark-instance-id} db-client))
 
 (defn show
   "Returns all incomplete tasks"
