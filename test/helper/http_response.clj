@@ -1,6 +1,9 @@
 (ns helper.http-response
   (:require [clojure.test       :refer :all]
-            [clojure.data.json  :as json]))
+            [clojure.data.json  :as json]
+            [helper.database    :as db]
+            [helper.fixture     :as fix]
+            ))
 
 (defn is-ok-response [response]
   (is (contains? #{200 201} (:status response))))
@@ -20,3 +23,9 @@
 (defn is-not-empty-body [response]
   (is (not (empty? (json/read-str (:body response))))))
 
+(defn test-response [{:keys [api-call tests fixtures]}]
+  (db/empty-database)
+  (apply fix/load-fixture fixtures)
+  (let [response (api-call)]
+    (dorun
+      (for [t tests] (t response)))))

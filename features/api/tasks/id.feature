@@ -45,3 +45,48 @@ Feature: Getting benchmarking tasks by ID
       | files/0/sha256 | "d421a4"                           |
       | files/0/type   | "reference_fasta"                  |
     And the JSON response should not have "benchmark_instance_id"
+
+  Scenario: Getting an evaluate task with an unsuccessful product event by ID
+    Given the database fixtures:
+      | fixture                    |
+      | unsuccessful_product_event |
+    When I get the url "/tasks/2"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | id             | 2                                  |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "evaluate"                         |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/quast"                   |
+      | image_type     | "reference_assembly_evaluation"    |
+      | image_sha256   | "digest_4"                         |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
+    And the JSON response should not have "benchmark_instance_id"
+    And the JSON response should not have "files/1"
+
+  Scenario: Getting an evaluate task with a successful product event by ID
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
+    When I get the url "/tasks/2"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | id             | 2                                  |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "evaluate"                         |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/quast"                   |
+      | image_type     | "reference_assembly_evaluation"    |
+      | image_sha256   | "digest_4"                         |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
+      | files/1/url    | "s3://contigs"                     |
+      | files/1/sha256 | "f7455"                            |
+      | files/1/type   | "contig_fasta"                     |
+    And the JSON response should not have "benchmark_instance_id"
+    And the JSON response should not have "files/2"
