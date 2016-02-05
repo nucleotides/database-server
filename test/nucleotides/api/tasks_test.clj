@@ -28,7 +28,7 @@
 (defn file-entry [[type_ url sha256 :as entry]]
   (into {} (map vector [:type :url :sha256] entry)))
 
-(defn test-task-response [{:keys [task-id extra-fixtures files]}]
+(defn test-get-task [{:keys [task-id extra-fixtures files]}]
   (resp/test-response
     {:api-call #(task/lookup {:connection (con/create-connection)} task-id {})
      :fixtures (concat fix/base-fixtures extra-fixtures)
@@ -36,21 +36,28 @@
                 contains-task-entries
                 #(apply contains-file-entries % (map file-entry files))]}))
 
+(defn test-show-tasks [{:keys [extra-fixtures expected]}]
+  (resp/test-response
+    {:api-call (partial task/show {:connection (con/create-connection)} {})
+     :fixtures (concat fix/base-fixtures extra-fixtures)
+     :tests    [resp/is-ok-response
+                #(is (= (sort (:body %)) (sort expected)))]}))
+
 (deftest nucleotides.api.tasks
 
   (testing "#get"
     (let [f #(partial task/lookup {:connection (con/create-connection)} % {})]
 
       (testing "an incomplete produce task by its ID"
-        (test-task-response {:task-id 1}))
+        (test-get-task {:task-id 1}))
 
       (testing "an incomplete evaluate task with no produce files by its ID"
-        (test-task-response
+        (test-get-task
           {:task-id 2
            :files [["reference_fasta" "s3://ref" "d421a4"]]}))
 
       (testing "an incomplete evaluate task with no produce files by its ID"
-        (test-task-response
+        (test-get-task
           {:task-id 2
            :files [["reference_fasta" "s3://ref" "d421a4"]
                    ["contig_fasta"    "s3://contigs" "f7455"]]
@@ -58,9 +65,10 @@
 
   (testing "#show"
 
-    (testing "getting tasks for an incomplete benchmark"
-      (resp/test-response
-        {:api-call  #(task/show {:connection (con/create-connection)} {})
-         :fixtures  (concat fix/base-fixtures)
-         :tests     [resp/is-ok-response
-                     #(is (= [1, 3, 5, 7, 9, 11] (:body %)))]}))))
+    (testing "getting all incomplete tasks"
+      (test-show-tasks {:expected [1 3 5 7 9 11]}))
+
+    (testing "getting incomplete tasks with successful produce task"
+      (test-show-tasks
+        {:extra-fixtures [:successful-product-event]
+         :expected       [2 3 5 7 9 11]}))))

@@ -12,7 +12,15 @@ Feature: Getting all incomplete tasks from the API
       | benchmarks              |
       | tasks                   |
 
-  Scenario: Listing all tasks for an incomplete benchmark
+  Scenario: Listing all tasks
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
     And the JSON should be [1,3,5,7,9,11]
+
+  Scenario: Listing all tasks with a completed produce task
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
+    When I get the url "/tasks/show.json"
+    Then the returned HTTP status code should be "200"
+    And the JSON should be [3,5,7,9,11,2]
