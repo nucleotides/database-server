@@ -10,7 +10,7 @@
 (defn contains-task-entries [response]
   (let [body (:body response)]
     (dorun
-      (for [key_ [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type]]
+      (for [key_ [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type :complete]]
         (is (contains? body key_))))
     (is (not (contains? body :benchmark_instance_id)))))
 

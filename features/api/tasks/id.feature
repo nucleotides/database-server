@@ -12,12 +12,34 @@ Feature: Getting benchmarking tasks by ID
       | benchmarks          |
       | tasks               |
 
-  Scenario: Getting a incomplete produce task by ID
+  Scenario: Getting an incomplete produce task by ID
     When I get the url "/tasks/1"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | id             | 1                                  |
+      | complete       | false                              |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "produce"                          |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/ray"                     |
+      | image_type     | "short_read_assembler"             |
+      | image_sha256   | "digest_2"                         |
+      | files/0/url    | "s3://reads"                       |
+      | files/0/sha256 | "c1f0f"                            |
+      | files/0/type   | "short_read_fastq"                 |
+    And the JSON response should not have "benchmark_instance_id"
+
+  Scenario: Getting a complete produce task by ID
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
+    When I get the url "/tasks/1"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | id             | 1                                  |
+      | complete       | true                               |
       | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
       | task_type      | "produce"                          |
       | image_task     | "default"                          |
@@ -35,6 +57,7 @@ Feature: Getting benchmarking tasks by ID
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | id             | 2                                  |
+      | complete       | false                              |
       | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
       | task_type      | "evaluate"                         |
       | image_task     | "default"                          |
@@ -55,6 +78,7 @@ Feature: Getting benchmarking tasks by ID
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | id             | 2                                  |
+      | complete       | false                              |
       | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
       | task_type      | "evaluate"                         |
       | image_task     | "default"                          |
@@ -76,6 +100,7 @@ Feature: Getting benchmarking tasks by ID
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | id             | 2                                  |
+      | complete       | false                              |
       | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
       | task_type      | "evaluate"                         |
       | image_task     | "default"                          |
