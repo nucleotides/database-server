@@ -9,7 +9,7 @@
    :input-data-source
    :input-data-file-set
    :input-data-file
-   :image-instance
+   :assembly-image-instance
    :benchmarks
    :tasks])
 

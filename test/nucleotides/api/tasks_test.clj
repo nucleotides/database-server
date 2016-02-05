@@ -56,10 +56,11 @@
                    ["contig_fasta"    "s3://contigs" "f7455"]]
            :extra-fixtures [:successful-product-event]}))))
 
-  (comment (testing "#show"
+  (testing "#show"
 
     (testing "getting tasks for an incomplete benchmark"
-      (let [{:keys [status body]} (task/show {:connection (con/create-connection)} {})]
-        (is (= 200 status))
-        (is (= 1 (count body)))
-        (contains-task-entries (first body)))))))
+      (resp/test-response
+        {:api-call  #(task/show {:connection (con/create-connection)} {})
+         :fixtures  (concat fix/base-fixtures)
+         :tests     [resp/is-ok-response
+                     #(is (= [1, 3, 5, 7, 9, 11] (:body %)))]}))))

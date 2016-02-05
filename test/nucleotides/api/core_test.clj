@@ -1,6 +1,7 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
             [ring.mock.request  :as mock]
+            [clojure.data.json  :as json]
 
             [helper.event          :refer :all]
             [helper.http-response  :refer :all]
@@ -15,8 +16,7 @@
 
 (use-fixtures :once (fn [f]
                       (empty-database)
-                      (load-fixture :metadata :input-data-source :input-data-file-set
-                                    :input-data-file :image-instance :benchmarks :tasks)
+                      (apply load-fixture base-fixtures)
                       (f)))
 
 (defn request
@@ -38,13 +38,13 @@
         (has-body-entry
           res "id" "benchmark" "task_type" "image_name" "image_sha256" "image_task" "image_type"))))
 
-  (comment (testing "GET /tasks/show.json"
-    (let [f (comp (partial request :get) (partial str "/tasks/show.json"))]
+  (testing "GET /tasks/show.json"
+    (let [f (partial request :get "/tasks/show.json")]
 
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (f)]
+      (let [res (f)]
         (is-ok-response res)
-        (is-not-empty-body res)))))
+        (is-not-empty-body res)
+        (is (= (set (json/read-str (:body res))) #{1 3 5 7 9 11})))))
 
 
   (comment (testing "POST /events"

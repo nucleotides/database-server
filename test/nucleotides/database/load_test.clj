@@ -75,6 +75,6 @@
 
 (deftest load-benchmark-instances
   (test-data-loader
-    {:fixtures [:metadata :input-data-source :input-data-file-set :input-data-file :image-instance :benchmarks]
+    {:fixtures [:metadata :input-data-source :input-data-file-set :input-data-file :assembly-image-instance :benchmarks]
      :loader   ld/rebuild-benchmark-task
      :tables   [:benchmark-instance :task]}))
