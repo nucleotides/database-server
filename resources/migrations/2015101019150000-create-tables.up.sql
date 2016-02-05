@@ -159,7 +159,29 @@ CREATE TABLE task(
 --;;
 CREATE INDEX task_type_idx ON task (task_type);
 --;;
+CREATE TABLE event(
+  id		serial		PRIMARY KEY,
+  created_at	timestamp	NOT NULL DEFAULT current_timestamp,
+  task_id	integer		NOT NULL REFERENCES task(id),
+  success	bool 		NOT NULL
+);
+--;;
+CREATE INDEX event_status ON event (success);
+--;;
+CREATE TABLE event_file_instances(
+  id			serial		PRIMARY KEY,
+  event_id		integer		NOT NULL REFERENCES event(id),
+  file_instance_id	integer 	NOT NULL REFERENCES file_instance(id),
+  CONSTRAINT event_file_idx UNIQUE(event_id, file_instance_id)
+);
+--;;
 CREATE VIEW task_expanded_fields AS
+WITH successful_event AS (
+  SELECT DISTINCT ON (task_id)
+  task_id
+  FROM event
+  WHERE success = TRUE
+)
 SELECT
 task.id,
 task.benchmark_instance_id,
@@ -168,12 +190,14 @@ task.task_type           AS task_type,
 image_instance.name      AS image_name,
 image_instance_task.task AS image_task,
 image_instance.sha256    AS image_sha256,
-image_type.name          AS image_type
+image_type.name          AS image_type,
+successful_event.task_id IS NOT NULL AS complete
 FROM task
 LEFT JOIN image_instance_task ON image_instance_task.id   = task.image_instance_task_id
 LEFT JOIN image_instance      ON image_instance.id        = image_instance_task.image_instance_id
 LEFT JOIN image_type          ON image_type.id            = image_instance.image_type_id
 LEFT JOIN benchmark_instance  ON benchmark_instance.id    = task.benchmark_instance_id
+LEFT JOIN successful_event    ON successful_event.task_id = task.id;
 --;;
 CREATE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
@@ -209,7 +233,7 @@ INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
 	SELECT
 	benchmark_instance.id   AS benchmark_instance_id,
 	image_instance_task.id  AS image_instance_task_id,
-	'evaluate'::task_type   AS benchmark_task_type
+	'evaluate'::task_type   AS task_type
 	FROM benchmark_instance
 	LEFT JOIN benchmark_type      ON benchmark_type.id = benchmark_instance.benchmark_type_id
 	LEFT JOIN image_instance      ON benchmark_type.evaluation_image_type_id = image_instance.image_type_id
@@ -218,13 +242,14 @@ UNION
 	SELECT
 	benchmark_instance.id	                          AS benchmark_instance_id,
 	benchmark_instance.product_image_instance_task_id AS image_instance_task_id,
-	'produce'::task_type                              AS type
+	'produce'::task_type                              AS task_type
 	FROM benchmark_instance
 EXCEPT
 	SELECT
 	benchmark_instance_id,
 	image_instance_task_id,
 	task_type
-	FROM task;
+	FROM task
+ORDER BY benchmark_instance_id, image_instance_task_id, task_type ASC;
 END; $$
 LANGUAGE PLPGSQL;

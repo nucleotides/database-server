@@ -4,6 +4,16 @@
             [nucleotides.database.migrate  :as build]
             [helper.database               :as db]))
 
+(def base-fixtures
+  [:metadata
+   :input-data-source
+   :input-data-file-set
+   :input-data-file
+   :image-instance
+   :benchmarks
+   :tasks])
+
+
 (defn test-directory [& paths]
   (->> paths
        (map ksk/->snake_case_string)
@@ -14,7 +24,6 @@
   (test-directory "fixtures" (str (ksk/->snake_case_string fixture) ".sql")))
 
 (defn load-fixture [& fixtures]
-  (db/empty-database)
   (dorun
     (for [f fixtures]
       (->> f

@@ -1,7 +1,9 @@
 INSERT INTO file_type (name, description)
 VALUES
+	('log', 'Free form text output from benchmarking tools'),
 	('short_read_fastq', 'Short read sequences in FASTQ format'),
-	('reference_fasta', 'Reference sequence in FASTA format');
+	('reference_fasta', 'Reference sequence in FASTA format'),
+	('contig_fasta', 'contigs');
 
 INSERT INTO source_type (name, description)
 VALUES

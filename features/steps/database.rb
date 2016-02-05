@@ -18,6 +18,12 @@ Given(/^the database scenario with "(.*?)"$/) do |scenario_name|
   execute_sql_fixture(scenario_name.strip.gsub(" ", "_"))
 end
 
+Given(/^the database fixtures:$/) do |table|
+  table.hashes.each do |row|
+    execute_sql_fixture(row['fixture'])
+  end
+end
+
 Then(/^the following tables should not be empty:$/) do |table|
   table.hashes.each do |row|
     expect(table_entries(row['name']).length).to_not be(0)

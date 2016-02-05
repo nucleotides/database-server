@@ -13,14 +13,16 @@
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
     (testing "loading with into an empty database"
-      (do (apply load-fixture fixtures)
+      (do (empty-database)
+          (apply load-fixture fixtures)
           (loader (con/create-connection))
           (dorun
             (for [t tables]
               (is (not (empty? (table-entries t))))))))
 
     (testing "reloading the same data"
-      (do (apply load-fixture fixtures)
+      (do (empty-database)
+          (apply load-fixture fixtures)
           (loader (con/create-connection))
           (loader (con/create-connection))
           (dorun
