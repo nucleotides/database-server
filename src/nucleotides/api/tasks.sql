@@ -6,11 +6,14 @@ WHERE task.id = :id::int
 
 -- name: incomplete-tasks
 -- Get all incomplete tasks
-WITH incomplete_task AS (
+WITH successful_event AS (
+  SELECT * FROM event WHERE event.success = TRUE
+),
+incomplete_task AS (
   SELECT task.*
   FROM task
-  LEFT JOIN event ON event.task_id = task.id
-  WHERE event.task_id IS NULL
+  LEFT JOIN successful_event ON successful_event.task_id = task.id
+  WHERE successful_event.task_id IS NULL
 ),
 incomplete_produce_task AS (
   SELECT *
@@ -20,9 +23,9 @@ incomplete_produce_task AS (
 complete_produce_task AS (
   SELECT *
   FROM task
-  LEFT JOIN event ON event.task_id = task.id
+  LEFT JOIN successful_event ON successful_event.task_id = task.id
   WHERE task.task_type = 'produce'
-  AND event.task_id IS NOT NULL
+  AND successful_event.task_id IS NOT NULL
 ),
 incomplete_evaluate_task AS (
   SELECT

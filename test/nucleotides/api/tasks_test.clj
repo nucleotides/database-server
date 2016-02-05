@@ -68,6 +68,11 @@
     (testing "getting all incomplete tasks"
       (test-show-tasks {:expected [1 3 5 7 9 11]}))
 
+    (testing "getting incomplete tasks with an unsuccessful produce task"
+      (test-show-tasks
+        {:extra-fixtures [:unsuccessful-product-event]
+         :expected       [1 3 5 7 9 11]}))
+
     (testing "getting incomplete tasks with successful produce task"
       (test-show-tasks
         {:extra-fixtures [:successful-product-event]
