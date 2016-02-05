@@ -1,0 +1,9 @@
+---
+- name: short_read_fastq
+  desc: Short read sequences in FASTQ format
+- name: reference_fasta
+  desc: Reference sequence in FASTA format
+- name: log
+  desc: Free form text output from benchmarking tools
+- name: contig_fasta
+  desc: Reads assembled into larger contiguous sequences in FASTA format

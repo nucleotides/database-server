@@ -3,11 +3,26 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
+## Unreleased
+
+### Changed
+
+  * Benchmarking tasks are now associated with multiple input files instead of
+    one file per task. This fixes the bug where a genome assembly evaluation
+    task needs the produced assembly and the reference genome as input files.
+
+  * Refactored data model for the input data used for benchmarking. The updated
+    data model makes it simpler to describe and organise the different
+    benchmarking data sets by their metadata. A top-level entity 'data source'
+    tracks metadata and any associated reference files. All data files descend
+    from a 'data source' entity and can therefore be linked back to the
+    metadata.
+
 ## v0.4.0 - 2015-01-20
 
 ### Added
 
-  * Added `/tasks/:id` - this provides a url for getting metadata about a
+  * Added `/tasks/:id` - this provides a URL for getting metadata about a
     single task.
 
 ## v0.3.0 - 2015-01-14
@@ -40,16 +55,16 @@ project adheres to Semantic Versioning(http://semver.org/).
 
   * Added a script within the docker image to start the migrations. The Docker
     image CMD now runs the migrations and then launches the server. This means
-    migrations will be run everytime the container is restarted or launched.
+    migrations will be run every time the container is restarted or launched.
 
 ## v0.2.0 - 2015-01-06
 
 ### Changed
 
-  * The API has been rewritten to use a postgres backend. The API now provides
+  * The API has been rewritten to use a postgres back end. The API now provides
     endpoints for listing outstanding tasks, and viewing completed benchmarks.
 
 ### Fixed
 
-  * Fixed development bug where DOCKER_HOST url was hard coded into the test
+  * Fixed development bug where DOCKER_HOST URL was hard coded into the test
     suite.

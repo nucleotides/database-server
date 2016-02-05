@@ -1,80 +1,117 @@
-Feature: Getting tasks from the API by ID
+Feature: Getting benchmarking tasks by ID
 
-  Scenario: Getting a produce task by ID
-    Given the database scenario with "a single incomplete task"
+  Background:
+    Given a clean database
+    And the database fixtures:
+      | fixture             |
+      | metadata            |
+      | input_data_source   |
+      | input_data_file_set |
+      | input_data_file     |
+      | image_instance      |
+      | benchmarks          |
+      | tasks               |
+
+  Scenario: Getting an incomplete produce task by ID
     When I get the url "/tasks/1"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
-    And the returned JSON should contain:
-       | key          | value                |
-       | id           | 1                    |
-       | task_type    | produce              |
-       | image_task   | default              |
-       | image_name   | bioboxes/velvet      |
-       | image_type   | short_read_assembler |
-       | image_sha256 | 123abc               |
-       | input_url    | s3://url             |
-       | input_md5    | abcdef               |
+    And the JSON should have the following:
+      | id             | 1                                  |
+      | complete       | false                              |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "produce"                          |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/ray"                     |
+      | image_type     | "short_read_assembler"             |
+      | image_sha256   | "digest_2"                         |
+      | files/0/url    | "s3://reads"                       |
+      | files/0/sha256 | "c1f0f"                            |
+      | files/0/type   | "short_read_fastq"                 |
+    And the JSON response should not have "benchmark_instance_id"
 
-  Scenario: Getting an evaluate task without inputs by ID
-    Given the database scenario with "a single incomplete task"
+  Scenario: Getting a complete produce task by ID
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
+    When I get the url "/tasks/1"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | id             | 1                                  |
+      | complete       | true                               |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "produce"                          |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/ray"                     |
+      | image_type     | "short_read_assembler"             |
+      | image_sha256   | "digest_2"                         |
+      | files/0/url    | "s3://reads"                       |
+      | files/0/sha256 | "c1f0f"                            |
+      | files/0/type   | "short_read_fastq"                 |
+    And the JSON response should not have "benchmark_instance_id"
+
+  Scenario: Getting an incomplete evaluate task by ID
     When I get the url "/tasks/2"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
-    And the returned JSON should contain:
-       | key          | value                |
-       | id           | 2                    |
-       | task_type    | evaluate             |
-       | image_task   | default              |
-       | image_name   | bioboxes/quast       |
-       | image_type   | assembly_evaluation  |
-       | image_sha256 | 123abc               |
-       | input_url    |                      |
-       | input_md5    |                      |
+    And the JSON should have the following:
+      | id             | 2                                  |
+      | complete       | false                              |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "evaluate"                         |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/quast"                   |
+      | image_type     | "reference_assembly_evaluation"    |
+      | image_sha256   | "digest_4"                         |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
+    And the JSON response should not have "benchmark_instance_id"
 
-  Scenario: Getting an evaluate task with failed produce inputs
-    Given the database scenario with "a single incomplete task"
-    And I successfully post to "/events" with the data:
-      """
-      { "task"          : 1,
-        "log_file_url"  : "log_url",
-        "success"       : false }
-      """
+  Scenario: Getting an evaluate task with an unsuccessful product event by ID
+    Given the database fixtures:
+      | fixture                    |
+      | unsuccessful_product_event |
     When I get the url "/tasks/2"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
-    And the returned JSON should contain:
-       | key          | value                |
-       | id           | 2                    |
-       | task_type    | evaluate             |
-       | image_task   | default              |
-       | image_name   | bioboxes/quast       |
-       | image_type   | assembly_evaluation  |
-       | image_sha256 | 123abc               |
-       | input_url    |                      |
-       | input_md5    |                      |
+    And the JSON should have the following:
+      | id             | 2                                  |
+      | complete       | false                              |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "evaluate"                         |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/quast"                   |
+      | image_type     | "reference_assembly_evaluation"    |
+      | image_sha256   | "digest_4"                         |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
+    And the JSON response should not have "benchmark_instance_id"
+    And the JSON response should not have "files/1"
 
-
-  Scenario: Getting an evaluate task with successful produce inputs
-    Given the database scenario with "a single incomplete task"
-    And I successfully post to "/events" with the data:
-      """
-      { "task"          : 1,
-        "log_file_url"  : "log_url",
-        "file_url"      : "product_url",
-        "file_md5"      : "123",
-        "success"       : true }
-      """
+  Scenario: Getting an evaluate task with a successful product event by ID
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
     When I get the url "/tasks/2"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
-    And the returned JSON should contain:
-       | key          | value                |
-       | id           | 2                    |
-       | task_type    | evaluate             |
-       | image_task   | default              |
-       | image_name   | bioboxes/quast       |
-       | image_type   | assembly_evaluation  |
-       | image_sha256 | 123abc               |
-       | input_url    | product_url          |
-       | input_md5    | 123                  |
+    And the JSON should have the following:
+      | id             | 2                                  |
+      | complete       | false                              |
+      | benchmark      | "453e406dcee4d18174d4ff623f52dcd8" |
+      | task_type      | "evaluate"                         |
+      | image_task     | "default"                          |
+      | image_name     | "bioboxes/quast"                   |
+      | image_type     | "reference_assembly_evaluation"    |
+      | image_sha256   | "digest_4"                         |
+      | files/0/url    | "s3://ref"                         |
+      | files/0/sha256 | "d421a4"                           |
+      | files/0/type   | "reference_fasta"                  |
+      | files/1/url    | "s3://contigs"                     |
+      | files/1/sha256 | "f7455"                            |
+      | files/1/type   | "contig_fasta"                     |
+    And the JSON response should not have "benchmark_instance_id"
+    And the JSON response should not have "files/2"

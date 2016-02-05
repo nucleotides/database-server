@@ -5,7 +5,7 @@
 
 (defproject nucleotides-api version
 
-  :description "REST API for recording nucleotid.es benchmarking events."
+  :description "REST API for nucleotid.es bioinformatics benchmarking"
 
   :dependencies [[camel-snake-kebab          "0.3.2"]
                  [clj-time                   "0.9.0"]
