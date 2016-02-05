@@ -3,14 +3,14 @@ Feature: Getting benchmarking tasks by ID
   Background:
     Given a clean database
     And the database fixtures:
-      | fixture             |
-      | metadata            |
-      | input_data_source   |
-      | input_data_file_set |
-      | input_data_file     |
-      | image_instance      |
-      | benchmarks          |
-      | tasks               |
+      | fixture                 |
+      | metadata                |
+      | input_data_source       |
+      | input_data_file_set     |
+      | input_data_file         |
+      | assembly_image_instance |
+      | benchmarks              |
+      | tasks                   |
 
   Scenario: Getting an incomplete produce task by ID
     When I get the url "/tasks/1"
