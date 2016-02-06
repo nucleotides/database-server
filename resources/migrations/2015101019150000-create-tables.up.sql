@@ -208,18 +208,18 @@ INSERT INTO benchmark_instance(
 	product_image_instance_task_id,
 	file_instance_id)
 SELECT
-benchmark_type.id,
-input_data_file.id,
-image_instance.id,
-image_instance_task.id,
-file_instance.id
+benchmark_type.id      AS benchmark_type_id,
+input_data_file.id     AS data_file_id,
+image_instance.id      AS image_instance_id,
+image_instance_task.id AS image_instance_task_id,
+file_instance.id       AS file_instance_id
 FROM benchmark_type
 LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
 LEFT JOIN input_data_file_set ON input_data_file_set.id = benchmark_data.input_data_file_set_id
 LEFT JOIN input_data_file     ON input_data_file.input_data_file_set_id = input_data_file_set.id
 LEFT JOIN file_instance       ON file_instance.id = input_data_file.file_instance_id
 LEFT JOIN image_type          ON benchmark_type.product_image_type_id = image_type.id
-LEFT JOIN image_instance      ON image_type.id = image_instance.image_type_id
+INNER JOIN image_instance     ON image_type.id = image_instance.image_type_id
 LEFT JOIN image_instance_task ON image_instance.id = image_instance_task.image_instance_id
 WHERE NOT EXISTS(
 	SELECT external_id FROM benchmark_instance WHERE benchmark_instance.external_id = external_id

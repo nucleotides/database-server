@@ -80,6 +80,38 @@ Feature: Migrating and loading input data for the database
       | 0eafe866d98c59ca39715e936cfa401e | evaluate  | bioboxes/quast             | default    |
       | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/velvet-then-quast | default    |
 
+  Scenario: Migrating and loading the database when there are no images for a benchmark type
+    Given an empty database without any tables
+    And I copy the directory "../../test/data" to "data"
+    And the file "data/image_instance.yml" with:
+      """
+      ---
+      - image_type: short_read_assembler
+        name: bioboxes/velvet
+        sha256: digest_1
+        tasks:
+          - default
+      - image_type: reference_assembly_evaluation
+        name: bioboxes/quast
+        sha256: digest_4
+        tasks:
+          - default
+      """
+    When in bash I run:
+      """
+      docker run \
+        --env=RDS_PORT=5433 \
+        --env=RDS_USERNAME=${POSTGRES_USER} \
+        --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=RDS_HOSTNAME=localhost \
+        --env=RDS_DB_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    Then the stderr excluding logging info should not contain anything
+    And the exit status should be 0
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables
