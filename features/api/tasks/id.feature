@@ -51,6 +51,16 @@ Feature: Getting benchmarking tasks by ID
       | files/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "benchmark_instance_id"
 
+  Scenario: Getting a complete produce task by ID
+    Given the database fixtures:
+      | fixture                    |
+      | unsuccessful_product_event |
+    When I get the url "/tasks/1"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | complete | false |
+
   Scenario: Getting an incomplete evaluate task by ID
     When I get the url "/tasks/2"
     Then the returned HTTP status code should be "200"
@@ -115,3 +125,14 @@ Feature: Getting benchmarking tasks by ID
       | files/1/type   | "contig_fasta"                     |
     And the JSON response should not have "benchmark_instance_id"
     And the JSON response should not have "files/2"
+
+  Scenario: Getting an evaluate task with a successful product and evaluate event
+    Given the database fixtures:
+      | fixture                   |
+      | successful_product_event  |
+      | successful_evaluate_event |
+    When I get the url "/tasks/2"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | complete | true |
