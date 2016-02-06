@@ -7,6 +7,10 @@ project adheres to Semantic Versioning(http://semver.org/).
 
 ### Changed
 
+  * GET `/tasks/show.json` now returns a list of only the task IDs. The
+    benchmarking client is then responsible for getting the task metadata from
+    `task/:id`.
+
   * Benchmarking tasks are now associated with multiple input files instead of
     one file per task. This fixes the bug where a genome assembly evaluation
     task needs the produced assembly and the reference genome as input files.
