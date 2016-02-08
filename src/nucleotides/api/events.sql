@@ -1,7 +1,7 @@
 -- name: create-event<!
 -- Create a new event
-INSERT INTO event (task_id, file_url, file_md5, log_file_url, success)
-VALUES (:task::integer, :file_url, :file_md5, :log_file_url, :success::boolean)
+INSERT INTO event (task_id, success)
+VALUES (:task::integer, :success::boolean)
 
 -- name: create-metric-instance<!
 -- Create a new metric instance

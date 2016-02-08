@@ -5,9 +5,8 @@
 (defn mock-event [event_type state]
   (match [event_type state]
 
-         [_ :failure]         {:task          1
-                               :success       "false"
-                               :log_file_url  "s3://url" }
+         [:produce :failure]  {:task          1
+                               :success       "false"}
 
          [:produce :success]  {:task          1
                                :success       "true"

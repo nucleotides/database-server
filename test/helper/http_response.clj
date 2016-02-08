@@ -29,3 +29,9 @@
   (let [response (api-call)]
     (dorun
       (for [t tests] (t response)))))
+
+(defn does-http-body-contain [ks response]
+  (let [body (:body response)]
+    (dorun
+      (for [k ks]
+        (is (contains? body k))))))

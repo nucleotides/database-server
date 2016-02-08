@@ -32,22 +32,16 @@
 (defn create
   "Creates a new event from the given parameters"
   [db-client {:keys [params] :as request}]
-  (let [id (-> {:file_url nil, :file_md5 nil}
-                  (merge params)
-                  (create-event<! db-client)
-                  (:id))
-        _  (create-metrics db-client id params)]
+  (let [id (-> params
+               (create-event<! db-client)
+               (:id))]
     (ring/created (str "/events/" id))))
 
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
-  (let [metrics (->> (metrics-by-event-id {:id id} db-client)
-                     (long->wide)
-                     (future))] ; I put this here because I wanted to experiment
-                                ; with clojure futures. This may not be optimal.
-    (-> {:id id}
-        (get-event db-client)
-        (first)
-        (assoc :metrics @metrics)
-        (ring/response))))
+  (-> {:id id}
+      (get-event db-client)
+      (first)
+      (clojure.set/rename-keys {:task_id :task})
+      (ring/response)))

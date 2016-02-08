@@ -46,6 +46,15 @@
         (is-not-empty-body res)
         (is (= (set (json/read-str (:body res))) #{1 3 5 7 9 11})))))
 
+  (testing "GET /events/:id"
+    (let [f #(request :get (str "/events/" %))]
+
+      (let [_   (load-fixture "unsuccessful_product_event")
+            res (f 1)]
+        (is-ok-response res)
+        (is-not-empty-body res)
+        (has-body-entry res "id"))))
+
 
   (comment (testing "POST /events"
     (let [f (partial request :post "/events")]
@@ -65,11 +74,4 @@
           (is (= 1 (table-length "event")))
           (is (= 2 (table-length "metric_instance"))))))))
 
-  (comment (testing "GET /events/:id"
-    (let [f #(request :get (str "/events/" %))]
-
-      (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
-            res (f 1)]
-        (is-ok-response res)
-        (is-not-empty-body res)
-        (has-body-entry res "id"))))))
+  )
