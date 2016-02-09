@@ -21,6 +21,11 @@
     flatten
     (partial map vals)))
 
+(defn create-event-files [db-client event-id files]
+  (dorun
+    (for [f files]
+      (create-event-file-instance<! (assoc f :event_id event-id) db-client))))
+
 (defn- create-metrics [db-client id {:keys [success metrics]}]
   (if (and (= success "true") (not (nil? metrics)))
     (->> metrics
@@ -31,23 +36,18 @@
 
 (defn create
   "Creates a new event from the given parameters"
-  [db-client {:keys [params] :as request}]
-  (let [id (-> {:file_url nil, :file_md5 nil}
-                  (merge params)
-                  (create-event<! db-client)
-                  (:id))
-        _  (create-metrics db-client id params)]
+  [db-client {:keys [body] :as request}]
+  (let [id (-> body (create-event<! db-client) (:id))]
+    (create-event-files db-client id (:files body))
     (ring/created (str "/events/" id))))
 
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
-  (let [metrics (->> (metrics-by-event-id {:id id} db-client)
-                     (long->wide)
-                     (future))] ; I put this here because I wanted to experiment
-                                ; with clojure futures. This may not be optimal.
-    (-> {:id id}
-        (get-event db-client)
+  (let [id     {:id id}
+        files  (future (get-event-file-instance id db-client))]
+    (-> (get-event id db-client)
         (first)
-        (assoc :metrics @metrics)
+        (clojure.set/rename-keys {:task_id :task})
+        (assoc :files @files)
         (ring/response))))

@@ -14,27 +14,13 @@
         (is (contains? body key_))))
     (is (not (contains? body :benchmark_instance_id)))))
 
-(defn contains-file-entries [response & entries]
-  (let [files (set (get-in response [:body :files]))]
-    (is (not (empty? files)))
-    (dorun
-      (for [f files]
-        (for [key_ [:url :type :sha256]]
-          (is (contains? f key_)))))
-    (dorun
-      (for [entry entries]
-        (is (contains? files entry))))))
-
-(defn file-entry [[type_ url sha256 :as entry]]
-  (into {} (map vector [:type :url :sha256] entry)))
-
 (defn test-get-task [{:keys [task-id extra-fixtures files]}]
   (resp/test-response
     {:api-call #(task/lookup {:connection (con/create-connection)} task-id {})
      :fixtures (concat fix/base-fixtures extra-fixtures)
      :tests    [resp/is-ok-response
                 contains-task-entries
-                #(apply contains-file-entries % (map file-entry files))]}))
+                #(apply resp/contains-file-entries % (map resp/file-entry files))]}))
 
 (defn test-show-tasks [{:keys [extra-fixtures expected]}]
   (resp/test-response

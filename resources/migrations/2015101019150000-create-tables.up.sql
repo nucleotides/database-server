@@ -168,7 +168,7 @@ CREATE TABLE event(
 --;;
 CREATE INDEX event_status ON event (success);
 --;;
-CREATE TABLE event_file_instances(
+CREATE TABLE event_file_instance(
   id			serial		PRIMARY KEY,
   event_id		integer		NOT NULL REFERENCES event(id),
   file_instance_id	integer 	NOT NULL REFERENCES file_instance(id),

@@ -1,62 +1,39 @@
 (ns nucleotides.api.events-test
   (:require [clojure.test          :refer :all]
             [helper.event          :refer :all]
-            [helper.fixture        :refer :all]
-            [helper.database       :refer :all]
-            [helper.http-response  :refer :all]
+            [helper.fixture        :as fix]
+            [helper.http-response  :as resp]
+            [helper.database       :as db]
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.events           :as event]))
+            [nucleotides.api.events           :as ev]))
 
+(defn test-create-event [event]
+  (resp/test-response
+    {:api-call #(ev/create {:connection (con/create-connection)} {:body event})
+     :fixtures fix/base-fixtures
+     :tests    [resp/is-ok-response
+                #(resp/has-header % "Location")]}))
 
-(def create
-  #(event/create {:connection (con/create-connection)} {:params %}))
+(defn test-get-event [{:keys [event-id fixtures files]}]
+  (resp/test-response
+    {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
+     :fixtures (concat fix/base-fixtures fixtures)
+     :tests    [resp/is-ok-response
+                (partial resp/does-http-body-contain [:task :success :created_at])
+                #(apply resp/contains-file-entries % (map resp/file-entry files))]}))
 
-(def lookup
-  #(event/lookup {:connection (con/create-connection)} % {}))
-
-
-(comment (deftest nucleotides.api.events
+(deftest nucleotides.api.events
 
   (testing "#create"
-
-    (testing "with a successful produce event"
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (create (mock-event :produce :success))]
-        (is-ok-response res)
-        (has-header res "Location")
-        (is (= 1 (table-length "event")))))
-
     (testing "with an unsuccessful produce event"
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (create (mock-event :produce :failure))]
-        (is-ok-response res)
-        (has-header res "Location")
-        (is (= 1 (table-length "event")))))
-
-    (testing "with a successful evaluate event"
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (create (mock-event :evaluate :success))]
-        (is-ok-response res)
-        (has-header res "Location")
-        (is (= 1 (table-length "event")))
-        (is (= 2 (table-length "metric-instance"))))))
+      (test-create-event (mock-event :produce :failure))
+      (is (= 1 (db/table-length "event")))
+      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance")))))))
 
   (testing "#get"
-
-    (testing "a product event"
-      (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
-            res (lookup 1)]
-        (is-ok-response res)
-        (is (contains? (:body res) :id))))
-
-    (testing "a product event"
-      (let [_   (load-fixture "a_single_incomplete_task"
-                              "a_successful_product_event"
-                              "a_successful_evaluate_event")
-            res (lookup 2)]
-        (is-ok-response res)
-        (is (contains? (:body res) :id))
-        (is (contains? (:body res) :metrics)))))))
-
+    (testing "an unsuccessful produce event"
+      (test-get-event
+        {:event-id 1
+         :fixtures [:unsuccessful-product-event]}))))
