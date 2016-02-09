@@ -22,6 +22,20 @@
 (defn is-not-empty-body [response]
   (is (not (empty? (json/read-str (:body response))))))
 
+(defn file-entry [[type_ url sha256 :as entry]]
+  (into {} (map vector [:type :url :sha256] entry)))
+
+(defn contains-file-entries [response & entries]
+  (let [files (set (get-in response [:body :files]))]
+    (is (not (empty? files)))
+    (dorun
+      (for [f files]
+        (for [key_ [:url :type :sha256]]
+          (is (contains? f key_)))))
+    (dorun
+      (for [entry entries]
+        (is (contains? files entry))))))
+
 (defn test-response [{:keys [api-call tests fixtures]}]
   (db/empty-database)
   (apply fix/load-fixture fixtures)

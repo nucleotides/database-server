@@ -9,5 +9,5 @@ files_ AS (
 	       ((SELECT id FROM file_type WHERE name = 'contig_fasta'), 'f7455', 's3://contigs')
 	RETURNING id
 )
-INSERT INTO event_file_instances (file_instance_id, event_id)
+INSERT INTO event_file_instance (file_instance_id, event_id)
 SELECT * FROM files_ CROSS JOIN event_

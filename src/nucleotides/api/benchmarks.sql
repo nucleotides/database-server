@@ -28,11 +28,11 @@ reference_files AS (
 ),
 produce_files AS (
   SELECT
-  event_file_instances.file_instance_id AS file_instance_id
+  event_file_instance.file_instance_id AS file_instance_id
   FROM _benchmark
   LEFT JOIN task                 ON task.benchmark_instance_id = _benchmark.id
   LEFT JOIN event                ON event.task_id = task.id
-  LEFT JOIN event_file_instances ON event_file_instances.event_id = event.id
+  LEFT JOIN event_file_instance  ON event_file_instance.event_id = event.id
   WHERE task.task_type = 'produce'
   AND event.success = true
 ),
