@@ -35,8 +35,8 @@
       (let [res (f 1)]
         (is-ok-response res)
         (is-not-empty-body res)
-        (has-body-entry
-          res "id" "benchmark" "task_type" "image_name" "image_sha256" "image_task" "image_type"))))
+        (does-http-body-contain
+          ["id" "benchmark" "task_type" "image_name" "image_sha256" "image_task" "image_type"] res))))
 
   (testing "GET /tasks/show.json"
     (let [f (partial request :get "/tasks/show.json")]
@@ -53,7 +53,7 @@
             res (f 1)]
         (is-ok-response res)
         (is-not-empty-body res)
-        (has-body-entry res "id"))))
+        (does-http-body-contain ["id"] res))))
 
 
   (comment (testing "POST /events"
