@@ -1,5 +1,6 @@
 (ns helper.event
   (:require [clojure.core.match      :refer [match]]
+            [clojure.data.json   :as json]
             [camel-snake-kebab.core  :as ksk]))
 
 (defn mock-event [event_type state]
@@ -24,8 +25,5 @@
                                :file_md5      "123"
                                :metrics       {"ng50" 20000, "lg50" 5}}))
 
-(defn event-as-http-params [event]
-  (->> (:metrics event)
-       (map (fn [[k v]] [(str "metrics[" k "]") v]))
-       (into {})
-       (merge (dissoc event :metrics))))
+(def mock-json-event
+  (comp json/write-str mock-event))

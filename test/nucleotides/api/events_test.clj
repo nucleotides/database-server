@@ -7,18 +7,18 @@
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.events           :as event]))
+            [nucleotides.api.events           :as ev]))
 
-(defn test-create-event [params]
+(defn test-create-event [event]
   (resp/test-response
-    {:api-call #(event/create {:connection (con/create-connection)} {:params params})
+    {:api-call #(ev/create {:connection (con/create-connection)} {:body event})
      :fixtures fix/base-fixtures
      :tests    [resp/is-ok-response
                 #(resp/has-header % "Location")]}))
 
 (defn test-get-event [{:keys [event-id fixtures files]}]
   (resp/test-response
-    {:api-call #(event/lookup {:connection (con/create-connection)} event-id {})
+    {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
      :fixtures (concat fix/base-fixtures fixtures)
      :tests    [resp/is-ok-response
                 (partial resp/does-http-body-contain [:task :success :created_at])
