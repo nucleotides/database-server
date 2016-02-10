@@ -72,6 +72,34 @@ LEFT JOIN benchmark_type	ON benchmark_type.id      = benchmark_instance.benchmar
 WHERE external_id = :id
 LIMIT 1
 
+
+-- name: benchmark-event-files
+-- Get all event files associated with a benchmark
+SELECT
+task.id,
+task.task_type,
+image_instance_task.task	AS image_task,
+image_instance.name		AS image_name,
+image_instance.sha256		AS image_sha256,
+image_type.name			AS image_type,
+event.id			AS event_id,
+event.created_at		AS event_created_at,
+event.success			AS event_success,
+file_type.name			AS file_type,
+file_instance.sha256,
+file_instance.url
+FROM benchmark_instance
+LEFT JOIN task			ON task.benchmark_instance_id	= benchmark_instance.id
+LEFT JOIN image_instance_task	ON image_instance_task.id	= task.image_instance_task_id
+LEFT JOIN image_instance	ON image_instance.id		= image_instance_task.image_instance_id
+LEFT JOIN image_type            ON image_type.id		= image_instance.image_type_id
+LEFT JOIN event			ON event.task_id		= task.id
+LEFT JOIN event_file_instance	ON event_file_instance.event_id	= event.id
+LEFT JOIN file_instance		ON file_instance.id		= event_file_instance.file_instance_id
+LEFT JOIN file_type		ON file_type.id			= file_instance.file_type_id
+WHERE external_id = :id
+
+
 -- name: benchmark-metrics-by-id
 -- Get metrics for a benchmark entry by ID
 SELECT DISTINCT ON (metric_type.id)

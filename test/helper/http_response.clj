@@ -25,8 +25,8 @@
 (defn file-entry [[type_ url sha256 :as entry]]
   (into {} (map vector [:type :url :sha256] entry)))
 
-(defn contains-file-entries [response & entries]
-  (let [files (set (get-in response [:body :files]))]
+(defn contains-file-entries [response path & entries]
+  (let [files (set (get-in response path))]
     (is (not (empty? files)))
     (dorun
       (for [f files]

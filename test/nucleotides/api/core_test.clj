@@ -41,7 +41,7 @@
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
                          (partial resp/does-http-body-contain
-                            [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type])]}))
+                                  [:id :benchmark :type :complete :image :inputs])]}))
 
   (testing "GET /tasks/show.json"
     (test-app-response
@@ -71,11 +71,11 @@
        :db-tests       {"event" 1
                         "event_file_instance" 1}}))
 
-  (testing "GET /benchmarks/:id"
+  (comment (testing "GET /benchmarks/:id"
     (test-app-response
       {:method          :get
        :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
                          (partial resp/does-http-body-contain [:id :name :image])
-                         image/has-image-metadata]})))
+                         image/has-image-metadata]}))))

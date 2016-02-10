@@ -3,24 +3,29 @@
             [clojure.data.json                :as json]
             [helper.http-response             :as resp]
             [helper.fixture                   :as fix]
+            [helper.image                     :as image]
             [nucleotides.database.connection  :as con]
             [nucleotides.api.tasks            :as task]))
 
 
-(defn contains-task-entries [response]
-  (let [body (:body response)]
-    (dorun
-      (for [key_ [:id :benchmark :task_type :image_name :image_sha256 :image_task :image_type :complete]]
-        (is (contains? body key_))))
-    (is (not (contains? body :benchmark_instance_id)))))
+(def contains-task-entries
+  (partial resp/does-http-body-contain
+           [:id :benchmark :type :complete :image :inputs]))
+
+(defn contains-task-files [file-list]
+  (let [path  [:body :inputs]
+        files (map resp/file-entry file-list)]
+    (fn [response]
+      (apply resp/contains-file-entries response path files))))
 
 (defn test-get-task [{:keys [task-id extra-fixtures files]}]
   (resp/test-response
     {:api-call #(task/lookup {:connection (con/create-connection)} task-id {})
      :fixtures (concat fix/base-fixtures extra-fixtures)
      :tests    [resp/is-ok-response
+                image/has-image-metadata
                 contains-task-entries
-                #(apply resp/contains-file-entries % (map resp/file-entry files))]}))
+                (contains-task-files files)]}))
 
 (defn test-show-tasks [{:keys [extra-fixtures expected]}]
   (resp/test-response
@@ -35,7 +40,9 @@
     (let [f #(partial task/lookup {:connection (con/create-connection)} % {})]
 
       (testing "an incomplete produce task by its ID"
-        (test-get-task {:task-id 1}))
+        (test-get-task
+          {:task-id 1
+           :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
 
       (testing "an incomplete evaluate task with no produce files by its ID"
         (test-get-task
