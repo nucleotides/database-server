@@ -9,7 +9,8 @@
 (def image-keys
   {:image_name    :name,
    :image_sha256  :sha256,
-   :image_task    :task})
+   :image_task    :task
+   :image_type    :type})
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
@@ -19,10 +20,6 @@
               (into {})
               (assoc kvs k))
          (keys ks)))
-
-(defn lookup-evaluations [db-client id]
-  (->>
-       (into [])))
 
 (defn lookup-metrics [db-client id]
   (->> (benchmark-metrics-by-id {:id id} db-client)
@@ -34,8 +31,11 @@
   (-> (benchmark-by-id {:id id} db-client)
       (first)
       (create-submap image-keys :image)
-      (merge
-        {:product  (first (benchmark-product-by-id {:id id} db-client))
-         :evaluate (into [] (benchmark-evaluations-by-id {:id id} db-client))
-         :metrics  (lookup-metrics db-client id)})
+      (assoc :complete false)
       (ring/response)))
+
+(comment
+  (merge
+    {:product  (first (benchmark-product-by-id {:id id} db-client))
+     :evaluate (into [] (benchmark-evaluations-by-id {:id id} db-client))
+     :metrics  (lookup-metrics db-client id)}))

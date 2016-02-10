@@ -11,10 +11,10 @@
   (is (contains? (:headers response) header)))
 
 (defn dispatch-response-body-test [f response]
-  (let [body (:body response)]
-    (f (if (isa? (class body) String)
-         (json/read-str body)
-         body))))
+  (let [body (if (isa? (class (:body response)) String)
+               (clojure.walk/keywordize-keys (json/read-str (:body response)))
+               (:body response))]
+    (f body)))
 
 (defn is-empty-body [response]
   (is (empty? (json/read-str (:body response)))))
