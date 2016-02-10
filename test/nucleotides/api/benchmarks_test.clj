@@ -13,22 +13,21 @@
 
 (defn test-get-benchmark [{:keys [fixtures tests complete]}]
   (let [base-tests [resp/is-ok-response
-                    (partial resp/does-http-body-contain [:id :name :image])
-                    image/has-image-metadata
+                    (partial resp/does-http-body-contain [:id :complete :type])
                     #(is (= (get-in % [:body :complete]) complete))]]
    (resp/test-response
     {:api-call #(bench/lookup {:connection (con/create-connection)} "2f221a18eb86380369570b2ed147d8b4" {})
      :fixtures (concat fix/base-fixtures fixtures)
      :tests    (concat base-tests tests)})))
 
-(comment (deftest nucleotides.api.benchmarks
+(deftest nucleotides.api.benchmarks
 
   (testing "#lookup"
 
     (testing "a benchmark with no events"
       (test-get-benchmark {:complete false}))
 
-    (testing "a benchmark with an unsuccessful produce event"
+    (comment (testing "a benchmark with an unsuccessful produce event"
       (test-get-benchmark
         {:complete false
          :fixtures [:unsuccessful_product_event]

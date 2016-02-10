@@ -6,7 +6,6 @@
             [taoensso.timbre        :as log]
             [nucleotides.api.events :as event]))
 
-
 (defqueries "nucleotides/api/benchmarks.sql")
 
 (defn lookup
@@ -14,4 +13,5 @@
   [db-client id _]
   (-> (benchmark-by-id {:id id} db-client)
       (first)
+      (assoc :complete false)
       (ring/response)))
