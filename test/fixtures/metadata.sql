@@ -32,3 +32,8 @@ VALUES
 	('short_read_preprocessor', 'desc'),
 	('reference_assembly_evaluation', 'desc'),
 	('short_read_preprocessing_reference_evaluation', 'desc') ;
+
+INSERT INTO metric_type (name, description)
+VALUES
+	('ng50', 'desc'),
+	('lg50', 'desc');

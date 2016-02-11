@@ -159,6 +159,8 @@ CREATE TABLE task(
 --;;
 CREATE INDEX task_type_idx ON task (task_type);
 --;;
+--;; Events
+--;;
 CREATE TABLE event(
   id		serial		PRIMARY KEY,
   created_at	timestamp	NOT NULL DEFAULT current_timestamp,
@@ -174,6 +176,19 @@ CREATE TABLE event_file_instance(
   file_instance_id	integer 	NOT NULL REFERENCES file_instance(id),
   CONSTRAINT event_file_idx UNIQUE(event_id, file_instance_id)
 );
+--;;
+--;; Metrics
+--;;
+CREATE TABLE metric_instance(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  metric_type_id	integer		NOT NULL REFERENCES metric_type(id),
+  event_id		integer		NOT NULL REFERENCES event(id),
+  value			float 		NOT NULL,
+  CONSTRAINT metric_to_event UNIQUE(metric_type_id, event_id)
+);
+--;;
+--;; Expanded view of tasks
 --;;
 CREATE VIEW task_expanded_fields AS
 WITH successful_event AS (
@@ -198,6 +213,8 @@ LEFT JOIN image_instance      ON image_instance.id        = image_instance_task.
 LEFT JOIN image_type          ON image_type.id            = image_instance.image_type_id
 LEFT JOIN benchmark_instance  ON benchmark_instance.id    = task.benchmark_instance_id
 LEFT JOIN successful_event    ON successful_event.task_id = task.id;
+--;;
+--;; Functions for populating benchmark_instance and task
 --;;
 CREATE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN

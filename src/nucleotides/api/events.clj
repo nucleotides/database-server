@@ -26,8 +26,8 @@
     (for [f files]
       (create-event-file-instance<! (assoc f :event_id event-id) db-client))))
 
-(defn- create-metrics [db-client id {:keys [success metrics]}]
-  (if (and (= success "true") (not (nil? metrics)))
+(defn- create-metrics [db-client id {:keys [metrics]}]
+  (if (not (nil? metrics))
     (->> metrics
          (wide->long)
          (map #(assoc % :id id))
@@ -39,15 +39,20 @@
   [db-client {:keys [body] :as request}]
   (let [id (-> body (create-event<! db-client) (:id))]
     (create-event-files db-client id (:files body))
+    (create-metrics db-client id body)
     (ring/created (str "/events/" id))))
 
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
   (let [id     {:id id}
-        files  (future (get-event-file-instance id db-client))]
+        files   (future (get-event-file-instance id db-client))
+        metrics (->> (metrics-by-event-id id db-client)
+                     (long->wide)
+                     (future))]
     (-> (get-event id db-client)
         (first)
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
+        (assoc :metrics @metrics)
         (ring/response))))

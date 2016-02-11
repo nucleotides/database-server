@@ -12,18 +12,12 @@
                                            :sha256  "log_file"
                                            :type    "log"}]}
 
-         [:produce :success]  {:task          1
-                               :success       "true"
-                               :log_file_url  "s3://url"
-                               :file_url      "s3://url"
-                               :file_md5      "123"}
-
-         [:evaluate :success] {:task          1
-                               :success       "true"
-                               :log_file_url  "s3://url"
-                               :file_url      "s3://url"
-                               :file_md5      "123"
-                               :metrics       {"ng50" 20000, "lg50" 5}}))
+         [:evaluate :success] {:task     2
+                               :success  true
+                               :files    [{:url     "s3://url"
+                                           :sha256  "log_file"
+                                           :type    "log"}]
+                               :metrics  {"ng50" 20000, "lg50" 5}}))
 
 (def mock-json-event
   (comp json/write-str mock-event))
