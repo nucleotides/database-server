@@ -54,6 +54,7 @@ Feature: Posting and getting events from the API
       | files/0/type   | "log"      |
       | files/0/sha256 | "adef5c"   |
       | files/0/url    | "s3://url" |
+      | metrics        | {}         |
 
   Scenario: Posting a successful event
     When I post to "/events" with the data:
@@ -118,3 +119,5 @@ Feature: Posting and getting events from the API
       | files/1/type   | "contig_fasta" |
       | files/1/sha256 | "afd456"       |
       | files/1/url    | "s3://url"     |
+      | metrics/ng50   | 20000.0        |
+      | metrics/lg50   | 10.0           |

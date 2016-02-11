@@ -46,9 +46,13 @@
   "Finds an event by ID"
   [db-client id _]
   (let [id     {:id id}
-        files  (future (get-event-file-instance id db-client))]
+        files   (future (get-event-file-instance id db-client))
+        metrics (->> (metrics-by-event-id id db-client)
+                     (long->wide)
+                     (future))]
     (-> (get-event id db-client)
         (first)
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
+        (assoc :metrics @metrics)
         (ring/response))))

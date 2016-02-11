@@ -21,7 +21,7 @@
     {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
      :fixtures (concat fix/base-fixtures fixtures)
      :tests    [resp/is-ok-response
-                (partial resp/does-http-body-contain [:task :success :created_at])
+                (partial resp/does-http-body-contain [:task :success :created_at :metrics])
                 #(apply resp/contains-file-entries % (map resp/file-entry files))]}))
 
 (deftest nucleotides.api.events
@@ -40,7 +40,13 @@
       (is (= "log_file" (:sha256 (last (db/table-entries "file_instance")))))))
 
   (testing "#get"
+
     (testing "an unsuccessful produce event"
       (test-get-event
         {:event-id 1
-         :fixtures [:unsuccessful-product-event]}))))
+         :fixtures [:unsuccessful-product-event]}))
+
+    (testing "a successful evaluate event"
+      (test-get-event
+        {:event-id 1
+         :fixtures [:successful-evaluate-event]}))))
