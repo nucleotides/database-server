@@ -9,6 +9,8 @@
             [helper.database       :as db]
             [helper.image          :as image]
 
+            [nucleotides.api.benchmarks-test :as bench-test]
+
             [nucleotides.database.connection  :as con]
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.core             :as app]))
@@ -40,7 +42,7 @@
        :url             "/tasks/1"
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
-                         (partial resp/does-http-body-contain
+                         (resp/does-http-body-contain
                                   [:id :benchmark :type :complete :image :inputs])]}))
 
   (testing "GET /tasks/show.json"
@@ -58,7 +60,7 @@
        :fixtures        ["unsuccessful_product_event"]
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
-                         (partial resp/does-http-body-contain [:id])]}))
+                         (resp/does-http-body-contain [:id])]}))
 
   (testing "POST /events"
     (test-app-response
@@ -77,5 +79,5 @@
        :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
-                         (partial resp/does-http-body-contain [:id :name :image])
-                         image/has-image-metadata]}))))
+                         bench-test/has-benchmark-fields
+                         bench-test/has-task-fields]}))))

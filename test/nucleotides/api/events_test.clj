@@ -21,7 +21,7 @@
     {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
      :fixtures (concat fix/base-fixtures fixtures)
      :tests    [resp/is-ok-response
-                (partial resp/does-http-body-contain [:task :success :created_at])
+                (resp/does-http-body-contain [:task :success :created_at])
                 #(apply resp/contains-file-entries % [:body :files] (map resp/file-entry files))]}))
 
 (deftest nucleotides.api.events

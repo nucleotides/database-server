@@ -11,14 +11,30 @@
             [nucleotides.database.connection  :as con]
             [nucleotides.api.benchmarks       :as bench]))
 
+(def has-benchmark-fields
+  (juxt
+    (resp/does-http-body-contain [:id :complete :type :tasks])
+    (partial resp/does-http-body-not-contain [:task_id])))
+
+(def has-task-fields
+  (let [f (juxt
+            #(is (not (empty? %)))
+            #(dorun
+               (for [task %]
+                 (dorun
+                   (for [k [:id :type :complete :image :inputs]]
+                     (is (contains? task k)))))))]
+    (partial resp/dispatch-response-body-test f [:tasks])))
+
 (defn test-get-benchmark [{:keys [fixtures tests complete]}]
   (let [base-tests [resp/is-ok-response
-                    (partial resp/does-http-body-contain [:id :complete :type])
+                    has-benchmark-fields
+                    has-task-fields
                     #(is (= (get-in % [:body :complete]) complete))]]
-   (resp/test-response
-    {:api-call #(bench/lookup {:connection (con/create-connection)} "2f221a18eb86380369570b2ed147d8b4" {})
-     :fixtures (concat fix/base-fixtures fixtures)
-     :tests    (concat base-tests tests)})))
+    (resp/test-response
+      {:api-call #(bench/lookup {:connection (con/create-connection)} "2f221a18eb86380369570b2ed147d8b4" {})
+       :fixtures (concat fix/base-fixtures fixtures)
+       :tests    (concat base-tests tests)})))
 
 (deftest nucleotides.api.benchmarks
 

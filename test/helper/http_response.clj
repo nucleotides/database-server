@@ -10,11 +10,14 @@
 (defn has-header [response header]
   (is (contains? (:headers response) header)))
 
-(defn dispatch-response-body-test [f response]
-  (let [body (if (isa? (class (:body response)) String)
-               (clojure.walk/keywordize-keys (json/read-str (:body response)))
-               (:body response))]
-    (f body)))
+(defn dispatch-response-body-test
+  ([f path response]
+   (let [body (if (isa? (class (:body response)) String)
+                (clojure.walk/keywordize-keys (json/read-str (:body response)))
+                (:body response))]
+     (f (get-in body path))))
+  ([f response]
+   (dispatch-response-body-test f [] response)))
 
 (defn is-empty-body [response]
   (is (empty? (json/read-str (:body response)))))
@@ -43,8 +46,19 @@
     (dorun
       (for [t tests] (t response)))))
 
-(defn does-http-body-contain [ks response]
-  (let [f #(dorun
+(defn does-http-body-contain
+  ([ks path]
+   (fn [response]
+     (let [f #(dorun
+                (for [k ks]
+                  (is (contains? % k))))]
+       (dispatch-response-body-test f response))))
+  ([ks]
+   (does-http-body-contain ks [])))
+
+(defn does-http-body-not-contain [ks response]
+  (let [not-contains? (complement contains?)
+        f #(dorun
              (for [k ks]
-               (is (contains? % k))))]
+               (is (not-contains? % k))))]
     (dispatch-response-body-test f response)))

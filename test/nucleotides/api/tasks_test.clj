@@ -9,8 +9,7 @@
 
 
 (def contains-task-entries
-  (partial resp/does-http-body-contain
-           [:id :benchmark :type :complete :image :inputs]))
+  (resp/does-http-body-contain [:id :benchmark :type :complete :image :inputs]))
 
 (defn contains-task-files [file-list]
   (let [path  [:body :inputs]
