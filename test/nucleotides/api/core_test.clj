@@ -7,6 +7,9 @@
             [helper.fixture        :as fix]
             [helper.http-response  :as resp]
             [helper.database       :as db]
+            [helper.image          :as image]
+
+            [nucleotides.api.benchmarks-test :as bench-test]
 
             [nucleotides.database.connection  :as con]
             [nucleotides.api.middleware       :as md]
@@ -39,8 +42,8 @@
        :url             "/tasks/1"
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
-                         (partial resp/does-http-body-contain
-                            ["id" "benchmark" "task_type" "image_name" "image_sha256" "image_task" "image_type"])]}))
+                         (resp/does-http-body-contain
+                                  [:id :benchmark :type :complete :image :inputs])]}))
 
   (testing "GET /tasks/show.json"
     (test-app-response
@@ -57,7 +60,7 @@
        :fixtures        ["unsuccessful_product_event"]
        :response-tests  [resp/is-ok-response
                          resp/is-not-empty-body
-                         (partial resp/does-http-body-contain ["id"])]}))
+                         (resp/does-http-body-contain [:id])]}))
 
   (testing "POST /events"
     (test-app-response
@@ -68,4 +71,13 @@
        :response-tests  [resp/is-ok-response
                          #(resp/has-header % "Location")]
        :db-tests       {"event" 1
-                        "event_file_instance" 1}})))
+                        "event_file_instance" 1}}))
+
+  (comment (testing "GET /benchmarks/:id"
+    (test-app-response
+      {:method          :get
+       :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
+       :response-tests  [resp/is-ok-response
+                         resp/is-not-empty-body
+                         bench-test/has-benchmark-fields
+                         bench-test/has-task-fields]}))))
