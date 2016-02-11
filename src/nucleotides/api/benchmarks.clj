@@ -18,10 +18,11 @@
   "Finds a benchmark instance by ID"
   [db-client id _]
   (let [benchmark (benchmark-by-id {:id id} db-client)
-        tasks     (doall (map (comp (partial fetch-task db-client) :task_id) benchmark))]
+        tasks     (doall (map (comp (partial fetch-task db-client) :task_id) benchmark))
+        complete  (every? :complete tasks)]
    (-> benchmark
       (first)
-      (assoc  :complete false)
+      (assoc  :complete complete)
       (dissoc :task_id)
       (assoc  :tasks tasks)
       (ring/response))))

@@ -12,7 +12,7 @@ Feature: Getting benchmarks from the API by their ID
       | benchmarks              |
       | tasks                   |
 
-  Scenario: Getting a benchmark with no events
+  Scenario: Getting a benchmark with no completed tasks
     When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
@@ -42,7 +42,7 @@ Feature: Getting benchmarks from the API by their ID
       | inputs/0/sha256 | "d421a4"                        |
       | inputs/0/type   | "reference_fasta"               |
 
-  Scenario: Getting a benchmark with a completed produce event
+  Scenario: Getting a benchmark with a completed produce task
     Given the database fixtures:
       | fixture                  |
       | successful_product_event |
@@ -69,6 +69,48 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON at "tasks/1" should have the following:
       | id              | 2                                  |
       | complete        | false                              |
+      | type            | "evaluate"                         |
+      | image/task      | "default"                          |
+      | image/name      | "bioboxes/quast"                   |
+      | image/type      | "reference_assembly_evaluation"    |
+      | image/sha256    | "digest_4"                         |
+      | inputs/0/url    | "s3://ref"                         |
+      | inputs/0/sha256 | "d421a4"                           |
+      | inputs/0/type   | "reference_fasta"                  |
+      | inputs/1/url    | "s3://contigs"                     |
+      | inputs/1/sha256 | "f7455"                            |
+      | inputs/1/type   | "contig_fasta"                     |
+    And the JSON response should not have "benchmark_instance_id"
+    And the JSON response should not have "task/1/inputs/2"
+
+  Scenario: Getting a benchmark with all completed tasks
+    Given the database fixtures:
+      | fixture                  |
+      | successful_product_event |
+      | successful_evaluate_event |
+    When I get the url "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | id       | "453e406dcee4d18174d4ff623f52dcd8"    |
+      | complete | true                                  |
+      | type     | "illumina_isolate_reference_assembly" |
+    And the JSON should not have "task_id"
+    And the JSON at "tasks/0" should have the following:
+      | id              | 1                                  |
+      | complete        | true                               |
+      | type            | "produce"                          |
+      | image/task      | "default"                          |
+      | image/name      | "bioboxes/ray"                     |
+      | image/type      | "short_read_assembler"             |
+      | image/sha256    | "digest_2"                         |
+      | inputs/0/url    | "s3://reads"                       |
+      | inputs/0/sha256 | "c1f0f"                            |
+      | inputs/0/type   | "short_read_fastq"                 |
+    And the JSON response should not have "task/0/inputs/1"
+    And the JSON at "tasks/1" should have the following:
+      | id              | 2                                  |
+      | complete        | true                               |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
