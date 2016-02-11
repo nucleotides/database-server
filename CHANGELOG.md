@@ -3,23 +3,26 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
-## Unreleased
+## v0.5.0 - 2015-02-10
 
 ### Changed
 
-  * GET `/tasks/show.json` now returns a list of only the task IDs. The
-    benchmarking client is then responsible for getting the task metadata from
-    `task/:id`.
+  * GET `/tasks/show.json` now returns a list containing only the IDs of
+    outstanding benchmarking tasks. The benchmarking client is then responsible
+    for getting the task metadata from `task/:id`. This is slightly more
+    efficient than multiple joins to fetch all metadata for each task.
 
   * Benchmarking tasks are now associated with multiple input files instead of
-    one file per task. This fixes the bug where a genome assembly evaluation
-    task needs the produced assembly and the reference genome as input files.
+    a one-to-one relationship between file and benchmark. This fixes the issue
+    where a genome assembly evaluation task needs two input files: the produced
+    assembly and the reference genome.
 
-  * Refactored data model for the input data used for benchmarking. The updated
-    data model makes it simpler to describe and organise the different
-    benchmarking data sets by their metadata. A top-level entity 'data source'
-    tracks metadata and any associated reference files. All data files descend
-    from a 'data source' entity and can therefore be linked back to the
+  * Refactored data model for the reference and input data used in
+    benchmarking. The updated data model makes it simpler to describe and
+    organise the different benchmarking data sets by their metadata. A
+    top-level entity was added: 'data source'. This tracks the metadata and any
+    associated reference files. All input data and reference files descend from
+    this 'data source' entity and can therefore be linked back to this
     metadata.
 
 ## v0.4.0 - 2015-01-20
