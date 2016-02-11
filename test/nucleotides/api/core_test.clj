@@ -1,68 +1,83 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
             [ring.mock.request  :as mock]
+            [clojure.data.json  :as json]
 
             [helper.event          :refer :all]
-            [helper.http-response  :refer :all]
-            [helper.fixture        :refer :all]
-            [helper.database       :refer :all]
+            [helper.fixture        :as fix]
+            [helper.http-response  :as resp]
+            [helper.database       :as db]
+            [helper.image          :as image]
+
+            [nucleotides.api.benchmarks-test :as bench-test]
 
             [nucleotides.database.connection  :as con]
-            [nucleotides.database.load        :as db]
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.core             :as app]))
 
 
-(defn request
+(defn http-request [{:keys [method url params body content] :or {params {}}}]
   "Create a mock request to the API"
-  ([method url params]
-   (let [hnd (md/middleware (app/api {:connection (con/create-connection)}))]
-     (hnd (mock/request method url params))))
-  ([method url]
-   (request method url {})))
+  (-> (mock/request method url params)
+      (mock/body body)
+      (mock/content-type content)
+      ((md/middleware (app/api {:connection (con/create-connection)})))))
+
+(defn test-app-response [{:keys [db-tests response-tests fixtures] :as m}]
+  (db/empty-database)
+  (apply fix/load-fixture (concat fix/base-fixtures fixtures))
+  (let [response (http-request m)]
+    (dorun
+      (for [t response-tests]
+        (t response)))
+    (dorun
+      (for [[table length] db-tests]
+        (is (= length (db/table-length table)))))))
 
 (deftest app
 
-  (testing "GET /tasks/show.json"
-    (let [f (comp (partial request :get) (partial str "/tasks/show.json"))]
-
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (f)]
-        (is-ok-response res)
-        (is-not-empty-body res))))
-
   (testing "GET /tasks/:id"
-    (let [f #(request :get (str "/tasks/" %))]
+    (test-app-response
+      {:method          :get
+       :url             "/tasks/1"
+       :response-tests  [resp/is-ok-response
+                         resp/is-not-empty-body
+                         (resp/does-http-body-contain
+                                  [:id :benchmark :type :complete :image :inputs])]}))
 
-      (let [_   (load-fixture "a_single_incomplete_task")
-            res (f 1)]
-        (is-ok-response res)
-        (is-not-empty-body res)
-        (has-body-entry res "id"))))
-
-  (testing "POST /events"
-    (let [f (partial request :post "/events")]
-
-      (testing "with a successful produce event"
-        (let [_   (load-fixture "a_single_incomplete_task")
-              res (f (event-as-http-params (mock-event :produce :success)))]
-          (is-ok-response res)
-          (has-header res "Location")
-          (is (= 1 (table-length "event")))))
-
-      (comment (testing "with a successful evaluate event"
-        (let [_   (load-fixture "a_single_incomplete_task")
-              res (f (event-as-http-params (mock-event :evaluate :success)))]
-          (is-ok-response res)
-          (has-header res "Location")
-          (is (= 1 (table-length "event")))
-          (is (= 2 (table-length "metric_instance"))))))))
+  (testing "GET /tasks/show.json"
+    (test-app-response
+      {:method          :get
+       :url             "/tasks/show.json"
+       :response-tests  [resp/is-ok-response
+                         resp/is-not-empty-body
+                         #(is (= (set (json/read-str (:body %))) #{1 3 5 7 9 11}))]}))
 
   (testing "GET /events/:id"
-    (let [f #(request :get (str "/events/" %))]
+    (test-app-response
+      {:method          :get
+       :url             "/events/1"
+       :fixtures        ["unsuccessful_product_event"]
+       :response-tests  [resp/is-ok-response
+                         resp/is-not-empty-body
+                         (resp/does-http-body-contain [:id])]}))
 
-      (let [_   (load-fixture "a_single_incomplete_task" "a_successful_product_event")
-            res (f 1)]
-        (is-ok-response res)
-        (is-not-empty-body res)
-        (has-body-entry res "id")))))
+  (testing "POST /events"
+    (test-app-response
+      {:method          :post
+       :url             "/events"
+       :body            (mock-json-event :produce :failure)
+       :content         "application/json"
+       :response-tests  [resp/is-ok-response
+                         #(resp/has-header % "Location")]
+       :db-tests       {"event" 1
+                        "event_file_instance" 1}}))
+
+  (comment (testing "GET /benchmarks/:id"
+    (test-app-response
+      {:method          :get
+       :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
+       :response-tests  [resp/is-ok-response
+                         resp/is-not-empty-body
+                         bench-test/has-benchmark-fields
+                         bench-test/has-task-fields]}))))
