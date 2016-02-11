@@ -27,9 +27,16 @@
 (deftest nucleotides.api.events
 
   (testing "#create"
+
     (testing "with an unsuccessful produce event"
       (test-create-event (mock-event :produce :failure))
       (is (= 1 (db/table-length "event")))
+      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance"))))))
+
+    (testing "with an unsuccessful produce event"
+      (test-create-event (mock-event :evaluate :success))
+      (is (= 1 (db/table-length "event")))
+      (is (= 2 (db/table-length "metric_instance")))
       (is (= "log_file" (:sha256 (last (db/table-entries "file_instance")))))))
 
   (testing "#get"
