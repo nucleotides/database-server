@@ -16,8 +16,9 @@
             [nucleotides.api.core             :as app]))
 
 
-(defn http-request [{:keys [method url params body content] :or {params {}}}]
+(defn http-request
   "Create a mock request to the API"
+  [{:keys [method url params body content] :or {params {}}}]
   (-> (mock/request method url params)
       (mock/body body)
       (mock/content-type content)

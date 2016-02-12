@@ -49,7 +49,7 @@
        (map transform))))
 
 (defn build-query [domain params]
-  (let [select-statment (merge {'select '* 'from (symbol domain)})]
+  (let [select-statment {'select '* 'from (symbol domain)}]
     (if (not (empty? params))
       (merge select-statment {'where (cons 'and (normalise-query-params params))})
       select-statment)))
