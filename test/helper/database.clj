@@ -9,6 +9,12 @@
 
 (log/set-config! [:appenders :standard-out :enabled? false])
 
+; Turn off logging for c3p0
+(System/setProperties
+  (doto (java.util.Properties. (System/getProperties))
+    (.put "com.mchange.v2.log.MLog" "com.mchange.v2.log.FallbackMLog")
+    (.put "com.mchange.v2.log.FallbackMLog.DEFAULT_CUTOFF_LEVEL" "OFF")))
+
 (defn exec-db-command [command]
   (sql/with-db-connection [conn (con/create-connection)]
     (with-open [s (.createStatement (:connection conn))]
