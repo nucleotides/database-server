@@ -17,7 +17,10 @@
    :password     (:password vars)})
 
 (def connection-pool
-  (delay (pool/make-datasource-spec (sql-params (util/fetch-variables! env-var-names)))))
+  (->> (util/fetch-variables! env-var-names)
+       (sql-params)
+       (pool/make-datasource-spec)
+       (delay)))
 
 (defn create-connection []
   @connection-pool)
