@@ -12,7 +12,7 @@
                  [circleci/clj-yaml          "0.5.4"]
                  [com.rpl/specter            "0.8.0"]
                  [com.taoensso/timbre        "4.1.4"]
-                 [compojure                  "1.3.1"]
+                 [compojure                  "1.4.0"]
                  [migratus                   "0.8.7"]
                  [org.clojure/clojure        "1.7.0"]
                  [org.clojure/data.json      "0.2.5"]
