@@ -3,6 +3,7 @@ Then(/^the stderr excluding logging info should not contain anything$/) do
     detect{|i| i.respond_to? :stderr}.
     stderr.lines.
     reject{|i| i =~ /^(.+clojure.tools.logging|INFO|WARNING).+$/}.
+    reject{|i| i =~ /com.mchange.v2/}.
     join.strip
   expect(stderr).to eq("")
 end

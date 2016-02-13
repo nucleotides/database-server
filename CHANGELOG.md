@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
+## v0.5.1 - 2015-02-12
+
+### Changed
+
+  * Reduced docker image size by switching to an Alpine Linux base image.
+
+  * Improved database perfomance by using a connection pool.
+
+  * Updated dependency libraries to latest versions
+
+  * Removed no longer used AWS SDB code module
+
 ## v0.5.0 - 2015-02-10
 
 ### Changed

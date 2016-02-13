@@ -1,5 +1,7 @@
 (ns nucleotides.database.connection
-  (:require [nucleotides.util :as util]))
+  (:require
+    [jdbc.pool.c3p0   :as pool]
+    [nucleotides.util :as util]))
 
 (def env-var-names
   {:user      "POSTGRES_USER"
@@ -14,5 +16,11 @@
    :user         (:user vars)
    :password     (:password vars)})
 
+(def connection-pool
+  (->> (util/fetch-variables! env-var-names)
+       (sql-params)
+       (pool/make-datasource-spec)
+       (delay)))
+
 (defn create-connection []
-  (sql-params (util/fetch-variables! env-var-names)))
+  @connection-pool)
