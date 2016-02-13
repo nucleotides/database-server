@@ -11,6 +11,9 @@ project adheres to Semantic Versioning(http://semver.org/).
 
   * Improved database perfomance by using a connection pool.
 
+  * Updated dependency libraries to latest versions
+
+  * Removed no longer used AWS SDB code module
 
 ## v0.5.0 - 2015-02-10
 
