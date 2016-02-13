@@ -37,9 +37,9 @@
 (defn- load-entries
   "Creates a function that transforms and saves data with a given
   DB connection"
-  ([transform save]
+  ([f save]
    (fn [connection data]
-     (->> (transform data)
+     (->> (f data)
           (map #(save % {:connection connection}))
           (dorun))))
   ([save]

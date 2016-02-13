@@ -119,7 +119,7 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container
 	  postgres > $@
 
 .rdm_image:
-	docker pull postgres:9.4
+	docker pull kiasaki/alpine-postgres:9.4
 	touch $@
 
 $(credentials): ./script/create_aws_credentials
