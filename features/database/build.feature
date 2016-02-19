@@ -32,15 +32,15 @@ Feature: Migrating and loading input data for the database
       | ecoli_k12        | $source_type?name='microbe'    |
       | kansas_farm_soil | $source_type?name='metagenome' |
     And the table "input_data_source_reference_file" should have the entries:
-      | input_data_source_id                | file_instance_id              |
-      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='eaa53' |
+      | input_data_source_id                | file_instance_id                                                                         |
+      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='6bac51cc35ee2d11782e7e31ea1bfd7247de2bfcdec205798a27c820b2810414' |
     And the table "input_data_file_set" should have the entries:
       | name                        | input_data_source_id                |
       | jgi_isolate_microbe_2x150_1 | $input_data_source?name='ecoli_k12' |
     And the table "input_data_file" should have the entries:
-      | input_data_file_set_id                                  | file_instance_id              |
-      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='7673a' |
-      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='c1f0f' |
+      | input_data_file_set_id                                  | file_instance_id                                                                         |
+      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' |
+      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' |
     And the table "image_instance" should have the entries:
       | name                 | sha256   | image_type_id                              |
       | bioboxes/velvet      | digest_1 | $image_type?name='short_read_assembler'    |
@@ -60,13 +60,13 @@ Feature: Migrating and loading input data for the database
       | $benchmark_type?name='illumina_isolate_reference_assembly'           | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
       | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
     And the table "benchmark_instance" should have the entries:
-      | file_instance_id              | benchmark_type_id                                                    | product_image_instance_id                   |
-      | $file_instance?sha256='7673a' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
-      | $file_instance?sha256='c1f0f' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
-      | $file_instance?sha256='7673a' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-      | $file_instance?sha256='c1f0f' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-      | $file_instance?sha256='7673a' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
-      | $file_instance?sha256='c1f0f' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
+      | file_instance_id                                                                         | benchmark_type_id                                                    | product_image_instance_id                   |
+      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
+      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
+      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
+      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
+      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
+      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
     And the table "task_expanded_fields" should have the entries:
       | external_id                      | task_type | image_name                 | image_task |
       | 0eafe866d98c59ca39715e936cfa401e | produce   | bioboxes/my-filterer       | default    |
