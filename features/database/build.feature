@@ -32,8 +32,8 @@ Feature: Migrating and loading input data for the database
       | ecoli_k12        | $source_type?name='microbe'    |
       | kansas_farm_soil | $source_type?name='metagenome' |
     And the table "input_data_source_reference_file" should have the entries:
-      | input_data_source_id                | file_instance_id              |
-      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='eaa53' |
+      | input_data_source_id                | file_instance_id                                                                         |
+      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='6bac51cc35ee2d11782e7e31ea1bfd7247de2bfcdec205798a27c820b2810414' |
     And the table "input_data_file_set" should have the entries:
       | name                        | input_data_source_id                |
       | jgi_isolate_microbe_2x150_1 | $input_data_source?name='ecoli_k12' |

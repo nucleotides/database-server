@@ -4,8 +4,8 @@
   source_type: microbe
   references:
   - file_type: reference_fasta
-    sha256: eaa53
-    url: s3://nucleotid-es/reference/0001/genome.fa
+    sha256: 6bac51cc35ee2d11782e7e31ea1bfd7247de2bfcdec205798a27c820b2810414
+    url: s3://nucleotides-testing/short-read-assembler/reference.fa
 - name: kansas_farm_soil
   description: A soil sample from a kansas farm
   source_type: metagenome
