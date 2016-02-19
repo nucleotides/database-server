@@ -116,7 +116,7 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container
 	  --env="$(db_pass)" \
           --publish=5433:5432 \
 	  --detach=true \
-	  postgres > $@
+	  kiasaki/alpine-postgres:9.4 > $@
 
 .rdm_image:
 	docker pull kiasaki/alpine-postgres:9.4
