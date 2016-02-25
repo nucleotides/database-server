@@ -39,6 +39,14 @@
       (for [entry entries]
         (is (contains? files entry))))))
 
+(defn contains-event-entries [response path & entries]
+  (let [events (->> (get-in response path)
+                    (map #(dissoc % :created_at :id))
+                    (set))]
+    (dorun
+      (for [e entries]
+        (is (contains? events e))))))
+
 (defn test-response [{:keys [api-call tests fixtures]}]
   (db/empty-database)
   (apply fix/load-fixture fixtures)

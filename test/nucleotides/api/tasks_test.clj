@@ -3,6 +3,7 @@
             [clojure.data.json                :as json]
             [helper.http-response             :as resp]
             [helper.fixture                   :as fix]
+            [helper.event                     :as ev]
             [helper.image                     :as image]
             [nucleotides.database.connection  :as con]
             [nucleotides.api.tasks            :as task]))
@@ -17,14 +18,20 @@
     (fn [response]
       (apply resp/contains-file-entries response path files))))
 
-(defn test-get-task [{:keys [task-id extra-fixtures files]}]
+(defn contains-events [events]
+  (let [path [:body :events]]
+    (fn [response]
+      (apply resp/contains-event-entries response path events))))
+
+(defn test-get-task [{:keys [task-id extra-fixtures files events]}]
   (resp/test-response
     {:api-call #(task/lookup {:connection (con/create-connection)} task-id {})
      :fixtures (concat fix/base-fixtures extra-fixtures)
      :tests    [resp/is-ok-response
                 image/has-image-metadata
                 contains-task-entries
-                (contains-task-files files)]}))
+                (contains-task-files files)
+                (contains-events events)]}))
 
 (defn test-show-tasks [{:keys [extra-fixtures expected]}]
   (resp/test-response
@@ -43,12 +50,19 @@
           {:task-id 1
            :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
 
+      (testing "an successfully completed produce task by its ID"
+        (test-get-task
+          {:task-id 1
+           :files [["short_read_fastq" "s3://reads" "c1f0f"]]
+           :extra-fixtures [:successful-product-event]
+           :events [(ev/mock-event :produce :success)]}))
+
       (testing "an incomplete evaluate task with no produce files by its ID"
         (test-get-task
           {:task-id 2
            :files [["reference_fasta" "s3://ref" "d421a4"]]}))
 
-      (testing "an incomplete evaluate task with no produce files by its ID"
+      (testing "an incomplete evaluate task with a successful produce task by its ID"
         (test-get-task
           {:task-id 2
            :files [["reference_fasta" "s3://ref" "d421a4"]

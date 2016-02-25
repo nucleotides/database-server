@@ -12,6 +12,16 @@
                                            :sha256  "log_file"
                                            :type    "log"}]}
 
+         [:produce :success]  {:task     1
+                               :success  true
+                               :metrics  {}
+                               :files    [{:url     "s3://log_file"
+                                           :sha256  "66b8d"
+                                           :type    "log"},
+                                          {:url     "s3://contigs"
+                                           :sha256  "f7455"
+                                           :type    "contig_fasta"}]}
+
          [:evaluate :success] {:task     2
                                :success  true
                                :files    [{:url     "s3://url"

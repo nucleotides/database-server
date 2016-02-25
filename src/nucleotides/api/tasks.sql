@@ -4,6 +4,10 @@ SELECT *
 FROM task_expanded_fields AS task
 WHERE task.id = :id::int
 
+-- name: events-by-task-id
+-- Get all events for a given task
+SELECT id FROM event WHERE event.task_id = :id::int
+
 -- name: incomplete-tasks
 -- Get all incomplete tasks
 WITH successful_event AS (
