@@ -3,7 +3,15 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
-## v0.5.1 - 2015-02-25
+## v0.5.3 - 2015-02-25
+
+### Changed
+
+  * Created jar file is last line in Dockerfile. This should prevent cached
+    file system layers being repeated 'popped' when the jar file is updated
+    with a new version.
+
+## v0.5.2 - 2015-02-25
 
 ### Added
 
