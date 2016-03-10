@@ -16,15 +16,7 @@
      :tests    [resp/is-ok-response
                 #(resp/has-header % "Location")]}))
 
-(defn test-get-event [{:keys [event-id fixtures files]}]
-  (resp/test-response
-    {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
-     :fixtures (concat fix/base-fixtures fixtures)
-     :tests    [resp/is-ok-response
-                (resp/does-http-body-contain [:task :success :created_at :metrics])
-                #(apply resp/contains-file-entries % [:body :files] (map resp/file-entry files))]}))
-
-(comment (deftest nucleotides.api.events
+(deftest nucleotides.api.events
 
   (testing "#create"
 
@@ -37,8 +29,4 @@
       (test-create-event (mock-event :evaluate :success))
       (is (= 1 (db/table-length "event")))
       (is (= 2 (db/table-length "metric_instance")))
-      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance")))))))
-
-  (testing "#get"
-
-    )))
+      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance"))))))))
