@@ -168,6 +168,13 @@
 
   (testing "GET /benchmarks/:id"
 
+    (testing "an unknown benchmark ID"
+      (test-app-response
+        {:method          :get
+         :url             "/benchmarks/unknown"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Unknown benchmark ID: unknown")]}))
+
     (testing "a benchmark with no events"
       (test-app-response
         {:method          :get

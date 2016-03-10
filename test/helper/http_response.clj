@@ -20,10 +20,13 @@
   (is (contains? #{200 201} (:status response))))
 
 (defn is-client-error-response [response]
-  (is (contains? #{422} (:status response))))
+  (is (contains? #{404 422} (:status response))))
 
 (defn has-header [response header]
   (is (contains? (:headers response) header)))
+
+(defn has-body [body]
+  #(is (= body (:body %))))
 
 (defn is-empty-body [response]
   (is (empty? (json/read-str (:body response)))))

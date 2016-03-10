@@ -8,9 +8,12 @@
 
 (deftest nucleotides.api.metrics
 
+  (use-fixtures :each (fn [f]
+                        (do
+                          (db/empty-database)
+                          (fix/load-fixture :metadata)
+                          (f))))
+
   (testing "#invalid-metrics"
-    (do
-      (db/empty-database)
-      (fix/load-fixture :metadata)
-      (is (empty? (mt/invalid-metrics [:lg50])))
-      (is (contains? (mt/invalid-metrics [:unknown]) "unknown")))))
+    (is (empty? (mt/invalid-metrics [:lg50])))
+    (is (contains? (mt/invalid-metrics [:unknown]) "unknown"))))

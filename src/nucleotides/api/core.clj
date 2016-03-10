@@ -48,6 +48,8 @@
 (defresource benchmark [db id]
   :available-media-types  ["application/json"]
   :allowed-methods        [:get]
+  :exists?                (fn [_] (benchmarks/exists? id))
+  :handle-not-found       (fn [_] (str "Unknown benchmark ID: " id))
   :handle-ok              (fn [_] (benchmarks/lookup db id {})))
 
 (defresource task-show [db]
