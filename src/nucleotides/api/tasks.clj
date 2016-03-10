@@ -37,8 +37,7 @@
   "Returns all incomplete tasks"
   [db-client _]
   (->> (incomplete-tasks {} db-client)
-       (map :id)
-       (ring/response)))
+       (map :id)))
 
 (defn lookup
   "Gets a single task entry by its ID"

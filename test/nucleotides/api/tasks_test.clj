@@ -33,13 +33,6 @@
                 (contains-task-files files)
                 (contains-events events)]}))
 
-(defn test-show-tasks [{:keys [extra-fixtures expected]}]
-  (resp/test-response
-    {:api-call (partial task/show {:connection (con/create-connection)} {})
-     :fixtures (concat fix/base-fixtures extra-fixtures)
-     :tests    [resp/is-ok-response
-                #(is (= (sort (:body %)) (sort expected)))]}))
-
 (deftest nucleotides.api.tasks
 
   (testing "#get"
@@ -67,24 +60,4 @@
           {:task-id 2
            :files [["reference_fasta" "s3://ref" "d421a4"]
                    ["contig_fasta"    "s3://contigs" "f7455"]]
-           :extra-fixtures [:successful-product-event]}))))
-
-  (testing "#show"
-
-    (testing "getting all incomplete tasks"
-      (test-show-tasks {:expected [1 3 5 7 9 11]}))
-
-    (testing "getting incomplete tasks with an unsuccessful produce task"
-      (test-show-tasks
-        {:extra-fixtures [:unsuccessful-product-event]
-         :expected       [1 3 5 7 9 11]}))
-
-    (testing "getting incomplete tasks with successful produce task"
-      (test-show-tasks
-        {:extra-fixtures [:successful-product-event]
-         :expected       [2 3 5 7 9 11]}))
-
-    (testing "getting incomplete tasks with successful produce task"
-      (test-show-tasks
-        {:extra-fixtures [:successful-product-event :successful-evaluate-event]
-         :expected       [3 5 7 9 11]}))))
+           :extra-fixtures [:successful-product-event]})))))

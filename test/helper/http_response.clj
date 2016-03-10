@@ -4,6 +4,18 @@
             [helper.database    :as db]
             [helper.fixture     :as fix]))
 
+(defn dispatch-response-body-test
+  ([f path response]
+   (let [body (if (isa? (class (:body response)) String)
+                (clojure.walk/keywordize-keys (json/read-str (:body response)))
+                (:body response))]
+     (f (get-in body path))))
+  ([f response]
+   (dispatch-response-body-test f [] response)))
+
+
+
+
 (defn is-ok-response [response]
   (is (contains? #{200 201} (:status response))))
 
@@ -26,15 +38,6 @@
 (defn is-complete [response]
   (let [f #(is (= true (:complete %)))]
     (dispatch-response-body-test f [] response)))
-
-(defn dispatch-response-body-test
-  ([f path response]
-   (let [body (if (isa? (class (:body response)) String)
-                (clojure.walk/keywordize-keys (json/read-str (:body response)))
-                (:body response))]
-     (f (get-in body path))))
-  ([f response]
-   (dispatch-response-body-test f [] response)))
 
 (defn file-entry [[type_ url sha256 :as entry]]
   (into {} (map vector [:type :url :sha256] entry)))
