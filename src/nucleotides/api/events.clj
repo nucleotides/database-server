@@ -36,11 +36,11 @@
 
 (defn create
   "Creates a new event from the given parameters"
-  [db-client {:keys [body] :as request}]
+  [db-client body]
   (let [id (-> body (create-event<! db-client) (:id))]
     (create-event-files db-client id (:files body))
     (create-metrics db-client id body)
-    (ring/created (str "/events/" id))))
+    {::id id}))
 
 (defn lookup
   "Finds an event by ID"

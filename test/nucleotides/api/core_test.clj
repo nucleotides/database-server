@@ -80,15 +80,28 @@
 
 
   (testing "POST /events"
-    (test-app-response
-      {:method          :post
-       :url             "/events"
-       :body            (mock-json-event :produce :failure)
-       :content         "application/json"
-       :response-tests  [resp/is-ok-response
-                         #(resp/has-header % "Location")]
-       :db-tests       {"event" 1
-                        "event_file_instance" 1}}))
+
+    (testing "with a failed produce event"
+      (test-app-response
+        {:method          :post
+         :url             "/events"
+         :body            (mock-json-event :produce :failure)
+         :content         "application/json"
+         :response-tests  [resp/is-ok-response
+                           #(resp/has-header % "Location")]
+         :db-tests       {"event" 1
+                          "event_file_instance" 1}}))
+
+    (testing "with a successful evaluate event"
+      (test-app-response
+        {:method          :post
+         :url             "/events"
+         :body            (mock-json-event :evaluate :success)
+         :content         "application/json"
+         :response-tests  [resp/is-ok-response
+                           #(resp/has-header % "Location")]
+         :db-tests       {"event" 1
+                          "event_file_instance" 1}})))
 
   (comment (testing "GET /benchmarks/:id"
     (test-app-response

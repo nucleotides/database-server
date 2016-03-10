@@ -26,13 +26,19 @@
   :allowed-methods        [:get]
   :handle-ok              (fn [_] (events/lookup db id {})))
 
+(defresource event-create [db]
+  :available-media-types  ["application/json"]
+  :allowed-methods        [:post]
+  :post!                  #(events/create db (get-in % [:request :body]))
+  :location               (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
+
 
 
 (defn api [db]
   (routes
 
     (GET  "/events/:id"           [id] (event-lookup db id))
-    (POST "/events"               []   (partial events/create     db))
+    (POST "/events"               []   (event-create db))
     (GET  "/tasks/show.json"      []   (partial tasks/show        db))
     (GET  "/tasks/:id"            [id] (partial tasks/lookup      db id))
     (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup db id))))
