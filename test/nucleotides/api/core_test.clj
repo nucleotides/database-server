@@ -101,7 +101,20 @@
          :response-tests  [resp/is-ok-response
                            #(resp/has-header % "Location")]
          :db-tests       {"event" 1
-                          "event_file_instance" 1}})))
+                          "event_file_instance" 1}}))
+
+    (testing "with an unknown metric type"
+      (test-app-response
+        {:method          :post
+         :url             "/events"
+         :body            (-> (mock-event :evaluate :success)
+                              (assoc-in [:metrics :unknown] 0)
+                              (json/write-str))
+         :content         "application/json"
+         :response-tests  [resp/is-client-error-response]
+         :db-tests       {"event" 0
+                          "event_file_instance" 0}})))
+
 
   (comment (testing "GET /benchmarks/:id"
     (test-app-response

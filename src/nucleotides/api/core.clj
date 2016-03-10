@@ -11,6 +11,7 @@
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.benchmarks       :as benchmarks]
             [nucleotides.api.tasks            :as tasks]
+            [nucleotides.api.metrics          :as metrics]
             [nucleotides.api.events           :as events]))
 
 
@@ -27,10 +28,22 @@
   :handle-ok              (fn [_] (events/lookup db id {})))
 
 (defresource event-create [db]
-  :available-media-types  ["application/json"]
-  :allowed-methods        [:post]
-  :post!                  #(events/create db (get-in % [:request :body]))
-  :location               (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
+  :available-media-types        ["application/json"]
+  :allowed-methods              [:post]
+  :processable?                 (fn [ctx]
+                                  (->> (get-in ctx [:request :body :metrics])
+                                       (keys)
+                                       (metrics/invalid-metrics)
+                                       (empty?)))
+  :handle-unprocessable-entity  (fn [ctx]
+                                  (->> (get-in ctx [:request :body :metrics])
+                                       (keys)
+                                       (metrics/invalid-metrics)
+                                       (clojure.string/join ", ")
+                                       (format "Unknown metric types in request: %s")))
+
+  :post!                        #(events/create db (get-in % [:request :body]))
+  :location                     (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
 
 
 

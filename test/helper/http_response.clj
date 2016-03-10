@@ -7,6 +7,9 @@
 (defn is-ok-response [response]
   (is (contains? #{200 201} (:status response))))
 
+(defn is-client-error-response [response]
+  (is (contains? #{422} (:status response))))
+
 (defn has-header [response header]
   (is (contains? (:headers response) header)))
 
