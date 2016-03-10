@@ -1,10 +1,10 @@
 (ns nucleotides.api.events
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
-            [clojure.string      :as st]
-            [ring.util.response  :as ring]))
+            [clojure.string      :as st]))
 
 (defqueries "nucleotides/api/events.sql")
+(defqueries "nucleotides/api/metrics.sql")
 
 (def wide->long
   (partial map
