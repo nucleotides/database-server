@@ -45,6 +45,10 @@
   :post!                        #(events/create db (get-in % [:request :body]))
   :location                     (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
 
+(defresource benchmark [db id]
+  :available-media-types  ["application/json"]
+  :allowed-methods        [:get]
+  :handle-ok              (fn [_] (benchmarks/lookup db id {})))
 
 
 (defn api [db]
@@ -52,9 +56,10 @@
 
     (GET  "/events/:id"           [id] (event-lookup db id))
     (POST "/events"               []   (event-create db))
+    (GET  "/benchmarks/:id"       [id] (benchmark db id))
+
     (GET  "/tasks/show.json"      []   (partial tasks/show        db))
-    (GET  "/tasks/:id"            [id] (partial tasks/lookup      db id))
-    (GET  "/benchmarks/:id"       [id] (partial benchmarks/lookup db id))))
+    (GET  "/tasks/:id"            [id] (partial tasks/lookup      db id))))
 
 (defn -main [& args]
   (-> {:connection (con/create-connection)}

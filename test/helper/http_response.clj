@@ -13,6 +13,20 @@
 (defn has-header [response header]
   (is (contains? (:headers response) header)))
 
+(defn is-empty-body [response]
+  (is (empty? (json/read-str (:body response)))))
+
+(defn is-not-empty-body [response]
+  (is (not (empty? (json/read-str (:body response))))))
+
+(defn is-not-complete [response]
+  (let [f #(is (= false (:complete %)))]
+    (dispatch-response-body-test f [] response)))
+
+(defn is-complete [response]
+  (let [f #(is (= true (:complete %)))]
+    (dispatch-response-body-test f [] response)))
+
 (defn dispatch-response-body-test
   ([f path response]
    (let [body (if (isa? (class (:body response)) String)
@@ -21,12 +35,6 @@
      (f (get-in body path))))
   ([f response]
    (dispatch-response-body-test f [] response)))
-
-(defn is-empty-body [response]
-  (is (empty? (json/read-str (:body response)))))
-
-(defn is-not-empty-body [response]
-  (is (not (empty? (json/read-str (:body response))))))
 
 (defn file-entry [[type_ url sha256 :as entry]]
   (into {} (map vector [:type :url :sha256] entry)))

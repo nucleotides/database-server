@@ -13,7 +13,6 @@
        (:body)
        (dissoc :benchmark_id)))
 
-
 (defn lookup
   "Finds a benchmark instance by ID"
   [db-client id _]
@@ -24,5 +23,4 @@
       (first)
       (assoc  :complete complete)
       (dissoc :task_id)
-      (assoc  :tasks tasks)
-      (ring/response))))
+      (assoc  :tasks tasks))))

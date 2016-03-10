@@ -116,11 +116,25 @@
                           "event_file_instance" 0}})))
 
 
-  (comment (testing "GET /benchmarks/:id"
-    (test-app-response
-      {:method          :get
-       :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
-       :response-tests  [resp/is-ok-response
-                         resp/is-not-empty-body
-                         bench-test/has-benchmark-fields
-                         bench-test/has-task-fields]}))))
+  (testing "GET /benchmarks/:id"
+
+    (testing "a benchmark with no events"
+      (test-app-response
+        {:method          :get
+         :url             "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+         :response-tests  [resp/is-ok-response
+                           resp/is-not-complete
+                           resp/is-not-empty-body
+                           bench-test/has-benchmark-fields
+                           bench-test/has-task-fields]}))
+
+    (testing "a completed benchmark"
+      (test-app-response
+        {:method          :get
+         :url             "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+         :fixtures        [:successful_product_event :successful_evaluate_event]
+         :response-tests  [resp/is-ok-response
+                           resp/is-not-empty-body
+                           resp/is-complete
+                           bench-test/has-benchmark-fields
+                           bench-test/has-task-fields]}))))
