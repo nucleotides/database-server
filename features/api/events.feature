@@ -121,3 +121,24 @@ Feature: Posting and getting events from the API
       | files/1/url    | "s3://url"     |
       | metrics/ng50   | 20000.0        |
       | metrics/lg50   | 10.0           |
+
+  Scenario: Posting an event with an unknown metric type
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":true,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"afd456",
+               "type":"contig_fasta"
+            }
+         ],
+         "metrics":{
+            "unknown" : 20000
+         }
+      }
+      """
+    Then the returned HTTP status code should be "422"
+    And the returned body should equal "Unknown metric types in request: unknown"
