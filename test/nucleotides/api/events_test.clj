@@ -24,7 +24,7 @@
                 (resp/does-http-body-contain [:task :success :created_at :metrics])
                 #(apply resp/contains-file-entries % [:body :files] (map resp/file-entry files))]}))
 
-(deftest nucleotides.api.events
+(comment (deftest nucleotides.api.events
 
   (testing "#create"
 
@@ -41,12 +41,4 @@
 
   (testing "#get"
 
-    (testing "an unsuccessful produce event"
-      (test-get-event
-        {:event-id 1
-         :fixtures [:unsuccessful-product-event]}))
-
-    (testing "a successful evaluate event"
-      (test-get-event
-        {:event-id 1
-         :fixtures [:successful-evaluate-event]}))))
+    )))

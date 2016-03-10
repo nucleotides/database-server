@@ -60,7 +60,7 @@
      (let [f #(dorun
                 (for [k ks]
                   (is (contains? % k))))]
-       (dispatch-response-body-test f response))))
+       (dispatch-response-body-test f path response))))
   ([ks]
    (does-http-body-contain ks [])))
 

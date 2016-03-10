@@ -54,5 +54,4 @@
         (first)
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
-        (assoc :metrics @metrics)
-        (ring/response))))
+        (assoc :metrics @metrics))))

@@ -35,6 +35,7 @@
       (for [[table length] db-tests]
         (is (= length (db/table-length table)))))))
 
+
 (deftest app
 
   (testing "GET /tasks/:id"
@@ -54,14 +55,19 @@
                          resp/is-not-empty-body
                          #(is (= (set (json/read-str (:body %))) #{1 3 5 7 9 11}))]}))
 
+
+
   (testing "GET /events/:id"
-    (test-app-response
-      {:method          :get
-       :url             "/events/1"
-       :fixtures        ["unsuccessful_product_event"]
-       :response-tests  [resp/is-ok-response
-                         resp/is-not-empty-body
-                         (resp/does-http-body-contain [:id])]}))
+    (testing "with an unsuccessful event"
+      (test-app-response
+        {:method          :get
+         :url             "/events/1"
+         :fixtures        ["unsuccessful_product_event"]
+         :response-tests  [resp/is-ok-response
+                           resp/is-not-empty-body
+                           (resp/does-http-body-contain [:task :success :created_at :metrics :id :files])]})))
+
+
 
   (testing "POST /events"
     (test-app-response

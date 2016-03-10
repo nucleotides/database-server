@@ -30,7 +30,7 @@
 (defn get-events [db-client task-id]
   "Fetch all events for a given task"
   (doall
-    (map #(:body (event/lookup db-client (:id %) {}))
+    (map #(event/lookup db-client (:id %) {})
          (events-by-task-id {:id task-id} db-client))))
 
 (defn show
