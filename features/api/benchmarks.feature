@@ -15,7 +15,7 @@ Feature: Getting benchmarks from the API by their ID
   Scenario: Getting an unknown benchmark
     When I get the url "/benchmarks/unknown"
     Then the returned HTTP status code should be "404"
-    And the returned body should equal "Unknown benchmark ID: unknown"
+    And the returned body should equal "Benchmark not found: unknown"
 
   Scenario: Getting a benchmark with no completed tasks
     When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"

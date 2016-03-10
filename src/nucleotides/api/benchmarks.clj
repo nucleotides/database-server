@@ -1,7 +1,8 @@
 (ns nucleotides.api.benchmarks
   (:require [yesql.core             :refer [defqueries]]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.tasks            :as task]))
+            [nucleotides.api.tasks            :as task]
+            [nucleotides.api.util             :as util]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
@@ -21,8 +22,5 @@
       (dissoc :task_id)
       (assoc  :tasks tasks))))
 
-(defn exists? [id]
-  (-> {:id id}
-      (benchmark-by-id {:connection (con/create-connection)})
-      (empty?)
-      (not)))
+(def exists?
+  (util/exists-fn benchmark-by-id))
