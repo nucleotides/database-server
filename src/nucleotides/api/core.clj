@@ -55,6 +55,11 @@
   :allowed-methods        [:get]
   :handle-ok              (fn [_] (tasks/show db {})))
 
+(defresource task-lookup [db id]
+  :available-media-types  ["application/json"]
+  :allowed-methods        [:get]
+  :handle-ok              (fn [_] (tasks/lookup db id {})))
+
 
 (defn api [db]
   (routes
@@ -63,8 +68,7 @@
     (POST "/events"               []   (event-create db))
     (GET  "/benchmarks/:id"       [id] (benchmark db id))
     (GET  "/tasks/show.json"      []   (task-show db))
-
-    (GET  "/tasks/:id"            [id] (partial tasks/lookup      db id))))
+    (GET  "/tasks/:id"            [id] (task-lookup db id))))
 
 (defn -main [& args]
   (-> {:connection (con/create-connection)}

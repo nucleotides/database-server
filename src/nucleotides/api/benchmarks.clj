@@ -10,8 +10,7 @@
 
 (defn fetch-task [db-client task-id]
   (-> (task/lookup db-client task-id {})
-       (:body)
-       (dissoc :benchmark_id)))
+      (dissoc :benchmark_id)))
 
 (defn lookup
   "Finds a benchmark instance by ID"

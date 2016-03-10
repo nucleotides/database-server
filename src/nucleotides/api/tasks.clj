@@ -1,7 +1,6 @@
 (ns nucleotides.api.tasks
   (:require [clojure.set            :as st]
             [yesql.core             :refer [defqueries]]
-            [ring.util.response     :as ring]
             [nucleotides.api.events :as event]))
 
 (defqueries "nucleotides/api/tasks.sql")
@@ -50,5 +49,4 @@
         (assoc :events events)
         (dissoc :benchmark_instance_id)
         (st/rename-keys {:external_id :benchmark, :task_type :type})
-        (create-submap image-keys :image)
-        (ring/response))))
+        (create-submap image-keys :image))))
