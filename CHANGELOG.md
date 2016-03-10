@@ -6,6 +6,23 @@ project adheres to Semantic Versioning(http://semver.org/).
 
 ## v0.5.4 - Date
 
+### Added
+
+  * Added checks for metric types in /event POST requests. If a request is sent
+    with an unknown metric type a 422 error code is returned, listing the
+    unknown metric types. This fixes the previous 500 error code returned when
+    an internal database error occurred.
+
+### Changed
+
+  * Internally, the API routes were converted to [liberator][] resources. This
+    allowed the separation of the code for searching the database and the code
+    for responding to HTTP requests. This overall should simplify the
+    maintenance of the project, an example is returning the appropriate 404 and
+    422 error codes included in this release.
+
+[liberator]: http://clojure-liberator.github.io/liberator/
+
 ## v0.5.3 - 2015-02-25
 
 ### Changed
@@ -26,7 +43,7 @@ project adheres to Semantic Versioning(http://semver.org/).
 
   * Reduced docker image size by switching to an Alpine Linux base image.
 
-  * Improved database perfomance by using a connection pool.
+  * Improved database performance by using a connection pool.
 
   * Updated dependency libraries to latest versions
 
