@@ -1,10 +1,10 @@
 (ns nucleotides.api.events
   (:require [yesql.core          :refer [defqueries]]
             [clojure.walk        :as walk]
-            [clojure.string      :as st]
-            [ring.util.response  :as ring]))
+            [clojure.string      :as st]))
 
 (defqueries "nucleotides/api/events.sql")
+(defqueries "nucleotides/api/metrics.sql")
 
 (def wide->long
   (partial map
@@ -36,11 +36,11 @@
 
 (defn create
   "Creates a new event from the given parameters"
-  [db-client {:keys [body] :as request}]
+  [db-client body]
   (let [id (-> body (create-event<! db-client) (:id))]
     (create-event-files db-client id (:files body))
     (create-metrics db-client id body)
-    (ring/created (str "/events/" id))))
+    {::id id}))
 
 (defn lookup
   "Finds an event by ID"
@@ -54,5 +54,4 @@
         (first)
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
-        (assoc :metrics @metrics)
-        (ring/response))))
+        (assoc :metrics @metrics))))

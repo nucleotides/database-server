@@ -13,6 +13,7 @@
                  [clojure.jdbc/clojure.jdbc-c3p0 "0.3.2"]
                  [com.rpl/specter            "0.9.2"]
                  [com.taoensso/timbre        "4.2.1"]
+                 [liberator                  "0.13"]
                  [compojure                  "1.4.0"]
                  [migratus                   "0.8.9"]
                  [org.clojure/clojure        "1.7.0"]
