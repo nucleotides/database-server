@@ -13,6 +13,9 @@ project adheres to Semantic Versioning(http://semver.org/).
     unknown metric types. This fixes the previous 500 error code returned when
     an internal database error occurred.
 
+  * Return 404 http codes when trying to get an event, task, or benchmark
+    resource which does not exist.
+
 ### Changed
 
   * Internally, the API routes were converted to [liberator][] resources. This
