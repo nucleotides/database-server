@@ -21,6 +21,8 @@
   (-write [date out]
   (json/-write (str date) out)))
 
+(def request-body
+  #(get-in % [:request :body]))
 
 (defresource event-lookup [db id]
   :available-media-types  ["application/json"]
@@ -32,13 +34,9 @@
 (defresource event-create [db]
   :available-media-types        ["application/json"]
   :allowed-methods              [:post]
-  :processable?                 (fn [ctx] (->> (get-in ctx [:request :body])
-                                               (events/valid?)))
-  :handle-unprocessable-entity  (fn [ctx]
-                                  (->> (get-in ctx [:request :body])
-                                       (events/error-message)))
-
-  :post!                        #(events/create db (get-in % [:request :body]))
+  :processable?                 (comp events/valid? request-body)
+  :handle-unprocessable-entity  (comp events/error-message request-body)
+  :post!                        (comp (partial events/create db) request-body)
   :location                     (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
 
 (defresource benchmark [db id]
