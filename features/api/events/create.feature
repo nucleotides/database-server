@@ -1,0 +1,77 @@
+Feature: Posting events to the API
+
+  Background:
+    Given a clean database
+    And the database fixtures:
+      | fixture                 |
+      | metadata                |
+      | input_data_source       |
+      | input_data_file_set     |
+      | input_data_file         |
+      | assembly_image_instance |
+      | benchmarks              |
+      | tasks                   |
+
+  Scenario: Posting an unsuccessful event
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":false,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"adef5c",
+               "type":"log"
+            }
+         ]
+      }
+      """
+    Then the returned HTTP status code should be "201"
+
+  Scenario: Posting a successful event
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":true,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"adef5c",
+               "type":"log"
+            },
+            {
+               "url":"s3://url",
+               "sha256":"afd456",
+               "type":"contig_fasta"
+            }
+         ],
+         "metrics":{
+            "ng50":20000,
+            "lg50":10
+         }
+      }
+      """
+    Then the returned HTTP status code should be "201"
+
+  Scenario: Posting an event with an unknown metric type
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":true,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"afd456",
+               "type":"contig_fasta"
+            }
+         ],
+         "metrics":{
+            "unknown" : 20000
+         }
+      }
+      """
+    Then the returned HTTP status code should be "422"
+    And the returned body should equal "Unknown metric types in request: unknown"
