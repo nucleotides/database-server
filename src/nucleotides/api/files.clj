@@ -14,3 +14,8 @@
                      (map :name)
                      (into #{}))]
     (clojure.set/difference (set (map to-str xs)) allowed)))
+
+(defn create-event-files [db-client event-id files]
+  (dorun
+    (for [f files]
+      (create-event-file-instance<! (assoc f :event_id event-id) db-client))))
