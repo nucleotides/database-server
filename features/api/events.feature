@@ -12,6 +12,11 @@ Feature: Posting and getting events from the API
       | benchmarks              |
       | tasks                   |
 
+  Scenario: Getting an unknown event
+    When I get the url "/events/1000"
+    Then the returned HTTP status code should be "404"
+    And the returned body should equal "Event not found: 1000"
+
   Scenario: Posting an unsuccessful event
     When I post to "/events" with the data:
       """

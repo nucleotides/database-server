@@ -1,7 +1,8 @@
 (ns nucleotides.api.events
-  (:require [yesql.core          :refer [defqueries]]
-            [clojure.walk        :as walk]
-            [clojure.string      :as st]))
+  (:require [yesql.core            :refer [defqueries]]
+            [clojure.walk          :as walk]
+            [clojure.string        :as st]
+            [nucleotides.api.util  :as util]))
 
 (defqueries "nucleotides/api/events.sql")
 (defqueries "nucleotides/api/metrics.sql")
@@ -55,3 +56,6 @@
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
         (assoc :metrics @metrics))))
+
+(def exists?
+  (util/integer-id-exists-fn? get-event))

@@ -91,7 +91,39 @@
         {:fixtures  [:successful-product-event :successful-evaluate-event]
          :expected  [3 5 7 9 11]})))
 
-  (testing "GET /events/:id"
+
+
+   (testing "GET /tasks/:id"
+
+     (test-app-response
+       {:method          :get
+        :url             "/tasks/1000"
+        :response-tests  [resp/is-client-error-response
+                          (resp/has-body "Task not found: 1000")]})
+
+     (test-app-response
+       {:method          :get
+        :url             "/tasks/unknown"
+        :response-tests  [resp/is-client-error-response
+                          (resp/has-body "Task not found: unknown")]}))
+
+
+
+   (testing "GET /events/:id"
+
+    (testing "a valid unknown event id"
+      (test-app-response
+        {:method          :get
+         :url             "/events/1000"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Event not found: 1000")]}))
+
+    (testing "an invalid unknown event id"
+      (test-app-response
+        {:method          :get
+         :url             "/events/unknown"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Event not found: unknown")]}))
 
       (testing "an incomplete produce task by its ID"
         (test-get-task
@@ -167,6 +199,13 @@
 
 
   (testing "GET /benchmarks/:id"
+
+    (testing "an unknown benchmark id"
+      (test-app-response
+        {:method          :get
+         :url             "/benchmarks/unknown"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Benchmark not found: unknown")]}))
 
     (testing "a benchmark with no events"
       (test-app-response

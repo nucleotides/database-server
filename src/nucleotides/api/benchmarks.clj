@@ -1,10 +1,8 @@
 (ns nucleotides.api.benchmarks
   (:require [yesql.core             :refer [defqueries]]
-            [clojure.walk           :as walk]
-            [clojure.set            :as st]
-            [ring.util.response     :as ring]
-            [taoensso.timbre        :as log]
-            [nucleotides.api.tasks  :as task]))
+            [nucleotides.database.connection  :as con]
+            [nucleotides.api.tasks            :as task]
+            [nucleotides.api.util             :as util]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
@@ -23,3 +21,6 @@
       (assoc  :complete complete)
       (dissoc :task_id)
       (assoc  :tasks tasks))))
+
+(def exists?
+  (util/exists-fn benchmark-by-id))

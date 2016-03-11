@@ -7,6 +7,20 @@
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.events           :as ev]))
+            [nucleotides.api.events           :as event]))
 
-(deftest nucleotides.api.events)
+
+(use-fixtures :each (fn [f]
+                      (do
+                        (db/empty-database)
+                        (apply fix/load-fixture (concat fix/base-fixtures [:unsuccessful-product-event]))
+                        (f))))
+
+(deftest nucleotides.api.events
+
+  (testing "#exists?"
+    (is (true?  (event/exists? 1)))
+    (is (true?  (event/exists? "1")))
+    (is (false? (event/exists? 1000)))
+    (is (false? (event/exists? "1000")))
+    (is (false? (event/exists? "unknown")))))

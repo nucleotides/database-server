@@ -25,3 +25,15 @@
                    (for [k [:id :type :complete :image :inputs]]
                      (is (contains? task k)))))))]
     (partial resp/dispatch-response-body-test f [:tasks])))
+
+(deftest nucleotides.api.benchmarks
+
+  (use-fixtures :each (fn [f]
+                        (do
+                          (db/empty-database)
+                          (apply fix/load-fixture fix/base-fixtures)
+                          (f))))
+
+  (testing "#exists?"
+    (is (true?  (bench/exists? "453e406dcee4d18174d4ff623f52dcd8")))
+    (is (false? (bench/exists? "unknown")))))

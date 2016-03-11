@@ -25,6 +25,8 @@
 (defresource event-lookup [db id]
   :available-media-types  ["application/json"]
   :allowed-methods        [:get]
+  :exists?                (fn [_] (events/exists? id))
+  :handle-not-found       (fn [_] (str "Event not found: " id))
   :handle-ok              (fn [_] (events/lookup db id {})))
 
 (defresource event-create [db]
@@ -48,6 +50,8 @@
 (defresource benchmark [db id]
   :available-media-types  ["application/json"]
   :allowed-methods        [:get]
+  :exists?                (fn [_] (benchmarks/exists? id))
+  :handle-not-found       (fn [_] (str "Benchmark not found: " id))
   :handle-ok              (fn [_] (benchmarks/lookup db id {})))
 
 (defresource task-show [db]
@@ -58,6 +62,8 @@
 (defresource task-lookup [db id]
   :available-media-types  ["application/json"]
   :allowed-methods        [:get]
+  :exists?                (fn [_] (tasks/exists? id))
+  :handle-not-found       (fn [_] (str "Task not found: " id))
   :handle-ok              (fn [_] (tasks/lookup db id {})))
 
 
