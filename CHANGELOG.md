@@ -8,10 +8,10 @@ project adheres to Semantic Versioning(http://semver.org/).
 
 ### Added
 
-  * Added checks for metric types in /event POST requests. If a request is sent
-    with an unknown metric type a 422 error code is returned, listing the
-    unknown metric types. This fixes the previous 500 error code returned when
-    an internal database error occurred.
+  * Added checks for metric and file types in /event POST requests. If a
+    request is sent with an unknown metric or file type a 422 error code is
+    returned, listing the unknown values. This fixes the previous 500 error
+    code returned when an internal database error occurred.
 
   * Return 404 http codes when trying to get an event, task, or benchmark
     resource which does not exist.

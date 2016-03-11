@@ -1,8 +1,11 @@
 (ns nucleotides.api.events
   (:require [yesql.core            :refer [defqueries]]
-            [clojure.walk          :as walk]
-            [clojure.string        :as st]
-            [nucleotides.api.util  :as util]))
+
+            [clojure.walk             :as walk]
+            [clojure.string           :as st]
+            [nucleotides.api.metrics  :as metrics]
+            [nucleotides.api.files    :as files]
+            [nucleotides.api.util     :as util]))
 
 (defqueries "nucleotides/api/events.sql")
 (defqueries "nucleotides/api/metrics.sql")
@@ -59,3 +62,24 @@
 
 (def exists?
   (util/integer-id-exists-fn? get-event))
+
+(defn event-validation-errors [event]
+  {"metrics"    (->> (:metrics event)
+                     (keys)
+                     (metrics/invalid-metrics))
+
+  "file types"  (->> (:files event)
+                      (map :type)
+                      (files/invalid-files))})
+
+(defn valid? [event]
+  (every? empty? (vals (event-validation-errors event))))
+
+(defn error-message [event]
+  (let [format-errors (fn [[k v]]
+                        (format "Unknown %s in request: %s" k (st/join ", " v)))]
+    (->> (event-validation-errors event)
+         (filter (comp not empty? last))
+         (map format-errors)
+         (st/join "\n"))))
+

@@ -7,6 +7,7 @@
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
+            [nucleotides.api.metrics          :as metrics]
             [nucleotides.api.events           :as event]))
 
 
@@ -23,4 +24,18 @@
     (is (true?  (event/exists? "1")))
     (is (false? (event/exists? 1000)))
     (is (false? (event/exists? "1000")))
-    (is (false? (event/exists? "unknown")))))
+    (is (false? (event/exists? "unknown"))))
+
+  (testing "valid?"
+
+    (is (true? (event/valid? (mock-event :produce :failure))))
+    (is (true? (event/valid? (mock-event :produce :success))))
+    (is (true? (event/valid? (mock-event :evaluate :success))))
+    (is (false? (event/valid? (mock-event :evaluate :invalid-file))))
+    (is (false? (event/valid? (mock-event :evaluate :invalid-metric)))))
+
+  (testing "#error-message"
+    (is (= "Unknown file types in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-file))))
+    (is (= "Unknown metrics in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-metric))))))

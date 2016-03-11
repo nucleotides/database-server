@@ -185,17 +185,27 @@
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
+    (testing "with an unknown file type"
+      (test-app-response
+        {:method          :post
+         :url             "/events"
+         :body            (mock-json-event :evaluate :invalid-file)
+         :content         "application/json"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Unknown file types in request: unknown")]
+         :db-tests        {"event" 0
+                           "event_file_instance" 0}}))
+
     (testing "with an unknown metric type"
       (test-app-response
         {:method          :post
          :url             "/events"
-         :body            (-> (mock-event :evaluate :success)
-                              (assoc-in [:metrics :unknown] 0)
-                              (json/write-str))
+         :body            (mock-json-event :evaluate :invalid-metric)
          :content         "application/json"
-         :response-tests  [resp/is-client-error-response]
-         :db-tests       {"event" 0
-                          "event_file_instance" 0}})))
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Unknown metrics in request: unknown")]
+         :db-tests        {"event" 0
+                           "event_file_instance" 0}})))
 
 
   (testing "GET /benchmarks/:id"

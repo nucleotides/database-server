@@ -27,7 +27,13 @@
                                :files    [{:url     "s3://url"
                                            :sha256  "log_file"
                                            :type    "log"}]
-                               :metrics  {"ng50" 20000, "lg50" 5}}))
+                               :metrics  {"ng50" 20000, "lg50" 5}}
+
+         [:evaluate :invalid-metric] (-> (mock-event :evaluate :success)
+                                         (assoc-in [:metrics :unknown] 0))
+
+         [:evaluate :invalid-file]   (-> (mock-event :evaluate :success)
+                                         (assoc-in [:files 0 :type] "unknown"))))
 
 (def mock-json-event
   (comp json/write-str mock-event))
