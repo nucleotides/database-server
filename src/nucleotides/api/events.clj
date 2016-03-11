@@ -74,3 +74,12 @@
 
 (defn valid? [event]
   (every? empty? (vals (event-validation-errors event))))
+
+(defn error-message [event]
+  (let [format-errors (fn [[k v]]
+                        (format "Unknown %s in request: %s" k (st/join ", " v)))]
+    (->> (event-validation-errors event)
+         (filter (comp not empty? last))
+         (map format-errors)
+         (st/join "\n"))))
+

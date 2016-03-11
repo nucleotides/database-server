@@ -32,4 +32,10 @@
     (is (true? (event/valid? (mock-event :produce :success))))
     (is (true? (event/valid? (mock-event :evaluate :success))))
     (is (false? (event/valid? (mock-event :evaluate :invalid-file))))
-    (is (false? (event/valid? (mock-event :evaluate :invalid-metric))))))
+    (is (false? (event/valid? (mock-event :evaluate :invalid-metric)))))
+
+  (testing "#error-message"
+    (is (= "Unknown file types in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-file))))
+    (is (= "Unknown metrics in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-metric))))))

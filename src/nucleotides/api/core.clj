@@ -32,17 +32,11 @@
 (defresource event-create [db]
   :available-media-types        ["application/json"]
   :allowed-methods              [:post]
-  :processable?                 (fn [ctx]
-                                  (->> (get-in ctx [:request :body :metrics])
-                                       (keys)
-                                       (metrics/invalid-metrics)
-                                       (empty?)))
+  :processable?                 (fn [ctx] (->> (get-in ctx [:request :body])
+                                               (events/valid?)))
   :handle-unprocessable-entity  (fn [ctx]
-                                  (->> (get-in ctx [:request :body :metrics])
-                                       (keys)
-                                       (metrics/invalid-metrics)
-                                       (clojure.string/join ", ")
-                                       (format "Unknown metric types in request: %s")))
+                                  (->> (get-in ctx [:request :body])
+                                       (events/error-message)))
 
   :post!                        #(events/create db (get-in % [:request :body]))
   :location                     (fn [ctx] {:location (format "/events/%s" (::id ctx))}))

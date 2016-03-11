@@ -74,4 +74,22 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "422"
-    And the returned body should equal "Unknown metric types in request: unknown"
+    And the returned body should equal "Unknown metrics in request: unknown"
+
+  Scenario: Posting an event with an unknown file type
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":false,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"afd456",
+               "type":"unknown_file_type"
+            }
+         ]
+      }
+      """
+    Then the returned HTTP status code should be "422"
+    And the returned body should equal "Unknown file types in request: unknown_file_type"
