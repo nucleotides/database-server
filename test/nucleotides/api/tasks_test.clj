@@ -5,7 +5,7 @@
             [helper.fixture                   :as fix]
             [helper.event                     :as ev]
             [helper.image                     :as image]
-            [nucleotides.database.connection  :as con]
+            [helper.database                  :as db]
             [nucleotides.api.tasks            :as task]))
 
 
@@ -24,6 +24,17 @@
       (apply resp/contains-event-entries response path events))))
 
 
+(use-fixtures :each (fn [f]
+                      (do
+                        (db/empty-database)
+                        (apply fix/load-fixture fix/base-fixtures)
+                        (f))))
+
 (deftest nucleotides.api.tasks
 
-  )
+  (testing "#exists?"
+    (is (true?  (task/exists? 1)))
+    (is (true?  (task/exists? "1")))
+    (is (false? (task/exists? 1000)))
+    (is (false? (task/exists? "1000")))
+    (is (false? (task/exists? "unknown")))))

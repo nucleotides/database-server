@@ -91,7 +91,25 @@
         {:fixtures  [:successful-product-event :successful-evaluate-event]
          :expected  [3 5 7 9 11]})))
 
-  (testing "GET /events/:id"
+
+
+   (testing "GET /tasks/:id"
+
+     (test-app-response
+       {:method          :get
+        :url             "/tasks/1000"
+        :response-tests  [resp/is-client-error-response
+                          (resp/has-body "Task not found: 1000")]})
+
+     (test-app-response
+       {:method          :get
+        :url             "/tasks/unknown"
+        :response-tests  [resp/is-client-error-response
+                          (resp/has-body "Task not found: unknown")]}))
+
+
+
+   (testing "GET /events/:id"
 
     (testing "a valid unknown event id"
       (test-app-response

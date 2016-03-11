@@ -1,7 +1,8 @@
 (ns nucleotides.api.tasks
   (:require [clojure.set            :as st]
             [yesql.core             :refer [defqueries]]
-            [nucleotides.api.events :as event]))
+            [nucleotides.api.events :as event]
+            [nucleotides.api.util   :as util]))
 
 (defqueries "nucleotides/api/tasks.sql")
 (defqueries "nucleotides/api/benchmarks.sql")
@@ -50,3 +51,6 @@
         (dissoc :benchmark_instance_id)
         (st/rename-keys {:external_id :benchmark, :task_type :type})
         (create-submap image-keys :image))))
+
+(def exists?
+  (util/integer-id-exists-fn? task-by-id))

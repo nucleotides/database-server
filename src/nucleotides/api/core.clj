@@ -62,6 +62,8 @@
 (defresource task-lookup [db id]
   :available-media-types  ["application/json"]
   :allowed-methods        [:get]
+  :exists?                (fn [_] (tasks/exists? id))
+  :handle-not-found       (fn [_] (str "Task not found: " id))
   :handle-ok              (fn [_] (tasks/lookup db id {})))
 
 

@@ -57,8 +57,5 @@
         (assoc :files @files)
         (assoc :metrics @metrics))))
 
-(defn exists? [id]
-  (every?
-    #(true? (% id))
-    [#(not (nil? (re-find (re-pattern "^\\d+$") (str %))))
-     (util/exists-fn get-event)]))
+(def exists?
+  (util/integer-id-exists-fn? get-event))
