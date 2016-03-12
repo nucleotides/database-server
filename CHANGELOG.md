@@ -13,8 +13,17 @@ project adheres to Semantic Versioning(http://semver.org/).
     returned, listing the unknown values. This fixes the previous 500 error
     code returned when an internal database error occurred.
 
-  * Return 404 http codes when trying to get an event, task, or benchmark
+  * Return 404 HTTP codes when trying to get an event, task, or benchmark
     resource which does not exist.
+
+### Fixed
+
+  * Handle identical files in POST requests. There exists the possibility that
+    two identical files will be created during benchmarking. These files will
+    have identical SHA256 digests, which a database error as the SHA256 is the
+    primary key in the file table. This fix handles identical files by skipping
+    the creation, and instead linking the existing file to the new event table
+    entry.
 
 ### Changed
 
