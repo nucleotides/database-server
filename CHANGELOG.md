@@ -3,8 +3,7 @@
 All notable changes to this project will be documented in this file. This
 project adheres to Semantic Versioning(http://semver.org/).
 
-
-## v0.5.4 - Date
+## v0.5.4 - 2015-03-11
 
 ### Added
 
