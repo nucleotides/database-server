@@ -1,7 +1,7 @@
 # Change Log
 
 All notable changes to this project will be documented in this file. This
-project adheres to Semantic Versioning(http://semver.org/).
+project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v0.5.4 - 2015-03-11
 
@@ -46,7 +46,8 @@ project adheres to Semantic Versioning(http://semver.org/).
 
 ### Added
 
-  * GET /task/:id not returns all the events associated with that task.
+  * GET /task/:id now returns all the events associated with that task. This
+    allows the completed events to be viewed for each task.
 
 ## v0.5.1 - 2015-02-12
 
