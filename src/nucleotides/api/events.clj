@@ -39,7 +39,7 @@
   (let [id (-> body (create-event<! db-client) (:id))]
     (files/create-event-files db-client id (:files body))
     (create-metrics db-client id body)
-    {::id id}))
+    id))
 
 (defn lookup
   "Finds an event by ID"

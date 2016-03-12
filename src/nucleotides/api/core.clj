@@ -36,8 +36,8 @@
   :allowed-methods              [:post]
   :processable?                 (comp events/valid? request-body)
   :handle-unprocessable-entity  (comp events/error-message request-body)
-  :post!                        (comp (partial events/create db) request-body)
-  :location                     (fn [ctx] {:location (format "/events/%s" (::id ctx))}))
+  :post!                        (comp #(hash-map ::id %) (partial events/create db) request-body)
+  :location                     (fn [ctx] (format "/events/%s" (::id ctx))))
 
 (defresource benchmark [db id]
   :available-media-types  ["application/json"]

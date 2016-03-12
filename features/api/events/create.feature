@@ -28,6 +28,9 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/1 |
 
   Scenario: Posting a successful event
     When I post to "/events" with the data:
@@ -54,6 +57,9 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/1 |
 
   Scenario: Posting an event with an unknown metric type
     When I post to "/events" with the data:
@@ -124,3 +130,6 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/2 |

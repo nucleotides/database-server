@@ -171,7 +171,7 @@
          :body            (mock-json-event :produce :failure)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location")]
+                           #(resp/has-header % "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -182,7 +182,7 @@
          :body            (mock-json-event :evaluate :success)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location")]
+                           #(resp/has-header % "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -220,7 +220,7 @@
           (merge params
                  {:keep-db?        true
                   :response-tests  [resp/is-ok-response
-                                    #(resp/has-header % "Location")]
+                                    #(resp/has-header % "Location" "/events/2")]
                   :db-tests       {"event" 2
                                    "event_file_instance" 2}})))))
 
