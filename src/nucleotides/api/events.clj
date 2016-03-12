@@ -1,10 +1,14 @@
 (ns nucleotides.api.events
-  (:require [yesql.core          :refer [defqueries]]
-            [clojure.walk        :as walk]
-            [clojure.string      :as st]
-            [ring.util.response  :as ring]))
+  (:require [yesql.core            :refer [defqueries]]
+
+            [clojure.walk             :as walk]
+            [clojure.string           :as st]
+            [nucleotides.api.metrics  :as metrics]
+            [nucleotides.api.files    :as files]
+            [nucleotides.api.util     :as util]))
 
 (defqueries "nucleotides/api/events.sql")
+(defqueries "nucleotides/api/metrics.sql")
 
 (def wide->long
   (partial map
@@ -21,11 +25,6 @@
     flatten
     (partial map vals)))
 
-(defn create-event-files [db-client event-id files]
-  (dorun
-    (for [f files]
-      (create-event-file-instance<! (assoc f :event_id event-id) db-client))))
-
 (defn- create-metrics [db-client id {:keys [metrics]}]
   (if (not (nil? metrics))
     (->> metrics
@@ -36,17 +35,17 @@
 
 (defn create
   "Creates a new event from the given parameters"
-  [db-client {:keys [body] :as request}]
+  [db-client body]
   (let [id (-> body (create-event<! db-client) (:id))]
-    (create-event-files db-client id (:files body))
+    (files/create-event-files db-client id (:files body))
     (create-metrics db-client id body)
-    (ring/created (str "/events/" id))))
+    id))
 
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
   (let [id     {:id id}
-        files   (future (get-event-file-instance id db-client))
+        files   (future (files/get-event-file-instance id db-client))
         metrics (->> (metrics-by-event-id id db-client)
                      (long->wide)
                      (future))]
@@ -54,5 +53,27 @@
         (first)
         (clojure.set/rename-keys {:task_id :task})
         (assoc :files @files)
-        (assoc :metrics @metrics)
-        (ring/response))))
+        (assoc :metrics @metrics))))
+
+(def exists?
+  (util/integer-id-exists-fn? get-event))
+
+(defn event-validation-errors [event]
+  {"metrics"    (->> (:metrics event)
+                     (keys)
+                     (metrics/invalid-metrics))
+
+  "file types"  (->> (:files event)
+                      (map :type)
+                      (files/invalid-files))})
+
+(defn valid? [event]
+  (every? empty? (vals (event-validation-errors event))))
+
+(defn error-message [event]
+  (let [format-errors (fn [[k v]]
+                        (format "Unknown %s in request: %s" k (st/join ", " v)))]
+    (->> (event-validation-errors event)
+         (filter (comp not empty? last))
+         (map format-errors)
+         (st/join "\n"))))

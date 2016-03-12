@@ -1,8 +1,8 @@
 (ns nucleotides.api.tasks
   (:require [clojure.set            :as st]
             [yesql.core             :refer [defqueries]]
-            [ring.util.response     :as ring]
-            [nucleotides.api.events :as event]))
+            [nucleotides.api.events :as event]
+            [nucleotides.api.util   :as util]))
 
 (defqueries "nucleotides/api/tasks.sql")
 (defqueries "nucleotides/api/benchmarks.sql")
@@ -30,15 +30,14 @@
 (defn get-events [db-client task-id]
   "Fetch all events for a given task"
   (doall
-    (map #(:body (event/lookup db-client (:id %) {}))
+    (map #(event/lookup db-client (:id %) {})
          (events-by-task-id {:id task-id} db-client))))
 
 (defn show
   "Returns all incomplete tasks"
   [db-client _]
   (->> (incomplete-tasks {} db-client)
-       (map :id)
-       (ring/response)))
+       (map :id)))
 
 (defn lookup
   "Gets a single task entry by its ID"
@@ -51,5 +50,7 @@
         (assoc :events events)
         (dissoc :benchmark_instance_id)
         (st/rename-keys {:external_id :benchmark, :task_type :type})
-        (create-submap image-keys :image)
-        (ring/response))))
+        (create-submap image-keys :image))))
+
+(def exists?
+  (util/integer-id-exists-fn? task-by-id))

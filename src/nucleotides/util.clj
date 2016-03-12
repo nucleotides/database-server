@@ -1,5 +1,6 @@
 (ns nucleotides.util
-  (:require [taoensso.timbre :as log]))
+  (:require
+    [taoensso.timbre :as log]))
 
 (defn get-env-var [v]
   (let [value (System/getenv v)]

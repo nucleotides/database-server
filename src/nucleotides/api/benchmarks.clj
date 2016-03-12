@@ -1,18 +1,14 @@
 (ns nucleotides.api.benchmarks
   (:require [yesql.core             :refer [defqueries]]
-            [clojure.walk           :as walk]
-            [clojure.set            :as st]
-            [ring.util.response     :as ring]
-            [taoensso.timbre        :as log]
-            [nucleotides.api.tasks  :as task]))
+            [nucleotides.database.connection  :as con]
+            [nucleotides.api.tasks            :as task]
+            [nucleotides.api.util             :as util]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
 
 (defn fetch-task [db-client task-id]
   (-> (task/lookup db-client task-id {})
-       (:body)
-       (dissoc :benchmark_id)))
-
+      (dissoc :benchmark_id)))
 
 (defn lookup
   "Finds a benchmark instance by ID"
@@ -24,5 +20,7 @@
       (first)
       (assoc  :complete complete)
       (dissoc :task_id)
-      (assoc  :tasks tasks)
-      (ring/response))))
+      (assoc  :tasks tasks))))
+
+(def exists?
+  (util/exists-fn benchmark-by-id))

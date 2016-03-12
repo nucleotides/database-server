@@ -7,46 +7,35 @@
 
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.events           :as ev]))
+            [nucleotides.api.metrics          :as metrics]
+            [nucleotides.api.events           :as event]))
 
-(defn test-create-event [event]
-  (resp/test-response
-    {:api-call #(ev/create {:connection (con/create-connection)} {:body event})
-     :fixtures fix/base-fixtures
-     :tests    [resp/is-ok-response
-                #(resp/has-header % "Location")]}))
 
-(defn test-get-event [{:keys [event-id fixtures files]}]
-  (resp/test-response
-    {:api-call #(ev/lookup {:connection (con/create-connection)} event-id {})
-     :fixtures (concat fix/base-fixtures fixtures)
-     :tests    [resp/is-ok-response
-                (resp/does-http-body-contain [:task :success :created_at :metrics])
-                #(apply resp/contains-file-entries % [:body :files] (map resp/file-entry files))]}))
+(use-fixtures :each (fn [f]
+                      (do
+                        (db/empty-database)
+                        (apply fix/load-fixture (concat fix/base-fixtures [:unsuccessful-product-event]))
+                        (f))))
 
 (deftest nucleotides.api.events
 
-  (testing "#create"
+  (testing "#exists?"
+    (is (true?  (event/exists? 1)))
+    (is (true?  (event/exists? "1")))
+    (is (false? (event/exists? 1000)))
+    (is (false? (event/exists? "1000")))
+    (is (false? (event/exists? "unknown"))))
 
-    (testing "with an unsuccessful produce event"
-      (test-create-event (mock-event :produce :failure))
-      (is (= 1 (db/table-length "event")))
-      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance"))))))
+  (testing "valid?"
 
-    (testing "with an unsuccessful produce event"
-      (test-create-event (mock-event :evaluate :success))
-      (is (= 1 (db/table-length "event")))
-      (is (= 2 (db/table-length "metric_instance")))
-      (is (= "log_file" (:sha256 (last (db/table-entries "file_instance")))))))
+    (is (true? (event/valid? (mock-event :produce :failure))))
+    (is (true? (event/valid? (mock-event :produce :success))))
+    (is (true? (event/valid? (mock-event :evaluate :success))))
+    (is (false? (event/valid? (mock-event :evaluate :invalid-file))))
+    (is (false? (event/valid? (mock-event :evaluate :invalid-metric)))))
 
-  (testing "#get"
-
-    (testing "an unsuccessful produce event"
-      (test-get-event
-        {:event-id 1
-         :fixtures [:unsuccessful-product-event]}))
-
-    (testing "a successful evaluate event"
-      (test-get-event
-        {:event-id 1
-         :fixtures [:successful-evaluate-event]}))))
+  (testing "#error-message"
+    (is (= "Unknown file types in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-file))))
+    (is (= "Unknown metrics in request: unknown"
+           (event/error-message (mock-event :evaluate :invalid-metric))))))

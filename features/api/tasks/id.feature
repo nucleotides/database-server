@@ -12,6 +12,11 @@ Feature: Getting benchmarking tasks by ID
       | benchmarks              |
       | tasks                   |
 
+  Scenario: Getting an unknown task
+    When I get the url "/tasks/1000"
+    Then the returned HTTP status code should be "404"
+    And the returned body should equal "Task not found: 1000"
+
   Scenario: Getting an incomplete produce task by ID
     When I get the url "/tasks/1"
     Then the returned HTTP status code should be "200"

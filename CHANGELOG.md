@@ -1,7 +1,38 @@
 # Change Log
 
 All notable changes to this project will be documented in this file. This
-project adheres to Semantic Versioning(http://semver.org/).
+project adheres to [Semantic Versioning](http://semver.org/).
+
+## v0.5.4 - 2015-03-11
+
+### Added
+
+  * Added checks for metric and file types in /event POST requests. If a
+    request is sent with an unknown metric or file type a 422 error code is
+    returned, listing the unknown values. This fixes the previous 500 error
+    code returned when an internal database error occurred.
+
+  * Return 404 HTTP codes when trying to get an event, task, or benchmark
+    resource which does not exist.
+
+### Fixed
+
+  * Handle identical files in POST requests. There exists the possibility that
+    two identical files will be created during benchmarking. These files will
+    have identical SHA256 digests, which a database error as the SHA256 is the
+    primary key in the file table. This fix handles identical files by skipping
+    the creation, and instead linking the existing file to the new event table
+    entry.
+
+### Changed
+
+  * Internally, the API routes were converted to [liberator][] resources. This
+    allowed the separation of the code for searching the database and the code
+    for responding to HTTP requests. This overall should simplify the
+    maintenance of the project, an example is returning the appropriate 404 and
+    422 error codes included in this release.
+
+[liberator]: http://clojure-liberator.github.io/liberator/
 
 ## v0.5.3 - 2015-02-25
 
@@ -15,7 +46,8 @@ project adheres to Semantic Versioning(http://semver.org/).
 
 ### Added
 
-  * GET /task/:id not returns all the events associated with that task.
+  * GET /task/:id now returns all the events associated with that task. This
+    allows the completed events to be viewed for each task.
 
 ## v0.5.1 - 2015-02-12
 
@@ -23,7 +55,7 @@ project adheres to Semantic Versioning(http://semver.org/).
 
   * Reduced docker image size by switching to an Alpine Linux base image.
 
-  * Improved database perfomance by using a connection pool.
+  * Improved database performance by using a connection pool.
 
   * Updated dependency libraries to latest versions
 
