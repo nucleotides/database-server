@@ -33,7 +33,10 @@
                                          (assoc-in [:metrics :unknown] 0))
 
          [:evaluate :invalid-file]   (-> (mock-event :evaluate :success)
-                                         (assoc-in [:files 0 :type] "unknown"))))
+                                         (assoc-in [:files 0 :type] "unknown"))
+
+         [:produce :duplicate-file]  (-> (mock-event :produce :success)
+                                         (assoc-in [:files 1 :sha256] "66b8d"))))
 
 (def mock-json-event
   (comp json/write-str mock-event))

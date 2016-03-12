@@ -25,11 +25,6 @@
     flatten
     (partial map vals)))
 
-(defn create-event-files [db-client event-id files]
-  (dorun
-    (for [f files]
-      (create-event-file-instance<! (assoc f :event_id event-id) db-client))))
-
 (defn- create-metrics [db-client id {:keys [metrics]}]
   (if (not (nil? metrics))
     (->> metrics
@@ -42,15 +37,15 @@
   "Creates a new event from the given parameters"
   [db-client body]
   (let [id (-> body (create-event<! db-client) (:id))]
-    (create-event-files db-client id (:files body))
+    (files/create-event-files db-client id (:files body))
     (create-metrics db-client id body)
-    {::id id}))
+    id))
 
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
   (let [id     {:id id}
-        files   (future (get-event-file-instance id db-client))
+        files   (future (files/get-event-file-instance id db-client))
         metrics (->> (metrics-by-event-id id db-client)
                      (long->wide)
                      (future))]
@@ -82,4 +77,3 @@
          (filter (comp not empty? last))
          (map format-errors)
          (st/join "\n"))))
-

@@ -28,6 +28,9 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/1 |
 
   Scenario: Posting a successful event
     When I post to "/events" with the data:
@@ -54,6 +57,9 @@ Feature: Posting events to the API
       }
       """
     Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/1 |
 
   Scenario: Posting an event with an unknown metric type
     When I post to "/events" with the data:
@@ -93,3 +99,37 @@ Feature: Posting events to the API
       """
     Then the returned HTTP status code should be "422"
     And the returned body should equal "Unknown file types in request: unknown_file_type"
+
+  Scenario: Posting two identical events
+    When I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":true,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"adef5c",
+               "type":"log"
+            }
+         ]
+      }
+      """
+    And I post to "/events" with the data:
+      """
+      {
+         "task":1,
+         "success":true,
+         "files":[
+            {
+               "url":"s3://url",
+               "sha256":"adef5c",
+               "type":"log"
+            }
+         ]
+      }
+      """
+    Then the returned HTTP status code should be "201"
+    And the returned HTTP headers should include:
+      | header   | value     |
+      | Location | /events/2 |

@@ -16,7 +16,6 @@
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.core             :as app]))
 
-
 (defn http-request
   "Create a mock request to the API"
   [{:keys [method url params body content] :or {params {}}}]
@@ -25,9 +24,11 @@
       (mock/content-type content)
       ((md/middleware (app/api {:connection (con/create-connection)})))))
 
-(defn test-app-response [{:keys [db-tests response-tests fixtures] :as m}]
-  (db/empty-database)
-  (apply fix/load-fixture (concat fix/base-fixtures fixtures))
+(defn test-app-response [{:keys [db-tests response-tests fixtures keep-db?] :as m}]
+  (if (not keep-db?)
+    (do
+      (db/empty-database)
+      (apply fix/load-fixture (concat fix/base-fixtures fixtures))))
   (let [response (http-request m)]
     (dorun
       (for [t response-tests]
@@ -170,7 +171,7 @@
          :body            (mock-json-event :produce :failure)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location")]
+                           #(resp/has-header % "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -181,7 +182,7 @@
          :body            (mock-json-event :evaluate :success)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location")]
+                           #(resp/has-header % "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -205,7 +206,23 @@
          :response-tests  [resp/is-client-error-response
                            (resp/has-body "Unknown metrics in request: unknown")]
          :db-tests        {"event" 0
-                           "event_file_instance" 0}})))
+                           "event_file_instance" 0}}))
+
+    (testing "posting the same event twice"
+      (let [params {:method   :post
+                    :url      "/events"
+                    :body     (mock-json-event :produce :failure)
+                    :content  "application/json"}]
+        (db/empty-database)
+        (apply fix/load-fixture fix/base-fixtures)
+        (http-request params)
+        (test-app-response
+          (merge params
+                 {:keep-db?        true
+                  :response-tests  [resp/is-ok-response
+                                    #(resp/has-header % "Location" "/events/2")]
+                  :db-tests       {"event" 2
+                                   "event_file_instance" 2}})))))
 
 
   (testing "GET /benchmarks/:id"

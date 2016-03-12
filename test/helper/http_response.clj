@@ -22,8 +22,10 @@
 (defn is-client-error-response [response]
   (is (contains? #{404 422} (:status response))))
 
-(defn has-header [response header]
-  (is (contains? (:headers response) header)))
+(defn has-header [response header value]
+  (let [hdrs (:headers response)]
+    (is (contains? hdrs header))
+    (is (= value (hdrs header)))))
 
 (defn has-body [body]
   #(is (= body (:body %))))

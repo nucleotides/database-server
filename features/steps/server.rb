@@ -40,6 +40,16 @@ Then(/^the returned body should match "(.*?)"$/) do |re|
   expect(@response.body.strip).to match(re)
 end
 
+# http://stackoverflow.com/a/14353011/91144
+Then(/^the returned HTTP headers should include:$/) do |table|
+  _, *http_headers = @response.header_str.split(/[\r\n]+/).map(&:strip)
+  http_headers = Hash[http_headers.flat_map{ |s| s.scan(/^(\S+): (.+)/) }]
+  table.hashes.each do |row|
+    expect(http_headers).to include(row['header'])
+    expect(http_headers[row['header']]).to eq(row['value'])
+  end
+end
+
 Then(/^the returned body should be a valid JSON document$/) do
   expect{@document = JSON.parse(@response.body)}.to_not raise_error
 end
