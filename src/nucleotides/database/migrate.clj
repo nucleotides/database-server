@@ -16,18 +16,6 @@
    :migration-table-name "db_version"
    :db                   sql-params})
 
-(defn load-yml-files-from
-  "Loads all nucleotides YAML files from a directory"
-  [directory]
-  (let [f #(-> (.getName %)
-               (st/replace ".yml" "")
-               (ksb/->kebab-case-keyword))]
-  (->> (io/file directory)
-       (file-seq)
-       (filter #(.endsWith (.getName %) ".yml"))
-       (map (juxt f (comp yaml/parse-string slurp)))
-       (into {}))))
-
 (defn load-data-files [directory]
   (merge
     (load-yml-files-from directory)

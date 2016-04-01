@@ -2,7 +2,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database using POSTGRES_* ENV variables
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     When in bash I run:
       """
       docker run \
