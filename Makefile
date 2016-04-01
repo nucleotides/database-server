@@ -106,9 +106,14 @@ $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.cl
 #
 ################################################
 
-bootstrap: Gemfile.lock $(credentials) .rdm_container
+bootstrap: Gemfile.lock $(credentials) .rdm_container tmp/input_data
 	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
+
+tmp/input_data:
+	mkdir -p $(dir $@)
+	git clone https://github.com/nucleotides/nucleotides-data.git $@
+	cd ./$@ && git reset --hard 246cd09a90
 
 .rdm_container: .rdm_image
 	docker run \
