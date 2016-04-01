@@ -16,3 +16,8 @@
     (is (= (first (inputs :source))
            {:name "metagenome" :desc "A mixture of multiple genomes"}))))
 
+(deftest test-load-data-files
+  (let [dir     "tmp/input_data"
+        inputs  (files/load-data-files dir)]
+    (is (contains? inputs :cv))
+    (is (contains? inputs :inputs))))

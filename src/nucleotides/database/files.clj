@@ -23,3 +23,8 @@
        (list-yaml-files)
        (map (juxt filename->keyword (comp yaml/parse-string slurp)))
        (into {})))
+
+(defn load-data-files [directory]
+  (let [f #(get-dataset-map (str directory %))]
+    {:cv      (f "/controlled_vocabulary")
+     :inputs  (f "/inputs")}))
