@@ -15,3 +15,9 @@
                        (str (ksk/->snake_case_string table-name) "_type")
                        (:name entry)
                        (:desc entry)))))
+
+(defn load-all-metadata [data]
+  (dorun
+    (for [[table-name entries] data]
+      (dorun
+        (map (partial save-metadatum! table-name) entries)))))
