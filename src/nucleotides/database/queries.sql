@@ -1,11 +1,11 @@
--- name: save-input-data-source<!
+-- name: save-biological-source<!
 -- Creates a new input data source entry
-INSERT INTO input_data_source (name, description, source_type_id)
-SELECT :name, :description, (SELECT id FROM source_type WHERE name = :source_type)
-WHERE NOT EXISTS (SELECT 1 FROM input_data_source WHERE name = :name);
+INSERT INTO biological_source (name, description, source_type_id)
+SELECT :name, :desc, (SELECT id FROM source_type WHERE name = :source_type)
+WHERE NOT EXISTS (SELECT 1 FROM biological_source WHERE name = :name);
 
--- name: save-input-data-source-file<!
--- Creates link between input_data_source and reference file_instance
+-- name: save-biological-source-file<!
+-- Creates link between biological_source and reference file_instance
 WITH _existing_file AS (
   SELECT id FROM file_instance WHERE sha256 = :sha256
 ),
@@ -20,15 +20,15 @@ _file AS (
   UNION ALL
   SELECT * FROM _new_file
 ),
-_input_data_source AS (
-  SELECT * FROM input_data_source WHERE name = :source_name
+_biological_source AS (
+  SELECT * FROM biological_source WHERE name = :source_name
 )
-INSERT INTO input_data_source_reference_file (input_data_source_id, file_instance_id)
-SELECT (SELECT id FROM _input_data_source), (SELECT id FROM _file)
+INSERT INTO biological_source_reference_file (biological_source_id, file_instance_id)
+SELECT (SELECT id FROM _biological_source), (SELECT id FROM _file)
 WHERE NOT EXISTS (
   SELECT 1
-  FROM input_data_source_reference_file
-  WHERE input_data_source_id = (SELECT id FROM _input_data_source)
+  FROM biological_source_reference_file
+  WHERE biological_source_id = (SELECT id FROM _biological_source)
   AND file_instance_id = (SELECT id FROM _file)
 )
 
@@ -41,15 +41,15 @@ INSERT INTO input_data_file_set (
   product_type_id,
   protocol_type_id,
   run_mode_type_id,
-  input_data_source_id)
+  biological_source_id)
  SELECT
   :name,
-  :description,
+  :desc,
   (SELECT id FROM platform_type WHERE name = :platform),
   (SELECT id FROM product_type WHERE name = :product),
   (SELECT id FROM protocol_type WHERE name = :protocol),
   (SELECT id FROM run_mode_type WHERE name = :run_mode),
-  (SELECT id FROM input_data_source WHERE name = :input_data_source)
+  (SELECT id FROM biological_source WHERE name = :biological_source)
 WHERE NOT EXISTS (SELECT id FROM input_data_file_set WHERE name = :name)
 
 -- name: save-input-data-file<!
@@ -108,7 +108,7 @@ WHERE NOT EXISTS (
 -- Creates a new benchmark type entry
 INSERT INTO benchmark_type (name, description, product_image_type_id, evaluation_image_type_id)
 SELECT :name,
-       :description,
+       :desc,
 	(SELECT id FROM image_type WHERE name = :product_image_type),
 	(SELECT id FROM image_type WHERE name = :evaluation_image_type)
 WHERE NOT EXISTS (SELECT 1 FROM benchmark_type WHERE name = :name);

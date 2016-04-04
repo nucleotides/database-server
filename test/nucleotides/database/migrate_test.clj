@@ -11,7 +11,10 @@
    :source-type
    :file-type
    :metric-type
-   :run-mode-type])
+   :run-mode-type
+
+   :biological-source
+   :biological-source-reference-file])
 
 (deftest migrate
 

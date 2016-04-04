@@ -3,6 +3,7 @@
   (:require
     [migratus.core                   :as mg]
     [nucleotides.database.metadata   :as mtd]
+    [nucleotides.database.load       :as ld]
     [nucleotides.database.files      :as files]
     [nucleotides.database.connection :as con]))
 
@@ -15,7 +16,8 @@
 (defn migrate [directory]
   (let [data (files/load-data-files directory)]
     (mg/migrate (create-migratus-spec))
-    (mtd/load-all-metadata (:cv data))))
+    (mtd/load-all-metadata   (:cv data))
+    (ld/load-all-input-data  (:inputs data))))
 
 (defn -main [& args]
   (migrate (first args))
