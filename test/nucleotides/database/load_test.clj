@@ -67,11 +67,11 @@
      :loader   #(ld/benchmark-types (:benchmark input-data))
      :tables   [:benchmark-type]}))
 
-(deftest load-benchmarks
+(deftest load-benchmark-data
   (test-data-loader
-    {:fixtures [:metadata :biological-source :input-data-file-set]
-     :loader   #(ld/benchmarks (:benchmark input-data))
-     :tables   [:benchmark-type :benchmark-data]}))
+    {:fixtures [:metadata :biological-source :input-data-file-set :benchmark_type]
+     :loader   #(ld/benchmark-data (:benchmark input-data))
+     :tables   [:benchmark-data]}))
 
 (deftest load-benchmark-instances
   (test-data-loader

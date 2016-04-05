@@ -24,7 +24,7 @@
    :image-instance-task
 
    :benchmark-type
-   ])
+   :benchmark-data])
 
 (deftest migrate
 

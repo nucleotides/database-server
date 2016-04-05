@@ -56,13 +56,11 @@
   "Load entries into the 'input_data_file_set' table"
   (load-entries save-benchmark-type<!))
 
-(def benchmarks
+(def benchmark-data
   "Load benchmark types into the database"
-  (let [save #(do (save-benchmark-type<! %1 %2)
-                  (save-benchmark-data<! %1 %2))]
-    (load-entries
-      (partial mapcat (partial unfold-by-key :data_sets :input_data_file_set))
-      save)))
+  (load-entries
+    (partial mapcat (partial unfold-by-key :data_sets :input_data_file_set))
+    save-benchmark-data<!))
 
 (defn rebuild-benchmark-task [connection]
   (let [args [{} {:connection connection}]]
@@ -74,7 +72,9 @@
    [input-data-file-set      :file]
    [input-data-files         :file]
    [image-instances          :image]
-   [benchmark-types          :benchmark]])
+   [benchmark-types          :benchmark]
+   [benchmark-data           :benchmark]
+   ])
 
 
 (defn load-all-input-data
