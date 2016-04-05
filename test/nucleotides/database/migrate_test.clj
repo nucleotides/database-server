@@ -21,7 +21,10 @@
 
    :image-type
    :image-instance
-   :image-instance-task])
+   :image-instance-task
+
+   :benchmark-type
+   ])
 
 (deftest migrate
 
