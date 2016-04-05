@@ -24,7 +24,6 @@ BEGIN
 	PERFORM create_metadata_table('image');
 
 	PERFORM create_metadata_table('platform');
-	PERFORM create_metadata_table('product');
 	PERFORM create_metadata_table('run_mode');
 	PERFORM create_metadata_table('protocol');
 	PERFORM create_metadata_table('source');
@@ -68,7 +67,6 @@ CREATE TABLE input_data_file_set(
   description		text		NOT NULL,
   biological_source_id	integer		NOT NULL REFERENCES biological_source(id),
   platform_type_id	integer		NOT NULL REFERENCES platform_type(id),
-  product_type_id	integer		NOT NULL REFERENCES product_type(id),
   protocol_type_id	integer		NOT NULL REFERENCES protocol_type(id),
   run_mode_type_id	integer		NOT NULL REFERENCES run_mode_type(id)
 );

@@ -46,13 +46,13 @@
 (deftest load-input-data-set
   (test-data-loader
     {:fixtures [:metadata :biological-source]
-     :loader   #(ld/input-data-file-set % (:data-file input-data))
+     :loader   #(ld/input-data-file-set (:file input-data))
      :tables   [:input-data-file-set]}))
 
 (deftest load-input-data-file
   (test-data-loader
     {:fixtures [:metadata :biological-source :input-data-file-set]
-     :loader   #(ld/input-data-files % (:data-file input-data))
+     :loader   #(ld/input-data-files (:file input-data))
      :tables   [:input-data-file]}))
 
 (deftest load-image-instances

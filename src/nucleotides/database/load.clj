@@ -44,7 +44,7 @@
 
 (def input-data-files
   "Loads entries into 'file_instance' and links to 'input_data_file_set'"
-  (load-entries (partial select-file-entries :replicates) save-input-data-file<!))
+  (load-entries (partial select-file-entries :files) save-input-data-file<!))
 
 (def image-instances
   "Select the image instances and load into the database"
@@ -66,7 +66,10 @@
 
 (def loaders
   [[biological-sources       :biological-source]
-   [biological-source-files  :biological-source]])
+   [biological-source-files  :biological-source]
+   [input-data-file-set      :file]
+   [input-data-files         :file]])
+
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"

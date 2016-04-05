@@ -14,7 +14,10 @@
    :run-mode-type
 
    :biological-source
-   :biological-source-reference-file])
+   :biological-source-reference-file
+
+   :input-data-file-set
+   :input-data-file])
 
 (deftest migrate
 

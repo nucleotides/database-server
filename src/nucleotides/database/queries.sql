@@ -38,18 +38,16 @@ INSERT INTO input_data_file_set (
   name,
   description,
   platform_type_id,
-  product_type_id,
   protocol_type_id,
   run_mode_type_id,
   biological_source_id)
  SELECT
   :name,
   :desc,
-  (SELECT id FROM platform_type WHERE name = :platform),
-  (SELECT id FROM product_type WHERE name = :product),
-  (SELECT id FROM protocol_type WHERE name = :protocol),
-  (SELECT id FROM run_mode_type WHERE name = :run_mode),
-  (SELECT id FROM biological_source WHERE name = :biological_source)
+  (SELECT id FROM platform_type WHERE name = :platform_type),
+  (SELECT id FROM protocol_type WHERE name = :protocol_type),
+  (SELECT id FROM run_mode_type WHERE name = :run_mode_type),
+  (SELECT id FROM biological_source WHERE name = :input_data_source)
 WHERE NOT EXISTS (SELECT id FROM input_data_file_set WHERE name = :name)
 
 -- name: save-input-data-file<!
