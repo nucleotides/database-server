@@ -68,7 +68,8 @@
   [[biological-sources       :biological-source]
    [biological-source-files  :biological-source]
    [input-data-file-set      :file]
-   [input-data-files         :file]])
+   [input-data-files         :file]
+   [image-instances          :image]])
 
 
 (defn load-all-input-data

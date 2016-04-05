@@ -17,7 +17,11 @@
    :biological-source-reference-file
 
    :input-data-file-set
-   :input-data-file])
+   :input-data-file
+
+   :image-type
+   :image-instance
+   :image-instance-task])
 
 (deftest migrate
 

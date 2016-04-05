@@ -58,7 +58,7 @@
 (deftest load-image-instances
   (test-data-loader
     {:fixtures [:metadata]
-     :loader   #(ld/image-instances % (:image-instance input-data))
+     :loader   #(ld/image-instances (:image input-data))
      :tables   [:image-instance :image-instance-task]}))
 
 (deftest load-benchmarks
