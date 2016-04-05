@@ -69,12 +69,12 @@
 
 (deftest load-benchmark-data
   (test-data-loader
-    {:fixtures [:metadata :biological-source :input-data-file-set :benchmark_type]
+    {:fixtures [:metadata :biological-source :input-data-file-set :benchmark-type]
      :loader   #(ld/benchmark-data (:benchmark input-data))
      :tables   [:benchmark-data]}))
 
 (deftest load-benchmark-instances
   (test-data-loader
-    {:fixtures [:metadata :biological-source :input-data-file-set :input-data-file :assembly-image-instance :benchmarks]
-     :loader   ld/rebuild-benchmark-task
+    {:fixtures [:metadata :biological-source :input-data-file-set :input-data-file :assembly-image-instance :benchmark-type :benchmark-data]
+     :loader   #(ld/populate-instance-and-task! {} {:connection (con/create-connection)})
      :tables   [:benchmark-instance :task]}))

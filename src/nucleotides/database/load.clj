@@ -62,10 +62,6 @@
     (partial mapcat (partial unfold-by-key :data_sets :input_data_file_set))
     save-benchmark-data<!))
 
-(defn rebuild-benchmark-task [connection]
-  (let [args [{} {:connection connection}]]
-    (apply populate-instance-and-task! args)))
-
 (def loaders
   [[biological-sources       :biological-source]
    [biological-source-files  :biological-source]
@@ -73,9 +69,7 @@
    [input-data-files         :file]
    [image-instances          :image]
    [benchmark-types          :benchmark]
-   [benchmark-data           :benchmark]
-   ])
-
+   [benchmark-data           :benchmark]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"

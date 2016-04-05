@@ -17,7 +17,8 @@
   (let [data (files/load-data-files directory)]
     (mg/migrate (create-migratus-spec))
     (mtd/load-all-metadata   (:cv data))
-    (ld/load-all-input-data  (:inputs data))))
+    (ld/load-all-input-data  (:inputs data))
+    (ld/populate-instance-and-task! {} {:connection (con/create-connection)})))
 
 (defn -main [& args]
   (migrate (first args))

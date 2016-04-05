@@ -24,7 +24,9 @@
    :image-instance-task
 
    :benchmark-type
-   :benchmark-data])
+   :benchmark-instance
+   :task
+   :task_expanded_fields])
 
 (deftest migrate
 
