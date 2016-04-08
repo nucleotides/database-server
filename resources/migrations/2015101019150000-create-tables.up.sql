@@ -2,7 +2,7 @@
 --;; Metadata Types
 --;;
 --;; Copied from http://dba.stackexchange.com/questions/42924
-CREATE OR REPLACE FUNCTION create_metadata_table(metadata_name varchar(30))
+CREATE OR REPLACE FUNCTION create_metadata_table(metadata_name varchar(50))
   RETURNS VOID AS
 $func$
 BEGIN
@@ -27,6 +27,8 @@ BEGIN
 	PERFORM create_metadata_table('run_mode');
 	PERFORM create_metadata_table('protocol');
 	PERFORM create_metadata_table('source');
+	PERFORM create_metadata_table('extraction_method');
+	PERFORM create_metadata_table('material');
 END$$;
 --;;
 --;; Files

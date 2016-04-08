@@ -12,21 +12,8 @@
    :file-type
    :metric-type
    :run-mode-type
-
-   :biological-source
-   :biological-source-reference-file
-
-   :input-data-file-set
-   :input-data-file
-
-   :image-type
-   :image-instance
-   :image-instance-task
-
-   :benchmark-type
-   :benchmark-instance
-   :task
-   :task_expanded_fields])
+   :extraction-method-type
+   :material-type])
 
 (deftest migrate
 
