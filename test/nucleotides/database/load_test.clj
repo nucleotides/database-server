@@ -3,6 +3,7 @@
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
+            [camel-snake-kebab.core          :as ksk]
             [nucleotides.database.files      :as files]
             [nucleotides.database.migrate    :as mg]
             [nucleotides.database.load       :as ld]
@@ -39,7 +40,7 @@
 (deftest load-biological-sources
   (test-data-loader
     {:fixtures [:metadata]
-     :loader   #(ld/biological-sources (:biological-source input-data))
+     :loader   #(ld/biological-sources (:data input-data))
      :tables   [:biological-source]}))
 
 (deftest load-biological-source-reference-files

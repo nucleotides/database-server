@@ -4,6 +4,8 @@
     [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
+
+    [camel-snake-kebab.core          :as ksk]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
@@ -32,7 +34,9 @@
 
 (def biological-sources
   "Loads input data sources into the database"
-  (load-entries save-biological-source<!))
+  (let [f (fn [[k v]]
+            (assoc (:source v) :name (ksk/->snake_case_string k)))]
+   (load-entries (partial map f) save-biological-source<!)))
 
 (def biological-source-files
   "Loads references into file_instance table and links to input_data_source"
@@ -63,11 +67,12 @@
     save-benchmark-data<!))
 
 (def loaders
-  [[image-instances          :image]])
+  [[image-instances          [:inputs :image]]
+   [biological-sources       [:data]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"
   [data]
   (dorun
-    (for [[f k] loaders]
-      (f (k data)))))
+    (for [[f ks] loaders]
+      (f (get-in data ks)))))

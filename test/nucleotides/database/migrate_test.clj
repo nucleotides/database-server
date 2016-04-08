@@ -17,7 +17,9 @@
 
    :image-type
    :image-instance
-   :image-instance-task])
+   :image-instance-task
+
+   :biological-source])
 
 (deftest migrate
 
