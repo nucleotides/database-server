@@ -9,7 +9,7 @@
             [nucleotides.database.connection :as con]))
 
 (def input-data
-  (:inputs (files/load-data-files "tmp/input_data")))
+  (files/load-data-files "tmp/input_data"))
 
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
@@ -30,6 +30,11 @@
             (for [t tables]
               (is (not (empty? (table-entries t)))))))))
 
+(deftest load-image-instances
+  (test-data-loader
+    {:fixtures [:metadata]
+     :loader   #(ld/image-instances (get-in input-data [:inputs :image]))
+     :tables   [:image-instance :image-instance-task]}))
 
 (deftest load-biological-sources
   (test-data-loader
@@ -54,12 +59,6 @@
     {:fixtures [:metadata :biological-source :input-data-file-set]
      :loader   #(ld/input-data-files (:file input-data))
      :tables   [:input-data-file]}))
-
-(deftest load-image-instances
-  (test-data-loader
-    {:fixtures [:metadata]
-     :loader   #(ld/image-instances (:image input-data))
-     :tables   [:image-instance :image-instance-task]}))
 
 (deftest load-benchmark-types
   (test-data-loader

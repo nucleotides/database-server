@@ -13,7 +13,11 @@
    :metric-type
    :run-mode-type
    :extraction-method-type
-   :material-type])
+   :material-type
+
+   :image-type
+   :image-instance
+   :image-instance-task])
 
 (deftest migrate
 

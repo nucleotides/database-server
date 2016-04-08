@@ -63,13 +63,7 @@
     save-benchmark-data<!))
 
 (def loaders
-  [[biological-sources       :biological-source]
-   [biological-source-files  :biological-source]
-   [input-data-file-set      :file]
-   [input-data-files         :file]
-   [image-instances          :image]
-   [benchmark-types          :benchmark]
-   [benchmark-data           :benchmark]])
+  [[image-instances          :image]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"
