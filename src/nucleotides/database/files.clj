@@ -27,4 +27,5 @@
 (defn load-data-files [directory]
   (let [f #(get-dataset-map (str directory %))]
     {:cv      (f "/controlled_vocabulary")
-     :inputs  (f "/inputs")}))
+     :inputs  (f "/inputs")
+     :data    (f "/inputs/data")}))
