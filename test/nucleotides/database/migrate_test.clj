@@ -19,7 +19,8 @@
    :image-instance
    :image-instance-task
 
-   :biological-source])
+   :biological-source
+   :biological-source-reference-file])
 
 (deftest migrate
 

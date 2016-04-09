@@ -12,6 +12,16 @@
 (def input-data
   (files/load-data-files "tmp/input_data"))
 
+(mapcat
+  (fn [[k v]]
+    (->> (get-in v [:source :references])
+         (flatten)
+         (map #(assoc % :source_name (ksk/->snake_case_string k)))))
+  (:data input-data))
+
+
+
+
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
     (testing "loading with into an empty database"
@@ -46,7 +56,7 @@
 (deftest load-biological-source-reference-files
   (test-data-loader
     {:fixtures [:metadata :biological-source]
-     :loader   #(ld/biological-source-files (:biological-source input-data))
+     :loader   #(ld/biological-source-files (:data input-data))
      :tables   [:biological-source-reference-file]}))
 
 (deftest load-input-data-set

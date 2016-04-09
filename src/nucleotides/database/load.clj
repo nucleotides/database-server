@@ -10,6 +10,9 @@
 
 (defqueries "nucleotides/database/queries.sql")
 
+
+
+
 (defn select-file-entries [k entries]
   (->> entries
        (mapcat (partial select [(collect-one :name) (keypath k) ALL]))
@@ -40,7 +43,12 @@
 
 (def biological-source-files
   "Loads references into file_instance table and links to input_data_source"
-  (load-entries (partial select-file-entries :references) save-biological-source-file<!))
+  (let [f (fn [[k v]]
+            (->> (get-in v [:source :references])
+                 (flatten)
+                 (remove empty?)
+                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+   (load-entries (partial mapcat f) save-biological-source-file<!)))
 
 (def input-data-file-set
   "Load entries into the 'input_data_file_set' table"
@@ -68,7 +76,8 @@
 
 (def loaders
   [[image-instances          [:inputs :image]]
-   [biological-sources       [:data]]])
+   [biological-sources       [:data]]
+   [biological-source-files  [:data]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"
