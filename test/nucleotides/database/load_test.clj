@@ -2,6 +2,7 @@
   (:require [clojure.test     :refer :all]
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
+    [com.rpl.specter          :refer :all]
 
             [camel-snake-kebab.core          :as ksk]
             [nucleotides.database.files      :as files]
@@ -11,7 +12,6 @@
 
 (def input-data
   (files/load-data-files "tmp/input_data"))
-
 
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
@@ -59,7 +59,7 @@
 (deftest load-input-data-file
   (test-data-loader
     {:fixtures [:metadata :biological-source :input-data-file-set]
-     :loader   #(ld/input-data-files (:file input-data))
+     :loader   #(ld/input-data-files (:data input-data))
      :tables   [:input-data-file]}))
 
 (deftest load-benchmark-types

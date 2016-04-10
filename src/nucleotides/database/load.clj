@@ -61,7 +61,12 @@
 
 (def input-data-files
   "Loads entries into 'file_instance' and links to 'input_data_file_set'"
-  (load-entries (partial select-file-entries :files) save-input-data-file<!))
+  (let [f (fn [[k v]]
+            (->> (:data v)
+                 (select [ALL (collect-one :name) (keypath :files) ALL])
+                 (map #(assoc (last %) :file_set_name (first %)))
+                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+   (load-entries (partial mapcat f) save-input-data-file<!)))
 
 (def image-instances
   "Select the image instances and load into the database"
@@ -83,7 +88,8 @@
   [[image-instances          [:inputs :image]]
    [biological-sources       [:data]]
    [biological-source-files  [:data]]
-   [input-data-file-set      [:data]]])
+   [input-data-file-set      [:data]]
+   [input-data-files         [:data]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"

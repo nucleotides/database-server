@@ -75,7 +75,12 @@ _file AS (
   SELECT * FROM _new_file
 ),
 _input_data_file_set AS (
-  SELECT * FROM input_data_file_set WHERE name = :source_name
+  SELECT *
+  FROM input_data_file_set
+  WHERE name                 = :file_set_name
+    AND biological_source_id = (SELECT id
+				FROM biological_source
+				WHERE name = :source_name)
 )
 INSERT INTO input_data_file (input_data_file_set_id, file_instance_id)
 SELECT (SELECT id FROM _input_data_file_set), (SELECT id FROM _file)

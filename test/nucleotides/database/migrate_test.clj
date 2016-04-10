@@ -22,7 +22,13 @@
    :biological-source
    :biological-source-reference-file
 
-   :input-data-file-set])
+   :input-data-file-set
+   :input-data-file
+
+   :benchmark-type
+   :benchmark-instance
+   :task
+   :task_expanded_fields])
 
 (deftest migrate
 
