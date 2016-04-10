@@ -80,16 +80,20 @@
 
 (def benchmark-data
   "Load benchmark types into the database"
-  (load-entries
-    (partial mapcat (partial unfold-by-key :data_sets :input_data_file_set))
-    save-benchmark-data<!))
+  (let [f #(map (comp
+                  (partial zipmap [:benchmark_name :source_name :file_set_name])
+                  flatten)
+                (select [(collect-one :name) (keypath :data_sets) ALL] %))]
+    (load-entries (partial mapcat f) save-benchmark-data<!)))
 
 (def loaders
   [[image-instances          [:inputs :image]]
    [biological-sources       [:data]]
    [biological-source-files  [:data]]
    [input-data-file-set      [:data]]
-   [input-data-files         [:data]]])
+   [input-data-files         [:data]]
+   [benchmark-types          [:inputs :benchmark]]
+   [benchmark-data           [:inputs :benchmark]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"

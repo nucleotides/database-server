@@ -126,16 +126,25 @@ WHERE NOT EXISTS (SELECT 1 FROM benchmark_type WHERE name = :name);
 
 -- name: save-benchmark-data<!
 -- Creates a new benchmark type entry
-WITH t AS (
-  SELECT (SELECT id FROM input_data_file_set WHERE name = :input_data_file_set) AS f_id,
-         (SELECT id FROM benchmark_type      WHERE name = :name) AS b_id
+WITH _input_data_file_set AS (
+  SELECT id
+  FROM input_data_file_set
+  WHERE name                 = :file_set_name
+    AND biological_source_id = (SELECT id
+				FROM biological_source
+				WHERE name = :source_name)
+),
+_benchmark AS (
+  SELECT id
+  FROM benchmark_type
+  WHERE name = :benchmark_name
 )
 INSERT INTO benchmark_data (input_data_file_set_id, benchmark_type_id)
-SELECT (SELECT f_id FROM t), (SELECT b_id FROM t)
+SELECT (SELECT id FROM _input_data_file_set), (SELECT id FROM _benchmark)
 WHERE NOT EXISTS (
 	SELECT 1 FROM benchmark_data
-	WHERE input_data_file_set_id = (SELECT f_id FROM t)
-	AND benchmark_type_id        = (SELECT b_id FROM t))
+	WHERE input_data_file_set_id = (SELECT id FROM _input_data_file_set)
+	AND benchmark_type_id        = (SELECT id FROM _benchmark))
 
 -- name: populate-instance-and-task!
 -- Populates benchmark instance table with combinations of data record and image task
