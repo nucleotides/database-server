@@ -12,15 +12,6 @@
 (def input-data
   (files/load-data-files "tmp/input_data"))
 
-(mapcat
-  (fn [[k v]]
-    (->> (get-in v [:source :references])
-         (flatten)
-         (map #(assoc % :source_name (ksk/->snake_case_string k)))))
-  (:data input-data))
-
-
-
 
 (defn test-data-loader [{:keys [loader tables fixtures]}]
 
@@ -62,7 +53,7 @@
 (deftest load-input-data-set
   (test-data-loader
     {:fixtures [:metadata :biological-source]
-     :loader   #(ld/input-data-file-set (:file input-data))
+     :loader   #(ld/input-data-file-set (:data input-data))
      :tables   [:input-data-file-set]}))
 
 (deftest load-input-data-file

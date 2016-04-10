@@ -40,6 +40,8 @@ INSERT INTO input_data_file_set (
   platform_type_id,
   protocol_type_id,
   run_mode_type_id,
+  material_type_id,
+  extraction_method_type_id,
   biological_source_id)
  SELECT
   :name,
@@ -47,8 +49,14 @@ INSERT INTO input_data_file_set (
   (SELECT id FROM platform_type WHERE name = :platform_type),
   (SELECT id FROM protocol_type WHERE name = :protocol_type),
   (SELECT id FROM run_mode_type WHERE name = :run_mode_type),
-  (SELECT id FROM biological_source WHERE name = :input_data_source)
-WHERE NOT EXISTS (SELECT id FROM input_data_file_set WHERE name = :name)
+  (SELECT id FROM material_type WHERE name = :material_type),
+  (SELECT id FROM extraction_method_type WHERE name = :extraction_method_type),
+  (SELECT id FROM biological_source WHERE name = :source_name)
+WHERE NOT EXISTS (
+	SELECT id
+	FROM input_data_file_set
+	WHERE name = :name
+	AND biological_source_id = (SELECT id FROM biological_source WHERE name = :source_name))
 
 -- name: save-input-data-file<!
 -- Creates link between 'input_data_file_set' and 'file_instance'

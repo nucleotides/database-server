@@ -52,7 +52,12 @@
 
 (def input-data-file-set
   "Load entries into the 'input_data_file_set' table"
-  (load-entries save-input-data-file-set<!))
+  (let [f (fn [[k v]]
+            (->>
+              (:data v)
+              (map #(assoc % :source_name (ksk/->snake_case_string k)))
+              (map #(dissoc % :files))))]
+  (load-entries (partial mapcat f) save-input-data-file-set<!)))
 
 (def input-data-files
   "Loads entries into 'file_instance' and links to 'input_data_file_set'"
@@ -77,7 +82,8 @@
 (def loaders
   [[image-instances          [:inputs :image]]
    [biological-sources       [:data]]
-   [biological-source-files  [:data]]])
+   [biological-source-files  [:data]]
+   [input-data-file-set      [:data]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"

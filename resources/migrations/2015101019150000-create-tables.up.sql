@@ -62,15 +62,18 @@ CREATE TABLE biological_source_reference_file(
 );
 --;;
 CREATE TABLE input_data_file_set(
-  id			serial		PRIMARY KEY,
-  created_at		timestamp	DEFAULT current_timestamp,
-  active		bool		NOT NULL DEFAULT true,
-  name			text		UNIQUE NOT NULL,
-  description		text		NOT NULL,
-  biological_source_id	integer		NOT NULL REFERENCES biological_source(id),
-  platform_type_id	integer		NOT NULL REFERENCES platform_type(id),
-  protocol_type_id	integer		NOT NULL REFERENCES protocol_type(id),
-  run_mode_type_id	integer		NOT NULL REFERENCES run_mode_type(id)
+  id				serial		PRIMARY KEY,
+  created_at			timestamp	DEFAULT current_timestamp,
+  active			bool		NOT NULL DEFAULT true,
+  name				text		NOT NULL,
+  description			text		NOT NULL,
+  biological_source_id		integer		NOT NULL REFERENCES biological_source(id),
+  platform_type_id		integer		NOT NULL REFERENCES platform_type(id),
+  protocol_type_id		integer		NOT NULL REFERENCES protocol_type(id),
+  material_type_id		integer		NOT NULL REFERENCES material_type(id),
+  extraction_method_type_id	integer		NOT NULL REFERENCES extraction_method_type(id),
+  run_mode_type_id		integer		NOT NULL REFERENCES run_mode_type(id),
+  CONSTRAINT unique_files_set_per_source_idx UNIQUE(name, biological_source_id)
 );
 --;;
 CREATE TABLE input_data_file(

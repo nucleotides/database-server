@@ -20,7 +20,9 @@
    :image-instance-task
 
    :biological-source
-   :biological-source-reference-file])
+   :biological-source-reference-file
+
+   :input-data-file-set])
 
 (deftest migrate
 

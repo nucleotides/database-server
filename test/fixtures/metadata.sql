@@ -16,7 +16,15 @@ VALUES
 
 INSERT INTO protocol_type (name, description)
 VALUES
-	('regular_fragment', 'Desc');
+	('unamplified_regular_fragment', 'Desc');
+
+INSERT INTO material_type (name, description)
+VALUES
+	('dna', 'Desc');
+
+INSERT INTO extraction_method_type (name, description)
+VALUES
+	('cultured_colony_isolate', 'Desc');
 
 INSERT INTO run_mode_type (name, description)
 VALUES
