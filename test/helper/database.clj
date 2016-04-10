@@ -29,7 +29,7 @@
 (defn empty-database []
   (do
     (drop-tables)
-    (mg/migrate (build/create-migratus-spec (con/create-connection)))))
+    (mg/migrate (build/create-migratus-spec))))
 
 (defn table-entries [table-name]
   (sql/query

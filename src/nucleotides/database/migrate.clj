@@ -1,44 +1,24 @@
 (ns nucleotides.database.migrate
   (:gen-class)
   (:require
-    [clojure.java.io                 :as io]
-    [clojure.string                  :as st]
     [migratus.core                   :as mg]
-    [clj-yaml.core                   :as yaml]
-    [camel-snake-kebab.core          :as ksb]
-    [nucleotides.util                :as util]
-    [nucleotides.database.load       :as loader]
+    [nucleotides.database.metadata   :as mtd]
+    [nucleotides.database.load       :as ld]
+    [nucleotides.database.files      :as files]
     [nucleotides.database.connection :as con]))
 
-(defn create-migratus-spec [sql-params]
+(defn create-migratus-spec []
   {:store                :database
    :migration-dir        "migrations/"
    :migration-table-name "db_version"
-   :db                   sql-params})
-
-(defn load-yml-files-from
-  "Loads all nucleotides YAML files from a directory"
-  [directory]
-  (let [f #(-> (.getName %)
-               (st/replace ".yml" "")
-               (ksb/->kebab-case-keyword))]
-  (->> (io/file directory)
-       (file-seq)
-       (filter #(.endsWith (.getName %) ".yml"))
-       (map (juxt f (comp yaml/parse-string slurp)))
-       (into {}))))
-
-(defn load-data-files [directory]
-  (merge
-    (load-yml-files-from directory)
-    (load-yml-files-from (str directory "/type"))
-    (load-yml-files-from (str directory "/input_data"))))
+   :db                   (con/create-connection)})
 
 (defn migrate [directory]
-  (let [data (load-data-files directory)
-        con  (con/create-connection)]
-    (mg/migrate (create-migratus-spec con))
-    (loader/load-data con data)))
+  (let [data (files/load-data-files directory)]
+    (mg/migrate (create-migratus-spec))
+    (mtd/load-all-metadata   (:cv data))
+    (ld/load-all-input-data  data)
+    (ld/populate-instance-and-task! {} {:connection (con/create-connection)})))
 
 (defn -main [& args]
   (migrate (first args))
