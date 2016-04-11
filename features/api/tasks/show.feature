@@ -5,12 +5,14 @@ Feature: Getting all incomplete tasks from the API
     And the database fixtures:
       | fixture                 |
       | metadata                |
-      | input_data_source       |
+      | biological_source       |
       | input_data_file_set     |
       | input_data_file         |
       | assembly_image_instance |
-      | benchmarks              |
+      | benchmark_type          |
+      | benchmark_data          |
       | tasks                   |
+
 
   Scenario: Listing all tasks
     When I get the url "/tasks/show.json"
