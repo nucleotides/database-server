@@ -36,7 +36,7 @@ incomplete_evaluate_task AS (
   incomplete_task.*
   FROM complete_produce_task
   LEFT JOIN benchmark_instance ON benchmark_instance.id = complete_produce_task.benchmark_instance_id
-  LEFT JOIN incomplete_task ON incomplete_task.benchmark_instance_id = benchmark_instance.id
+  LEFT JOIN incomplete_task    ON incomplete_task.benchmark_instance_id = benchmark_instance.id
   WHERE incomplete_task.task_type = 'evaluate'
 )
 SELECT * FROM incomplete_produce_task

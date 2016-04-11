@@ -130,24 +130,24 @@
 
   (testing "GET /task/:id"
 
-    (testing "an incomplete produce task by its ID"
+    (testing "an incomplete produce task"
       (test-get-task
         {:task-id 1
          :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
 
-    (testing "an successfully completed produce task by its ID"
+    (testing "an successfully completed produce task"
       (test-get-task
         {:task-id 1
          :files [["short_read_fastq" "s3://reads" "c1f0f"]]
          :fixtures [:successful-product-event]
          :events [(mock-event :produce :success)]}))
 
-    (testing "an incomplete evaluate task with no produce files by its ID"
+    (testing "an incomplete evaluate task with no produce files"
       (test-get-task
         {:task-id 2
          :files [["reference_fasta" "s3://ref" "d421a4"]]}))
 
-    (testing "an incomplete evaluate task with a successful produce task by its ID"
+    (testing "an incomplete evaluate task with a successful produce task"
       (test-get-task
         {:task-id 2
          :files [["reference_fasta" "s3://ref" "d421a4"]
