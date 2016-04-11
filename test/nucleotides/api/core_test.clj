@@ -94,23 +94,23 @@
 
 
 
-   (testing "GET /tasks/:id"
+  (testing "GET /tasks/:id"
 
-     (test-app-response
-       {:method          :get
-        :url             "/tasks/1000"
-        :response-tests  [resp/is-client-error-response
-                          (resp/has-body "Task not found: 1000")]})
+    (test-app-response
+      {:method          :get
+       :url             "/tasks/1000"
+       :response-tests  [resp/is-client-error-response
+                         (resp/has-body "Task not found: 1000")]})
 
-     (test-app-response
-       {:method          :get
-        :url             "/tasks/unknown"
-        :response-tests  [resp/is-client-error-response
-                          (resp/has-body "Task not found: unknown")]}))
+    (test-app-response
+      {:method          :get
+       :url             "/tasks/unknown"
+       :response-tests  [resp/is-client-error-response
+                         (resp/has-body "Task not found: unknown")]}))
 
 
 
-   (testing "GET /events/:id"
+  (testing "GET /events/:id"
 
     (testing "a valid unknown event id"
       (test-app-response
@@ -124,31 +124,39 @@
         {:method          :get
          :url             "/events/unknown"
          :response-tests  [resp/is-client-error-response
-                           (resp/has-body "Event not found: unknown")]}))
+                           (resp/has-body "Event not found: unknown")]})))
 
-      (testing "an incomplete produce task by its ID"
-        (test-get-task
-          {:task-id 1
-           :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
 
-      (testing "an successfully completed produce task by its ID"
-        (test-get-task
-          {:task-id 1
-           :files [["short_read_fastq" "s3://reads" "c1f0f"]]
-           :fixtures [:successful-product-event]
-           :events [(mock-event :produce :success)]}))
 
-      (testing "an incomplete evaluate task with no produce files by its ID"
-        (test-get-task
-          {:task-id 2
-           :files [["reference_fasta" "s3://ref" "d421a4"]]}))
+  (testing "GET /task/:id"
 
-      (testing "an incomplete evaluate task with a successful produce task by its ID"
-        (test-get-task
-          {:task-id 2
-           :files [["reference_fasta" "s3://ref" "d421a4"]
-                   ["contig_fasta"    "s3://contigs" "f7455"]]
-           :fixtures [:successful-product-event]}))
+    (testing "an incomplete produce task by its ID"
+      (test-get-task
+        {:task-id 1
+         :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
+
+    (testing "an successfully completed produce task by its ID"
+      (test-get-task
+        {:task-id 1
+         :files [["short_read_fastq" "s3://reads" "c1f0f"]]
+         :fixtures [:successful-product-event]
+         :events [(mock-event :produce :success)]}))
+
+    (testing "an incomplete evaluate task with no produce files by its ID"
+      (test-get-task
+        {:task-id 2
+         :files [["reference_fasta" "s3://ref" "d421a4"]]}))
+
+    (testing "an incomplete evaluate task with a successful produce task by its ID"
+      (test-get-task
+        {:task-id 2
+         :files [["reference_fasta" "s3://ref" "d421a4"]
+                 ["contig_fasta"    "s3://contigs" "f7455"]]
+         :fixtures [:successful-product-event]})))
+
+
+
+  (testing "GET /event/:id"
 
     (testing "for an unsuccessful product event"
       (test-get-event
