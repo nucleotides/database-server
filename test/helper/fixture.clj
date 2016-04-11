@@ -6,13 +6,13 @@
 
 (def base-fixtures
   [:metadata
-   :input-data-source
+   :biological-source
    :input-data-file-set
    :input-data-file
    :assembly-image-instance
-   :benchmarks
+   :benchmark-type
+   :benchmark-data
    :tasks])
-
 
 (defn test-directory [& paths]
   (->> paths
