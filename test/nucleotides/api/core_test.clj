@@ -110,7 +110,6 @@
          :response-tests  [resp/is-client-error-response
                            (resp/has-body "Task not found: unknown")]})))
 
-
     (testing "an incomplete produce task"
       (test-get-task
         {:task-id 1

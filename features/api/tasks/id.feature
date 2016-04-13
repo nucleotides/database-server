@@ -6,6 +6,7 @@ Feature: Getting benchmarking tasks by ID
       | fixture                 |
       | metadata                |
       | biological_source       |
+      | biological_source_files |
       | input_data_file_set     |
       | input_data_file         |
       | assembly_image_instance |

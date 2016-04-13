@@ -7,6 +7,7 @@
 (def base-fixtures
   [:metadata
    :biological-source
+   :biological-source-files
    :input-data-file-set
    :input-data-file
    :assembly-image-instance
