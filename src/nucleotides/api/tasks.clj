@@ -20,15 +20,17 @@
               (assoc kvs k))
          (keys ks)))
 
-(defn get-task-files [db-client benchmark-instance-id task-type]
+(defn get-task-files
   "Fetch all input files for a given task"
+  [db-client benchmark-instance-id task-type]
   ((if (= "produce" task-type)
      benchmark-produce-files-by-id
      benchmark-evaluate-files-by-id)
      {:id benchmark-instance-id} db-client))
 
-(defn get-events [db-client task-id]
+(defn get-events
   "Fetch all events for a given task"
+  [db-client task-id]
   (doall
     (map #(event/lookup db-client (:id %) {})
          (events-by-task-id {:id task-id} db-client))))
