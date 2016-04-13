@@ -6,12 +6,10 @@
             [ring.adapter.jetty  :refer [run-jetty]]
 
             [clojure.data.json                :as json]
-
             [nucleotides.database.connection  :as con]
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.benchmarks       :as benchmarks]
             [nucleotides.api.tasks            :as tasks]
-            [nucleotides.api.metrics          :as metrics]
             [nucleotides.api.events           :as events]))
 
 
@@ -68,7 +66,7 @@
     (GET  "/tasks/show.json"      []   (task-show db))
     (GET  "/tasks/:id"            [id] (task-lookup db id))))
 
-(defn -main [& args]
+(defn -main [& _]
   (-> {:connection (con/create-connection)}
       (api)
       (md/middleware)

@@ -68,7 +68,7 @@
   (let [f #(is (= true (:complete %)))]
     (dispatch-response-body-test f [] response)))
 
-(defn file-entry [[type_ url sha256 :as entry]]
+(defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))
 
 

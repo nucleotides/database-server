@@ -1,9 +1,7 @@
 (ns nucleotides.database.migrate-test
   (:require [clojure.test     :refer :all]
-            [helper.fixture   :refer :all]
             [helper.database  :refer :all]
-
-            [nucleotides.database.migrate  :as migrate]))
+            [nucleotides.database.migrate :as migrate]))
 
 (def tables
   [:platform-type

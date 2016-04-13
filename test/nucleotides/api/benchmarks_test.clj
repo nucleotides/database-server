@@ -1,6 +1,5 @@
 (ns nucleotides.api.benchmarks-test
   (:require [clojure.test          :refer :all]
-            [yesql.core            :refer [defqueries]]
             [helper.fixture              :as fix]
             [helper.database             :as db]
             [helper.http-response        :as resp]

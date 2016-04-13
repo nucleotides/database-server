@@ -1,8 +1,7 @@
 (ns helper.event
   (:require [clojure.test            :refer :all]
             [clojure.core.match      :refer [match]]
-            [clojure.data.json       :as json]
-            [camel-snake-kebab.core  :as ksk]))
+            [clojure.data.json       :as json]))
 
 (defn mock-event [event_type state]
   (match [event_type state]

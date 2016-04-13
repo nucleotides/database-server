@@ -1,10 +1,7 @@
 (ns nucleotides.api.tasks-test
   (:require [clojure.test                     :refer :all]
-            [clojure.data.json                :as json]
             [helper.http-response             :as resp]
             [helper.fixture                   :as fix]
-            [helper.event                     :as ev]
-            [helper.image                     :as image]
             [helper.database                  :as db]
             [nucleotides.api.tasks            :as task]))
 

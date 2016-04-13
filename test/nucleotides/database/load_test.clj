@@ -3,9 +3,7 @@
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
 
-            [camel-snake-kebab.core          :as ksk]
             [nucleotides.database.files      :as files]
-            [nucleotides.database.migrate    :as mg]
             [nucleotides.database.load       :as ld]
             [nucleotides.database.connection :as con]))
 

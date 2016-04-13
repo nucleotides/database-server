@@ -3,7 +3,6 @@
 
             [helper.database                  :as db]
             [helper.fixture                   :as fix]
-            [nucleotides.database.connection  :as con]
             [nucleotides.api.metrics          :as mt]))
 
 (deftest nucleotides.api.metrics

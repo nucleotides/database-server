@@ -1,14 +1,9 @@
 (ns nucleotides.api.events-test
   (:require [clojure.test          :refer :all]
             [helper.event          :refer :all]
-            [helper.fixture        :as fix]
-            [helper.http-response  :as resp]
-            [helper.database       :as db]
-
-            [clojure.data.json                :as json]
-            [nucleotides.database.connection  :as con]
-            [nucleotides.api.metrics          :as metrics]
-            [nucleotides.api.events           :as event]))
+            [helper.fixture          :as fix]
+            [helper.database         :as db]
+            [nucleotides.api.events  :as event]))
 
 
 (use-fixtures :each (fn [f]
