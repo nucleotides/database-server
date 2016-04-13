@@ -46,7 +46,7 @@
      :response-tests  [resp/is-ok-response
                        resp/is-not-empty-body
                        (resp/does-http-body-contain [:task :success :created_at :metrics :id :files])
-                       #(apply resp/contains-file-entries % [:body] (map resp/file-entry files))]}))
+                       (resp/contains-file-entries  [:files] (map resp/file-entry files))]}))
 
 
 (defn test-show-tasks [{:keys [fixtures expected]}]
@@ -60,14 +60,14 @@
 
 (defn test-get-task [{:keys [task-id fixtures files events]}]
   (test-app-response
-    {:method    :get
-     :url       (str "/tasks/" task-id)
-     :fixtures  fixtures
-     :tests     [resp/is-ok-response
-                image/has-image-metadata
-                task-test/contains-task-entries
-                (task-test/contains-task-files files)
-                (task-test/contains-events events)]}))
+    {:method          :get
+     :url             (str "/tasks/" task-id)
+     :fixtures        fixtures
+     :response-tests  [resp/is-ok-response
+                       image/has-image-metadata
+                       task-test/contains-task-entries
+                       (resp/contains-file-entries [:inputs] (map resp/file-entry files))
+                       (task-test/contains-events events)]}))
 
 
 (deftest app

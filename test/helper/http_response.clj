@@ -6,14 +6,30 @@
 
 (defn dispatch-response-body-test
   ([f path response]
-   (let [body (if (isa? (class (:body response)) String)
-                (clojure.walk/keywordize-keys (json/read-str (:body response)))
-                (:body response))]
-     (f (get-in body path))))
+   (let [body     (if (isa? (class (:body response)) String)
+                    (clojure.walk/keywordize-keys (json/read-str (:body response)))
+                    (:body response))
+         content  (get-in body path)]
+     (is (not (nil? content)) (str "No content found for " path " in: \n" body))
+     (f content)))
   ([f response]
    (dispatch-response-body-test f [] response)))
 
-
+(defn contains-file-entries [path entries]
+  (let [test-empty    #(is (not (empty? %)))
+        test-valid    #(dorun
+                         (for [f %]
+                           (for [key_ [:url :type :sha256]]
+                             (is (contains? f key_)))))
+        test-entries  #(dorun
+                         (for [e entries]
+                           (is (contains? % e))))
+        f (fn [xs]
+            (let [files (set xs)]
+              (do (test-empty files)
+                  (test-valid files)
+                  (test-entries files))))]
+    (partial dispatch-response-body-test f path)))
 
 
 (defn is-ok-response [response]
@@ -46,17 +62,6 @@
 
 (defn file-entry [[type_ url sha256 :as entry]]
   (into {} (map vector [:type :url :sha256] entry)))
-
-(defn contains-file-entries [response path & entries]
-  (let [files (set (get-in response path))]
-    (is (not (empty? files)))
-    (dorun
-      (for [f files]
-        (for [key_ [:url :type :sha256]]
-          (is (contains? f key_)))))
-    (dorun
-      (for [entry entries]
-        (is (contains? files entry))))))
 
 (defn contains-event-entries [response path & entries]
   (let [events (->> (get-in response path)
