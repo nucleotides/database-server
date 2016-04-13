@@ -110,24 +110,6 @@
 
 
 
-  (testing "GET /events/:id"
-
-    (testing "a valid unknown event id"
-      (test-app-response
-        {:method          :get
-         :url             "/events/1000"
-         :response-tests  [resp/is-client-error-response
-                           (resp/has-body "Event not found: 1000")]}))
-
-    (testing "an invalid unknown event id"
-      (test-app-response
-        {:method          :get
-         :url             "/events/unknown"
-         :response-tests  [resp/is-client-error-response
-                           (resp/has-body "Event not found: unknown")]})))
-
-
-
   (testing "GET /task/:id"
 
     (testing "an incomplete produce task"
@@ -157,6 +139,20 @@
 
 
   (testing "GET /event/:id"
+
+    (testing "a valid unknown event id"
+      (test-app-response
+        {:method          :get
+         :url             "/events/1000"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Event not found: 1000")]}))
+
+    (testing "an invalid unknown event id"
+      (test-app-response
+        {:method          :get
+         :url             "/events/unknown"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Event not found: unknown")]}))
 
     (testing "for an unsuccessful product event"
       (test-get-event
