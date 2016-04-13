@@ -66,8 +66,8 @@
      :response-tests  [resp/is-ok-response
                        image/has-image-metadata
                        task-test/contains-task-entries
-                       (resp/contains-file-entries [:inputs] (map resp/file-entry files))
-                       (task-test/contains-events events)]}))
+                       (resp/contains-file-entries  [:inputs] (map resp/file-entry files))
+                       (resp/contains-event-entries [:events] events)]}))
 
 
 (deftest app
@@ -96,21 +96,20 @@
 
   (testing "GET /tasks/:id"
 
-    (test-app-response
-      {:method          :get
-       :url             "/tasks/1000"
-       :response-tests  [resp/is-client-error-response
-                         (resp/has-body "Task not found: 1000")]})
+    (testing "Getting an unknown task ID"
+      (test-app-response
+        {:method          :get
+         :url             "/tasks/1000"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Task not found: 1000")]}))
 
-    (test-app-response
-      {:method          :get
-       :url             "/tasks/unknown"
-       :response-tests  [resp/is-client-error-response
-                         (resp/has-body "Task not found: unknown")]}))
+    (testing "Getting an invalid task ID"
+      (test-app-response
+        {:method          :get
+         :url             "/tasks/unknown"
+         :response-tests  [resp/is-client-error-response
+                           (resp/has-body "Task not found: unknown")]})))
 
-
-
-  (testing "GET /task/:id"
 
     (testing "an incomplete produce task"
       (test-get-task
@@ -134,7 +133,7 @@
         {:task-id 2
          :files [["reference_fasta" "s3://ref" "d421a4"]
                  ["contig_fasta"    "s3://contigs" "f7455"]]
-         :fixtures [:successful-product-event]})))
+         :fixtures [:successful-product-event]}))
 
 
 

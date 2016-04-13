@@ -1,6 +1,7 @@
 (ns helper.event
-  (:require [clojure.core.match      :refer [match]]
-            [clojure.data.json   :as json]
+  (:require [clojure.test            :refer :all]
+            [clojure.core.match      :refer [match]]
+            [clojure.data.json       :as json]
             [camel-snake-kebab.core  :as ksk]))
 
 (defn mock-event [event_type state]
@@ -40,3 +41,13 @@
 
 (def mock-json-event
   (comp json/write-str mock-event))
+
+(defn is-valid-event? [e]
+  (let [ks [:id :created_at :task :success :files :metrics]]
+    (dorun
+      (for [k ks]
+        (is (contains? e k))))))
+
+(defn has-event? [coll event]
+  (let [events (into #{} (map #(dissoc % :created_at :id) coll))]
+    (is (contains? events event))))
