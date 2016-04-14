@@ -12,19 +12,23 @@ VALUES
 
 INSERT INTO platform_type (name, description)
 VALUES
-	('illumina', 'Illumina sequencing platform');
-
-INSERT INTO product_type (name, description)
-VALUES
-	('random', 'DNA extraction followed by random DNA sequencing');
+	('miseq', 'Desc');
 
 INSERT INTO protocol_type (name, description)
 VALUES
-	('nextera', 'Illumina nextera protocol');
+	('unamplified_regular_fragment', 'Desc');
+
+INSERT INTO material_type (name, description)
+VALUES
+	('dna', 'Desc');
+
+INSERT INTO extraction_method_type (name, description)
+VALUES
+	('cultured_colony_isolate', 'Desc');
 
 INSERT INTO run_mode_type (name, description)
 VALUES
-	('2x150_270', 'An insert size of 270bp sequenced with 2x150bp reads');
+	('2x150_300', 'Desc');
 
 INSERT INTO image_type (name, description)
 VALUES

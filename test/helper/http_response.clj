@@ -2,19 +2,43 @@
   (:require [clojure.test       :refer :all]
             [clojure.data.json  :as json]
             [helper.database    :as db]
+            [helper.event       :as evt]
             [helper.fixture     :as fix]))
 
 (defn dispatch-response-body-test
+  "Given a http response, executes the given function `f` on the content
+  at the specified `path` within the returned body of the response."
   ([f path response]
-   (let [body (if (isa? (class (:body response)) String)
-                (clojure.walk/keywordize-keys (json/read-str (:body response)))
-                (:body response))]
-     (f (get-in body path))))
+   (let [body     (if (isa? (class (:body response)) String)
+                    (clojure.walk/keywordize-keys (json/read-str (:body response)))
+                    (:body response))
+         content  (get-in body path)]
+     (is (not (nil? content)) (str "No content found for " path " in: \n" body))
+     (f content)))
   ([f response]
    (dispatch-response-body-test f [] response)))
 
+(defn contains-file-entries [path entries]
+  (let [test-empty    #(is (not (empty? %)))
+        test-valid    #(dorun
+                         (for [f %]
+                           (for [key_ [:url :type :sha256]]
+                             (is (contains? f key_)))))
+        test-entries  #(dorun
+                         (for [e entries]
+                           (is (contains? % e))))
+        f (fn [xs]
+            (let [files (set xs)]
+              (do (test-empty files)
+                  (test-valid files)
+                  (test-entries files))))]
+    (partial dispatch-response-body-test f path)))
 
-
+(defn contains-event-entries [path entries]
+  (let [f (fn [events]
+            (dorun (map evt/is-valid-event? events))
+            (dorun (map (partial evt/has-event? events) entries)))]
+   (partial dispatch-response-body-test f path)))
 
 (defn is-ok-response [response]
   (is (contains? #{200 201} (:status response))))
@@ -44,27 +68,9 @@
   (let [f #(is (= true (:complete %)))]
     (dispatch-response-body-test f [] response)))
 
-(defn file-entry [[type_ url sha256 :as entry]]
+(defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))
 
-(defn contains-file-entries [response path & entries]
-  (let [files (set (get-in response path))]
-    (is (not (empty? files)))
-    (dorun
-      (for [f files]
-        (for [key_ [:url :type :sha256]]
-          (is (contains? f key_)))))
-    (dorun
-      (for [entry entries]
-        (is (contains? files entry))))))
-
-(defn contains-event-entries [response path & entries]
-  (let [events (->> (get-in response path)
-                    (map #(dissoc % :created_at :id))
-                    (set))]
-    (dorun
-      (for [e entries]
-        (is (contains? events e))))))
 
 (defn test-response [{:keys [api-call tests fixtures]}]
   (db/empty-database)

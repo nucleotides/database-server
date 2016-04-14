@@ -3,7 +3,18 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## v0.5.4 - 2015-03-11
+## v0.6.0 - 2016-4-13
+
+### Changed
+
+  * The input file nucleotides have been significatly changed with release
+    [96abff940b][] of the nucleotides-data repository. This version supports
+    these changes in the backend database and in the migration and import of
+    the data. The API however is still unchanged.
+
+[96abff940b]: https://github.com/nucleotides/nucleotides-data/commit/96abff940b9b44825071d76b2c0907791f03e7c3
+
+## v0.5.4 - 2016-03-11
 
 ### Added
 
@@ -34,7 +45,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 [liberator]: http://clojure-liberator.github.io/liberator/
 
-## v0.5.3 - 2015-02-25
+## v0.5.3 - 2016-02-25
 
 ### Changed
 
@@ -42,14 +53,14 @@ project adheres to [Semantic Versioning](http://semver.org/).
     file system layers being repeated 'popped' when the jar file is updated
     with a new version.
 
-## v0.5.2 - 2015-02-25
+## v0.5.2 - 2016-02-25
 
 ### Added
 
   * GET /task/:id now returns all the events associated with that task. This
     allows the completed events to be viewed for each task.
 
-## v0.5.1 - 2015-02-12
+## v0.5.1 - 2016-02-12
 
 ### Changed
 
@@ -61,7 +72,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
   * Removed no longer used AWS SDB code module
 
-## v0.5.0 - 2015-02-10
+## v0.5.0 - 2016-02-10
 
 ### Changed
 
@@ -83,14 +94,14 @@ project adheres to [Semantic Versioning](http://semver.org/).
     this 'data source' entity and can therefore be linked back to this
     metadata.
 
-## v0.4.0 - 2015-01-20
+## v0.4.0 - 2016-01-20
 
 ### Added
 
   * Added `/tasks/:id` - this provides a URL for getting metadata about a
     single task.
 
-## v0.3.0 - 2015-01-14
+## v0.3.0 - 2016-01-14
 
 ### Fixed
 
@@ -100,21 +111,21 @@ project adheres to [Semantic Versioning](http://semver.org/).
     migrations to be run repeatedly, the intended behaviour, when adding new
     data and images to the input files.
 
-## v0.2.3 - 2015-01-13
+## v0.2.3 - 2016-01-13
 
 ### Fixed
 
   * Don't show evaluation tasks in `/tasks/show.json` for which there are no
     produced input data available.
 
-## v0.2.2 - 2015-01-13
+## v0.2.2 - 2016-01-13
 
 ### Added
 
   * Initialisation scripts can optionally use RDS environment variables as set
     by elastic beanstalk.
 
-## v0.2.1 - 2015-01-08
+## v0.2.1 - 2016-01-08
 
 ### Added
 
@@ -122,7 +133,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
     image CMD now runs the migrations and then launches the server. This means
     migrations will be run every time the container is restarted or launched.
 
-## v0.2.0 - 2015-01-06
+## v0.2.0 - 2016-01-06
 
 ### Changed
 

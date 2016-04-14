@@ -1,26 +1,11 @@
 (ns nucleotides.database.load
   (:require
-    [clojure.set              :as st]
-    [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
-    [camel-snake-kebab.core   :as ksk]
     [yesql.core               :refer [defqueries]]
+    [camel-snake-kebab.core          :as ksk]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
-
-(defn metadata-types [connection table-name data]
-  (let [query "INSERT INTO %1$s (name, description)
-               SELECT '%2$s', '%3$s'
-               WHERE NOT EXISTS (SELECT id FROM %1$s WHERE name = '%2$s')
-               RETURNING id;"
-      save! (fn [entry]
-              (sql/query connection
-               (format query
-                       (str (ksk/->snake_case_string table-name) "_type")
-                       (:name entry)
-                       (:desc entry))))]
-    (dorun (map save! data))))
 
 (defn select-file-entries [k entries]
   (->> entries
@@ -28,38 +13,54 @@
        (remove empty?)
        (map #(assoc (last %) :source_name (first %)))))
 
-
 (defn unfold-by-key [collection-key singleton-key entry]
   (map
     #(-> entry (dissoc collection-key) (assoc singleton-key %))
     (collection-key entry)))
 
 (defn- load-entries
-  "Creates a function that transforms and saves data with a given
-  DB connection"
+  "Takes a save and optional transform function, returns a new function that
+  applies 'transform' and then maps the 'save' over the data."
   ([f save]
-   (fn [connection data]
+   (fn [data]
      (->> (f data)
-          (map #(save % {:connection connection}))
+          (map #(save % {:connection (con/create-connection)}))
           (dorun))))
   ([save]
    (load-entries identity save)))
 
-(def input-data-sources
+(def biological-sources
   "Loads input data sources into the database"
-  (load-entries save-input-data-source<!))
+  (let [f (fn [[k v]]
+            (assoc (:source v) :name (ksk/->snake_case_string k)))]
+   (load-entries (partial map f) save-biological-source<!)))
 
-(def input-data-source-files
-  "Loads references into file_instance and links to input_data_source"
-  (load-entries (partial select-file-entries :references) save-input-data-source-file<!))
+(def biological-source-files
+  "Loads references into file_instance table and links to input_data_source"
+  (let [f (fn [[k v]]
+            (->> (get-in v [:source :references])
+                 (flatten)
+                 (remove empty?)
+                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+   (load-entries (partial mapcat f) save-biological-source-file<!)))
 
 (def input-data-file-set
   "Load entries into the 'input_data_file_set' table"
-  (load-entries save-input-data-file-set<!))
+  (let [f (fn [[k v]]
+            (->>
+              (:data v)
+              (map #(assoc % :source_name (ksk/->snake_case_string k)))
+              (map #(dissoc % :files))))]
+  (load-entries (partial mapcat f) save-input-data-file-set<!)))
 
 (def input-data-files
   "Loads entries into 'file_instance' and links to 'input_data_file_set'"
-  (load-entries (partial select-file-entries :replicates) save-input-data-file<!))
+  (let [f (fn [[k v]]
+            (->> (:data v)
+                 (select [ALL (collect-one :name) (keypath :files) ALL])
+                 (map #(assoc (last %) :file_set_name (first %)))
+                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+   (load-entries (partial mapcat f) save-input-data-file<!)))
 
 (def image-instances
   "Select the image instances and load into the database"
@@ -67,35 +68,30 @@
             (map #(-> entry (dissoc :tasks) (assoc :task %)) (:tasks entry)))]
     (load-entries (partial mapcat f) save-image-instance<!)))
 
-(def benchmarks
+(def benchmark-types
+  "Load entries into the 'input_data_file_set' table"
+  (load-entries save-benchmark-type<!))
+
+(def benchmark-data
   "Load benchmark types into the database"
-  (let [save #(do (save-benchmark-type<! %1 %2)
-                  (save-benchmark-data<! %1 %2))]
-   (load-entries
-    (partial mapcat (partial unfold-by-key :input_data_file_sets :input_data_file_set))
-    save)))
-
-(defn rebuild-benchmark-task [connection]
-  (let [args [{} {:connection connection}]]
-    (apply populate-instance-and-task! args)))
-
-(def metadata-entries
-  [:platform :file :metric :protocol :product :run-mode :source :image])
+  (let [f #(map (comp
+                  (partial zipmap [:benchmark_name :source_name :file_set_name])
+                  flatten)
+                (select [(collect-one :name) (keypath :data_sets) ALL] %))]
+    (load-entries (partial mapcat f) save-benchmark-data<!)))
 
 (def loaders
-  [[input-data-sources       :data-source]
-   [input-data-source-files  :data-source]
-   [input-data-file-set      :data-file]
-   [input-data-files         :data-file]
-   [image-instances          :image-instance]
-   [benchmarks               :benchmark-type]])
+  [[image-instances          [:inputs :image]]
+   [biological-sources       [:data]]
+   [biological-source-files  [:data]]
+   [input-data-file-set      [:data]]
+   [input-data-files         [:data]]
+   [benchmark-types          [:inputs :benchmark]]
+   [benchmark-data           [:inputs :benchmark]]])
 
-(defn load-data
+(defn load-all-input-data
   "Load and update benchmark data in the database"
-  [connection data]
-  (let [load_         (fn [[f k]] (f connection (k data)))
-        load-metadata #(metadata-types connection % (% data))]
-    (do
-      (dorun (map load-metadata metadata-entries))
-      (dorun (map load_ loaders))
-      (rebuild-benchmark-task connection))))
+  [data]
+  (dorun
+    (for [[f ks] loaders]
+      (f (get-in data ks)))))

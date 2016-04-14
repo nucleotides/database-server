@@ -1,7 +1,5 @@
 (ns helper.database
-  (:require [clojure.test       :refer :all]
-            [clojure.java.jdbc               :as sql]
-            [clojure.string                  :as string]
+  (:require [clojure.java.jdbc               :as sql]
             [taoensso.timbre                 :as log]
             [migratus.core                   :as mg]
             [camel-snake-kebab.core          :as ksk]
@@ -29,7 +27,7 @@
 (defn empty-database []
   (do
     (drop-tables)
-    (mg/migrate (build/create-migratus-spec (con/create-connection)))))
+    (mg/migrate (build/create-migratus-spec))))
 
 (defn table-entries [table-name]
   (sql/query

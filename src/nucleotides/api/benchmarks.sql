@@ -20,11 +20,11 @@ WITH _benchmark AS (
 ),
 reference_files AS (
   SELECT
-  input_data_source_reference_file.file_instance_id AS file_instance_id
+  biological_source_reference_file.file_instance_id AS file_instance_id
   FROM _benchmark
   LEFT JOIN input_data_file                  ON input_data_file.id = _benchmark.input_data_file_id
   LEFT JOIN input_data_file_set              ON input_data_file_set.id = input_data_file.input_data_file_set_id
-  LEFT JOIN input_data_source_reference_file ON input_data_source_reference_file.input_data_source_id = input_data_file_set.input_data_source_id
+  LEFT JOIN biological_source_reference_file ON biological_source_reference_file.biological_source_id = input_data_file_set.biological_source_id
 ),
 produce_files AS (
   SELECT
