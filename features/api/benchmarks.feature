@@ -5,12 +5,15 @@ Feature: Getting benchmarks from the API by their ID
     And the database fixtures:
       | fixture                 |
       | metadata                |
-      | input_data_source       |
+      | biological_source       |
+      | biological_source_files |
       | input_data_file_set     |
       | input_data_file         |
       | assembly_image_instance |
-      | benchmarks              |
+      | benchmark_type          |
+      | benchmark_data          |
       | tasks                   |
+
 
   Scenario: Getting an unknown benchmark
     When I get the url "/benchmarks/unknown"

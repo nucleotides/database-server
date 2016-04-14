@@ -1,15 +1,9 @@
 (ns nucleotides.api.benchmarks-test
   (:require [clojure.test          :refer :all]
-            [yesql.core            :refer [defqueries]]
-            [com.rpl.specter          :refer :all]
-
-            [helper.fixture        :as fix]
-            [helper.database       :as db]
-            [helper.http-response  :as resp]
-            [helper.image          :as image]
-
-            [nucleotides.database.connection  :as con]
-            [nucleotides.api.benchmarks       :as bench]))
+            [helper.fixture              :as fix]
+            [helper.database             :as db]
+            [helper.http-response        :as resp]
+            [nucleotides.api.benchmarks  :as bench]))
 
 (def has-benchmark-fields
   (juxt

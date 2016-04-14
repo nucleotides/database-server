@@ -2,7 +2,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database using POSTGRES_* ENV variables
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     When in bash I run:
       """
       docker run \
@@ -18,84 +18,60 @@ Feature: Migrating and loading input data for the database
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
     And the following tables should not be empty:
-      | name          |
-      | platform_type |
-      | protocol_type |
-      | platform_type |
-      | run_mode_type |
-      | file_type     |
-      | metric_type   |
-      | source_type   |
-      | image_type    |
-    And the table "input_data_source" should have the entries:
-      | name             | source_type_id                 |
-      | ecoli_k12        | $source_type?name='microbe'    |
-      | kansas_farm_soil | $source_type?name='metagenome' |
-    And the table "input_data_source_reference_file" should have the entries:
-      | input_data_source_id                | file_instance_id                                                                         |
-      | $input_data_source?name='ecoli_k12' | $file_instance?sha256='6bac51cc35ee2d11782e7e31ea1bfd7247de2bfcdec205798a27c820b2810414' |
+      | name                   |
+      | platform_type          |
+      | protocol_type          |
+      | extraction_method_type |
+      | material_type          |
+      | run_mode_type          |
+      | file_type              |
+      | metric_type            |
+      | source_type            |
+      | image_type             |
+    And the table "biological_source" should have the entries:
+      | name                              | source_type_id                 |
+      | amycolatopsis_sulphurea_dsm_46092 | $source_type?name='microbe'    |
+    And the table "biological_source_reference_file" should have the entries:
+      | biological_source_id                                        | file_instance_id                                                                         |
+      | $biological_source?name='amycolatopsis_sulphurea_dsm_46092' | $file_instance?sha256='d2a60c17386f344a6edc08b5b3b389536c36aae1b8d6fc9394e1c132148288e7' |
     And the table "input_data_file_set" should have the entries:
-      | name                        | input_data_source_id                |
-      | jgi_isolate_microbe_2x150_1 | $input_data_source?name='ecoli_k12' |
+      | name               | biological_source_id                                        |
+      | regular_fragment_1 | $biological_source?name='amycolatopsis_sulphurea_dsm_46092' |
     And the table "input_data_file" should have the entries:
-      | input_data_file_set_id                                  | file_instance_id                                                                         |
-      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' |
-      | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' |
+      | file_instance_id                                                                         |
+      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' |
+      | $file_instance?sha256='573722ec83179cfb156f8a613691ee7c7d250770b42b111ae58720a8d22dae97' |
     And the table "image_instance" should have the entries:
-      | name                 | sha256   | image_type_id                              |
-      | bioboxes/velvet      | digest_1 | $image_type?name='short_read_assembler'    |
-      | bioboxes/ray         | digest_2 | $image_type?name='short_read_assembler'    |
-      | bioboxes/my-filterer | digest_3 | $image_type?name='short_read_preprocessor' |
+      | name                 | sha256                                                           | image_type_id                              |
+      | bioboxes/velvet      | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_type?name='short_read_assembler'    |
+      | bioboxes/ray         | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_type?name='short_read_assembler'    |
     And the table "image_instance_task" should have the entries:
       | task    | image_instance_id                           |
       | default | $image_instance?name='bioboxes/velvet'      |
       | careful | $image_instance?name='bioboxes/velvet'      |
-      | default | $image_instance?name='bioboxes/my-filterer' |
     And the table "benchmark_type" should have the entries:
       | name                                          | product_image_type_id                      |
       | illumina_isolate_reference_assembly           | $image_type?name='short_read_assembler'    |
-      | short_read_preprocessing_reference_evaluation | $image_type?name='short_read_preprocessor' |
     And the table "benchmark_data" should have the entries:
-      | benchmark_type_id                                                    | input_data_file_set_id                                  |
-      | $benchmark_type?name='illumina_isolate_reference_assembly'           | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
-      | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $input_data_file_set?name='jgi_isolate_microbe_2x150_1' |
+      | benchmark_type_id                                                    |
+      | $benchmark_type?name='illumina_isolate_reference_assembly'           |
     And the table "benchmark_instance" should have the entries:
       | file_instance_id                                                                         | benchmark_type_id                                                    | product_image_instance_id                   |
-      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
-      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
-      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-      | $file_instance?sha256='24b5b01b08482053d7d13acd514e359fb0b726f1e8ae36aa194b6ddc07335298' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
-      | $file_instance?sha256='11948b41d44931c6a25cabe58b138a4fc7ecc1ac628c40dcf1ad006e558fb533' | $benchmark_type?name='short_read_preprocessing_reference_evaluation' | $image_instance?name='bioboxes/my-filterer' |
+      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
+      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
     And the table "task_expanded_fields" should have the entries:
       | external_id                      | task_type | image_name                 | image_task |
-      | 0eafe866d98c59ca39715e936cfa401e | produce   | bioboxes/my-filterer       | default    |
-      | 0eafe866d98c59ca39715e936cfa401e | evaluate  | bioboxes/velvet-then-quast | default    |
       | 2f221a18eb86380369570b2ed147d8b4 | produce   | bioboxes/velvet            | default    |
       | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/quast             | default    |
       | 4f57d0ecf9622a0bd8a6e3f79c71a09d | produce   | bioboxes/velvet            | careful    |
       | 4f57d0ecf9622a0bd8a6e3f79c71a09d | evaluate  | bioboxes/quast             | default    |
-    And the table "task_expanded_fields" should not have the entries:
-      | external_id                      | task_type | image_name                 | image_task |
-      | 0eafe866d98c59ca39715e936cfa401e | evaluate  | bioboxes/quast             | default    |
-      | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/velvet-then-quast | default    |
 
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables
     And I copy the directory "../../test/data" to "data"
-    And the file "data/image_instance.yml" with:
+    And the file "data/inputs/image.yml" with:
       """
       ---
-      - image_type: short_read_assembler
-        name: bioboxes/velvet
-        sha256: digest_1
-        tasks:
-          - default
-      - image_type: reference_assembly_evaluation
-        name: bioboxes/quast
-        sha256: digest_4
-        tasks:
-          - default
       """
     When in bash I run:
       """
