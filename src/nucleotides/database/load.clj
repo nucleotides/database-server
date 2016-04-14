@@ -1,17 +1,11 @@
 (ns nucleotides.database.load
   (:require
-    [clojure.set              :as st]
-    [clojure.java.jdbc        :as sql]
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
-
     [camel-snake-kebab.core          :as ksk]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
-
-
-
 
 (defn select-file-entries [k entries]
   (->> entries

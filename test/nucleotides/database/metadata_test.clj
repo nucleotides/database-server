@@ -1,7 +1,6 @@
 (ns nucleotides.database.metadata-test
   (:require [clojure.test     :refer :all]
             [helper.database  :refer :all]
-            [helper.fixture   :refer :all]
 
             [nucleotides.database.files    :as files]
             [nucleotides.database.metadata :as mtd]))

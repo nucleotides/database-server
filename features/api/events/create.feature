@@ -5,11 +5,12 @@ Feature: Posting events to the API
     And the database fixtures:
       | fixture                 |
       | metadata                |
-      | input_data_source       |
+      | biological_source       |
       | input_data_file_set     |
       | input_data_file         |
       | assembly_image_instance |
-      | benchmarks              |
+      | benchmark_type          |
+      | benchmark_data          |
       | tasks                   |
 
   Scenario: Posting an unsuccessful event

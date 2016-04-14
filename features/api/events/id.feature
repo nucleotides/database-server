@@ -5,12 +5,14 @@ Feature: Getting events from the API
     And the database fixtures:
       | fixture                 |
       | metadata                |
-      | input_data_source       |
+      | biological_source       |
       | input_data_file_set     |
       | input_data_file         |
       | assembly_image_instance |
-      | benchmarks              |
+      | benchmark_type          |
+      | benchmark_data          |
       | tasks                   |
+
 
   Scenario: Getting an unknown event
     When I get the url "/events/1000"
