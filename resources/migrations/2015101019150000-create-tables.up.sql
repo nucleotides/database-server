@@ -80,7 +80,7 @@ CREATE TABLE input_data_file(
   id				serial		PRIMARY KEY,
   created_at			timestamp	DEFAULT current_timestamp,
   active			bool		NOT NULL DEFAULT true,
-  input_data_file_set_id	integer		NOT NULL REFERENCES biological_source(id),
+  input_data_file_set_id	integer		NOT NULL REFERENCES input_data_file_set(id),
   file_instance_id		integer		NOT NULL REFERENCES file_instance(id),
   CONSTRAINT unique_file_per_file_set_idx UNIQUE(input_data_file_set_id, file_instance_id)
 );
