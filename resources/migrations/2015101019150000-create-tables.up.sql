@@ -91,19 +91,26 @@ CREATE TABLE image_instance(
   id		serial		PRIMARY KEY,
   created_at	timestamp	DEFAULT current_timestamp,
   image_type_id	integer		NOT NULL REFERENCES image_type(id),
-  name		text		NOT NULL,
-  sha256	text		NOT NULL,
-  active	bool		NOT NULL DEFAULT true,
-  CONSTRAINT image_instance_idx UNIQUE(image_type_id, name, sha256)
+  name		text		UNIQUE NOT NULL,
+  active	bool		NOT NULL DEFAULT true
 );
 --;;
-CREATE TABLE image_instance_task(
+CREATE TABLE image_version(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
-  task			text		NOT NULL,
+  sha256		text		NOT NULL,
   active		bool		NOT NULL DEFAULT true,
-  CONSTRAINT image_instance_task_idx UNIQUE(image_instance_id, task)
+  CONSTRAINT image_version_idx UNIQUE(image_instance_id, sha256)
+);
+--;;
+CREATE TABLE image_task(
+  id			serial		PRIMARY KEY,
+  created_at		timestamp	DEFAULT current_timestamp,
+  image_version_id	integer		NOT NULL REFERENCES image_version(id),
+  name			text		NOT NULL,
+  active		bool		NOT NULL DEFAULT true,
+  CONSTRAINT image_instance_task_idx UNIQUE(image_task_id, name)
 );
 --;;
 --;; Benchmarks
