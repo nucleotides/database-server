@@ -122,10 +122,10 @@ tmp/input_data:
 	  --env="$(db_pass)" \
           --publish=5433:5432 \
 	  --detach=true \
-	  kiasaki/alpine-postgres:9.4 > $@
+	  kiasaki/alpine-postgres:9.5 > $@
 
 .rdm_image:
-	docker pull kiasaki/alpine-postgres:9.4
+	docker pull kiasaki/alpine-postgres:9.5
 	touch $@
 
 $(credentials): ./script/create_aws_credentials
