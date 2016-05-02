@@ -93,27 +93,21 @@ WHERE NOT EXISTS (
 
 -- name: save-image-instance<!
 -- Creates a new Docker image instance entry
-WITH _new_image_instance AS (
-    INSERT INTO image_instance (name, sha256, image_type_id)
-    SELECT
-      :name,
-      :sha256,
-      (SELECT id FROM image_type WHERE name = :image_type)
-    WHERE NOT EXISTS (SELECT id FROM image_instance WHERE name = :name)
-    RETURNING id
-),
-_image_instance AS (
-  SELECT id FROM image_instance WHERE name = :name
-  UNION ALL
-  SELECT * FROM _new_image_instance
-)
-INSERT INTO image_instance_task (task, image_instance_id)
-SELECT :task, (SELECT id FROM _image_instance)
-WHERE NOT EXISTS (
-  SELECT id FROM image_instance_task
-  WHERE task = :task
-  AND image_instance_id = (SELECT id FROM _image_instance)
-);
+INSERT INTO image_instance (name, image_type_id)
+VALUES (:image_name, (SELECT id FROM image_type WHERE name = :image_type))
+ON CONFLICT DO NOTHING
+
+-- name: save-image-version<!
+-- Creates a new Docker version entry
+INSERT INTO image_version (sha256, image_instance_id)
+VALUES (:sha256, (SELECT id FROM image_instance WHERE name = :image_name))
+ON CONFLICT DO NOTHING
+
+-- name: save-image-task<!
+-- Creates a new Docker task entry
+INSERT INTO image_task (name, image_version_id)
+VALUES (:task, (SELECT id FROM image_version WHERE sha256 = :sha256))
+ON CONFLICT DO NOTHING
 
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry

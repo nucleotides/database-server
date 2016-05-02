@@ -99,9 +99,8 @@ CREATE TABLE image_version(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
-  sha256		text		NOT NULL,
-  active		bool		NOT NULL DEFAULT true,
-  CONSTRAINT image_version_idx UNIQUE(image_instance_id, sha256)
+  sha256		text		UNIQUE NOT NULL,
+  active		bool		NOT NULL DEFAULT true
 );
 --;;
 CREATE TABLE image_task(
@@ -110,7 +109,7 @@ CREATE TABLE image_task(
   image_version_id	integer		NOT NULL REFERENCES image_version(id),
   name			text		NOT NULL,
   active		bool		NOT NULL DEFAULT true,
-  CONSTRAINT image_instance_task_idx UNIQUE(image_version_id, name)
+  CONSTRAINT image_task_idx UNIQUE(image_version_id, name)
 );
 --;;
 --;; Benchmarks
@@ -261,10 +260,10 @@ LANGUAGE PLPGSQL;
 --;;
 CREATE FUNCTION populate_task () RETURNS void AS $$
 BEGIN
-INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
+INSERT INTO task (benchmark_instance_id, image_task_id, task_type)
 	SELECT
 	benchmark_instance.id   AS benchmark_instance_id,
-	image_instance_task.id  AS image_instance_task_id,
+	image_task.id           AS image_task_id,
 	'evaluate'::task_type   AS task_type
 	FROM benchmark_instance
 	LEFT JOIN benchmark_type      ON benchmark_type.id = benchmark_instance.benchmark_type_id
@@ -273,16 +272,16 @@ INSERT INTO task (benchmark_instance_id, image_instance_task_id, task_type)
 	LEFT JOIN image_task          ON image_task.image_version_id = image_instance.id
 UNION
 	SELECT
-	benchmark_instance.id	                          AS benchmark_instance_id,
-	benchmark_instance.product_image_instance_task_id AS image_instance_task_id,
-	'produce'::task_type                              AS task_type
+	benchmark_instance.id	                 AS benchmark_instance_id,
+	benchmark_instance.product_image_task_id AS image_task_id,
+	'produce'::task_type                     AS task_type
 	FROM benchmark_instance
 EXCEPT
 	SELECT
 	benchmark_instance_id,
-	image_instance_task_id,
+	image_task_id,
 	task_type
 	FROM task
-ORDER BY benchmark_instance_id, image_instance_task_id, task_type ASC;
+ORDER BY benchmark_instance_id, image_task_id, task_type ASC;
 END; $$
 LANGUAGE PLPGSQL;

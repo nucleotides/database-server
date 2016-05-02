@@ -63,10 +63,20 @@
    (load-entries (partial mapcat f) save-input-data-file<!)))
 
 (def image-instances
-  "Select the image instances and load into the database"
-  (let [f (fn [entry]
-            (map #(-> entry (dissoc :tasks) (assoc :task %)) (:tasks entry)))]
-    (load-entries (partial mapcat f) save-image-instance<!)))
+  "Loads image instances, versions and tasks."
+  (let [transform #(->> %
+                        (select [(collect-one :image_type)
+                                 (collect-one :name)
+                                 (keypath :versions)
+                                 ALL
+                                 (collect-one :sha256)
+                                 (keypath :tasks)
+                                 ALL])
+                        (map (partial interleave [:image_type :image_name :sha256 :task]))
+                        (map (partial apply hash-map)))
+        f #(dorun (for [save [save-image-instance<! save-image-version<! save-image-task<!]]
+                    (save %1 %2)))]
+    (load-entries (partial mapcat transform) f)))
 
 (def benchmark-types
   "Load entries into the 'input_data_file_set' table"
