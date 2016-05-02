@@ -96,7 +96,6 @@ build: $(jar)
 	docker build --tag=$(name) .
 	touch $@
 
-
 $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.clj' -o -name '*.sql')
 	lein uberjar
 
@@ -113,8 +112,9 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container tmp/input_data
 tmp/input_data:
 	mkdir -p $(dir $@)
 	git clone https://github.com/nucleotides/nucleotides-data.git $@
-	cd ./$@ && git reset --hard bb895e1
-
+	cd ./$@ && \
+		git reset --hard bb895e1 && \
+		rm inputs/data/saccharopolyspora_spinosa_dsm_44228.yml
 
 .rdm_container: .rdm_image
 	docker run \
