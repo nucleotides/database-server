@@ -252,9 +252,7 @@ LEFT JOIN image_type          ON image_type.id = benchmark_type.product_image_ty
 INNER JOIN image_instance     ON image_instance.image_type_id = image_type.id
 LEFT JOIN image_version       ON image_version.image_instance_id = image_instance.id
 LEFT JOIN image_task          ON image_task.image_version_id = image_instance.id
-WHERE NOT EXISTS(
-	SELECT external_id FROM benchmark_instance WHERE benchmark_instance.external_id = external_id
-);
+ON CONFLICT DO NOTHING;
 END; $$
 LANGUAGE PLPGSQL;
 --;;

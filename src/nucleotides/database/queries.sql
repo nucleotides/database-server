@@ -1,8 +1,8 @@
 -- name: save-biological-source<!
 -- Creates a new input data source entry
 INSERT INTO biological_source (name, description, source_type_id)
-SELECT :name, :desc, (SELECT id FROM source_type WHERE name = :source_type)
-WHERE NOT EXISTS (SELECT 1 FROM biological_source WHERE name = :name);
+VALUES (:name, :desc, (SELECT id FROM source_type WHERE name = :source_type))
+ON CONFLICT DO NOTHING
 
 -- name: save-biological-source-file<!
 -- Creates link between biological_source and reference file_instance
@@ -24,13 +24,8 @@ _biological_source AS (
   SELECT * FROM biological_source WHERE name = :source_name
 )
 INSERT INTO biological_source_reference_file (biological_source_id, file_instance_id)
-SELECT (SELECT id FROM _biological_source), (SELECT id FROM _file)
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM biological_source_reference_file
-  WHERE biological_source_id = (SELECT id FROM _biological_source)
-  AND file_instance_id = (SELECT id FROM _file)
-)
+VALUES ((SELECT id FROM _biological_source), (SELECT id FROM _file))
+ON CONFLICT DO NOTHING
 
 -- name: save-input-data-file-set<!
 -- Creates a new input_data_file_set entry
@@ -43,7 +38,7 @@ INSERT INTO input_data_file_set (
   material_type_id,
   extraction_method_type_id,
   biological_source_id)
- SELECT
+ VALUES (
   :name,
   :desc,
   (SELECT id FROM platform_type WHERE name = :platform_type),
@@ -51,12 +46,8 @@ INSERT INTO input_data_file_set (
   (SELECT id FROM run_mode_type WHERE name = :run_mode_type),
   (SELECT id FROM material_type WHERE name = :material_type),
   (SELECT id FROM extraction_method_type WHERE name = :extraction_method_type),
-  (SELECT id FROM biological_source WHERE name = :source_name)
-WHERE NOT EXISTS (
-	SELECT id
-	FROM input_data_file_set
-	WHERE name = :name
-	AND biological_source_id = (SELECT id FROM biological_source WHERE name = :source_name))
+  (SELECT id FROM biological_source WHERE name = :source_name))
+ON CONFLICT DO NOTHING
 
 -- name: save-input-data-file<!
 -- Creates link between 'input_data_file_set' and 'file_instance'
@@ -83,13 +74,8 @@ _input_data_file_set AS (
 				WHERE name = :source_name)
 )
 INSERT INTO input_data_file (input_data_file_set_id, file_instance_id)
-SELECT (SELECT id FROM _input_data_file_set), (SELECT id FROM _file)
-WHERE NOT EXISTS (
-  SELECT 1
-  FROM input_data_file
-  WHERE input_data_file_set_id = (SELECT id FROM _input_data_file_set)
-  AND file_instance_id = (SELECT id FROM _file)
-)
+VALUES ((SELECT id FROM _input_data_file_set), (SELECT id FROM _file))
+ON CONFLICT DO NOTHING
 
 -- name: save-image-instance<!
 -- Creates a new Docker image instance entry
@@ -112,11 +98,11 @@ ON CONFLICT DO NOTHING
 -- name: save-benchmark-type<!
 -- Creates a new benchmark type entry
 INSERT INTO benchmark_type (name, description, product_image_type_id, evaluation_image_type_id)
-SELECT :name,
-       :desc,
+VALUES (:name,
+        :desc,
 	(SELECT id FROM image_type WHERE name = :product_image_type),
-	(SELECT id FROM image_type WHERE name = :evaluation_image_type)
-WHERE NOT EXISTS (SELECT 1 FROM benchmark_type WHERE name = :name);
+	(SELECT id FROM image_type WHERE name = :evaluation_image_type))
+ON CONFLICT DO NOTHING
 
 -- name: save-benchmark-data<!
 -- Creates a new benchmark type entry
@@ -134,11 +120,8 @@ _benchmark AS (
   WHERE name = :benchmark_name
 )
 INSERT INTO benchmark_data (input_data_file_set_id, benchmark_type_id)
-SELECT (SELECT id FROM _input_data_file_set), (SELECT id FROM _benchmark)
-WHERE NOT EXISTS (
-	SELECT 1 FROM benchmark_data
-	WHERE input_data_file_set_id = (SELECT id FROM _input_data_file_set)
-	AND benchmark_type_id        = (SELECT id FROM _benchmark))
+VALUES ((SELECT id FROM _input_data_file_set), (SELECT id FROM _benchmark))
+ON CONFLICT DO NOTHING
 
 -- name: populate-instance-and-task!
 -- Populates benchmark instance table with combinations of data record and image task
