@@ -3,11 +3,22 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## v0.6.0 - 2016-4-13
+## v0.7.0 - 2015-05-03
 
 ### Changed
 
-  * The input file nucleotides have been significatly changed with release
+  * The nucleotides input file release [bb895e1][] now support multiple
+    versions of the same image using the SHA256 of the image to distinguish
+    them. This release supports multiple image versions through an additional
+    database table `image_version`. The API however is unchanged.
+
+[bb895e1]: https://github.com/nucleotides/nucleotides-data/commit/bb895e180a12b6bd6788b500a7a52fb587e7504c
+
+## v0.6.0 - 2016-04-13
+
+### Changed
+
+  * The nucleotides input files have been significantly changed with release
     [96abff940b][] of the nucleotides-data repository. This version supports
     these changes in the backend database and in the migration and import of
     the data. The API however is still unchanged.
