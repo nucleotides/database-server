@@ -1,7 +1,7 @@
 (ns nucleotides.api.benchmarks
   (:require [yesql.core             :refer [defqueries]]
-            [nucleotides.api.tasks            :as task]
-            [nucleotides.api.util             :as util]))
+            [nucleotides.api.tasks  :as task]
+            [nucleotides.api.util   :as util]))
 
 (defqueries "nucleotides/api/benchmarks.sql")
 

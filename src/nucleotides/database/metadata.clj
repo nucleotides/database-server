@@ -7,8 +7,8 @@
 
 (defn save-metadatum! [table-name entry]
   (let [query "INSERT INTO %1$s (name, description)
-               SELECT '%2$s', '%3$s'
-               WHERE NOT EXISTS (SELECT id FROM %1$s WHERE name = '%2$s')
+               VALUES ('%2$s', '%3$s')
+               ON CONFLICT DO NOTHING
                RETURNING id;"]
     (sql/query (con/create-connection)
                (format query

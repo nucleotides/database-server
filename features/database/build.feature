@@ -28,43 +28,59 @@ Feature: Migrating and loading input data for the database
       | metric_type            |
       | source_type            |
       | image_type             |
-    And the table "biological_source" should have the entries:
+    And the table "biological_source" should include the entries:
       | name                              | source_type_id                 |
       | amycolatopsis_sulphurea_dsm_46092 | $source_type?name='microbe'    |
-    And the table "biological_source_reference_file" should have the entries:
+    And the table "biological_source_reference_file" should include the entries:
       | biological_source_id                                        | file_instance_id                                                                         |
       | $biological_source?name='amycolatopsis_sulphurea_dsm_46092' | $file_instance?sha256='d2a60c17386f344a6edc08b5b3b389536c36aae1b8d6fc9394e1c132148288e7' |
-    And the table "input_data_file_set" should have the entries:
+    And the table "input_data_file_set" should contain "1" rows
+    And the table "input_data_file_set" should include the entries:
       | name               | biological_source_id                                        |
       | regular_fragment_1 | $biological_source?name='amycolatopsis_sulphurea_dsm_46092' |
-    And the table "input_data_file" should have the entries:
+    And the table "input_data_file" should contain "5" rows
+    And the table "input_data_file" should include the entries:
       | file_instance_id                                                                         |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' |
       | $file_instance?sha256='573722ec83179cfb156f8a613691ee7c7d250770b42b111ae58720a8d22dae97' |
-    And the table "image_instance" should have the entries:
-      | name                 | sha256                                                           | image_type_id                              |
-      | bioboxes/velvet      | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_type?name='short_read_assembler'    |
-      | bioboxes/ray         | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_type?name='short_read_assembler'    |
-    And the table "image_instance_task" should have the entries:
-      | task    | image_instance_id                           |
-      | default | $image_instance?name='bioboxes/velvet'      |
-      | careful | $image_instance?name='bioboxes/velvet'      |
-    And the table "benchmark_type" should have the entries:
+    And the table "image_instance" should contain "3" rows
+    And the table "image_instance" should include the entries:
+      | name                  | image_type_id                                    |
+      | bioboxes/velvet       | $image_type?name='short_read_assembler'          |
+      | bioboxes/ray          | $image_type?name='short_read_assembler'          |
+      | bioboxes/quast        | $image_type?name='reference_assembly_evaluation' |
+    And the table "image_version" should contain "3" rows
+    And the table "image_version" should include the entries:
+      | sha256                                                           | image_instance_id                      |
+      | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
+      | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
+      | 1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc | $image_instance?name='bioboxes/quast'  |
+    And the table "image_task" should contain "4" rows
+    And the table "image_task" should include the entries:
+      | name    | image_version_id                                                                         |
+      | default | $image_version?sha256='6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad' |
+      | default | $image_version?sha256='faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29' |
+      | default | $image_version?sha256='1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc' |
+    And the table "benchmark_type" should contain "1" rows
+    And the table "benchmark_type" should include the entries:
       | name                                          | product_image_type_id                      |
       | illumina_isolate_reference_assembly           | $image_type?name='short_read_assembler'    |
-    And the table "benchmark_data" should have the entries:
+    And the table "benchmark_data" should contain "1" rows
+    And the table "benchmark_data" should include the entries:
       | benchmark_type_id                                                    |
       | $benchmark_type?name='illumina_isolate_reference_assembly'           |
-    And the table "benchmark_instance" should have the entries:
+    And the table "benchmark_instance" should contain "15" rows
+    And the table "benchmark_instance" should include the entries:
       | file_instance_id                                                                         | benchmark_type_id                                                    | product_image_instance_id                   |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-    And the table "task_expanded_fields" should have the entries:
-      | external_id                      | task_type | image_name                 | image_task |
-      | 2f221a18eb86380369570b2ed147d8b4 | produce   | bioboxes/velvet            | default    |
-      | 2f221a18eb86380369570b2ed147d8b4 | evaluate  | bioboxes/quast             | default    |
-      | 4f57d0ecf9622a0bd8a6e3f79c71a09d | produce   | bioboxes/velvet            | careful    |
-      | 4f57d0ecf9622a0bd8a6e3f79c71a09d | evaluate  | bioboxes/quast             | default    |
+    And the table "task" should contain "30" rows
+    And the table "task_expanded_fields" should include the entries:
+      | task_type | image_name                 | image_task |
+      | produce   | bioboxes/velvet            | default    |
+      | evaluate  | bioboxes/quast             | default    |
+      | produce   | bioboxes/velvet            | careful    |
+      | evaluate  | bioboxes/quast             | default    |
 
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables

@@ -113,12 +113,12 @@
     (testing "an incomplete produce task"
       (test-get-task
         {:task-id 1
-         :files [["short_read_fastq" "s3://reads" "c1f0f"]]}))
+         :files [["short_read_fastq" "s3://reads" "7673a"]]}))
 
     (testing "an successfully completed produce task"
       (test-get-task
         {:task-id 1
-         :files [["short_read_fastq" "s3://reads" "c1f0f"]]
+         :files [["short_read_fastq" "s3://reads" "7673a"]]
          :fixtures [:successful-product-event]
          :events [(mock-event :produce :success)]}))
 
@@ -249,7 +249,7 @@
     (testing "a completed benchmark"
       (test-app-response
         {:method          :get
-         :url             "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+         :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
          :fixtures        [:successful_product_event :successful_evaluate_event]
          :response-tests  [resp/is-ok-response
                            resp/is-not-empty-body
