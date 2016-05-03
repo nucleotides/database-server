@@ -112,9 +112,12 @@ bootstrap: Gemfile.lock $(credentials) .rdm_container tmp/input_data
 tmp/input_data:
 	mkdir -p $(dir $@)
 	git clone https://github.com/nucleotides/nucleotides-data.git $@
-	cd ./$@ && \
+	cd ./$@/inputs/ && \
 		git reset --hard bb895e1 && \
-		rm inputs/data/saccharopolyspora_spinosa_dsm_44228.yml
+		rm data/saccharopolyspora_spinosa_dsm_44228.yml && \
+		sed '$$d' benchmark.yml > tmp && \
+		mv tmp benchmark.yml
+
 
 .rdm_container: .rdm_image
 	docker run \
