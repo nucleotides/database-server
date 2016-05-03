@@ -2,7 +2,6 @@
   (:require [clojure.test     :refer :all]
             [helper.database  :refer :all]
             [helper.fixture   :refer :all]
-    [com.rpl.specter          :refer :all]
 
             [nucleotides.database.files      :as files]
             [nucleotides.database.load       :as ld]
