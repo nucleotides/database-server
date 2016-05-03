@@ -27,14 +27,14 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 1                                  |
       | complete        | false                              |
-      | benchmark       | "453e406dcee4d18174d4ff623f52dcd8" |
+      | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "produce"                          |
       | image/task      | "default"                          |
-      | image/name      | "bioboxes/ray"                     |
+      | image/name      | "bioboxes/velvet"                  |
       | image/type      | "short_read_assembler"             |
-      | image/sha256    | "digest_2"                         |
+      | image/sha256    | "digest_1"                         |
       | inputs/0/url    | "s3://reads"                       |
-      | inputs/0/sha256 | "c1f0f"                            |
+      | inputs/0/sha256 | "7673a"                            |
       | inputs/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "benchmark_instance_id"
 
@@ -49,14 +49,14 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id                      | 1                                  |
       | complete                | true                               |
-      | benchmark               | "453e406dcee4d18174d4ff623f52dcd8" |
+      | benchmark               | "2f221a18eb86380369570b2ed147d8b4" |
       | type                    | "produce"                          |
       | image/task              | "default"                          |
-      | image/name              | "bioboxes/ray"                     |
+      | image/name              | "bioboxes/velvet"                  |
       | image/type              | "short_read_assembler"             |
-      | image/sha256            | "digest_2"                         |
+      | image/sha256            | "digest_1"                         |
       | inputs/0/url            | "s3://reads"                       |
-      | inputs/0/sha256         | "c1f0f"                            |
+      | inputs/0/sha256         | "7673a"                            |
       | inputs/0/type           | "short_read_fastq"                 |
       | events/0/id             | 1                                  |
       | events/0/success        | true                               |
@@ -88,12 +88,12 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
-      | benchmark       | "453e406dcee4d18174d4ff623f52dcd8" |
+      | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
       | image/type      | "reference_assembly_evaluation"    |
-      | image/sha256    | "digest_4"                         |
+      | image/sha256    | "digest_3"                         |
       | inputs/0/url    | "s3://ref"                         |
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |
@@ -109,12 +109,12 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
-      | benchmark       | "453e406dcee4d18174d4ff623f52dcd8" |
+      | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
       | image/type      | "reference_assembly_evaluation"    |
-      | image/sha256    | "digest_4"                         |
+      | image/sha256    | "digest_3"                         |
       | inputs/0/url    | "s3://ref"                         |
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |
@@ -131,12 +131,12 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
-      | benchmark       | "453e406dcee4d18174d4ff623f52dcd8" |
+      | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
       | image/type      | "reference_assembly_evaluation"    |
-      | image/sha256    | "digest_4"                         |
+      | image/sha256    | "digest_3"                         |
       | inputs/0/url    | "s3://ref"                         |
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |

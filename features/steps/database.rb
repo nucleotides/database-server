@@ -30,7 +30,7 @@ Then(/^the following tables should not be empty:$/) do |table|
   end
 end
 
-Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
+Then(/^the table "(.*?)" should include the entries:$/) do |name, table|
   entries = table_entries(name)
   table   = table.hashes.map do |row|
     row = Hash[row.map do |(k, v)|
@@ -54,7 +54,7 @@ Then(/^the table "(.*?)" should have the entries:$/) do |name, table|
 end
 
 
-Then(/^the table "(.*?)" should not have the entries:$/) do |name, table|
+Then(/^the table "(.*?)" should not include the entries:$/) do |name, table|
   entries = table_entries(name)
   table   = table.hashes.map do |row|
     row = Hash[row.map do |(k, v)|
@@ -73,4 +73,8 @@ Then(/^the table "(.*?)" should not have the entries:$/) do |name, table|
       fail("The table '#{name}' should not include the entry:\n#{row}")
     end
   end
+end
+
+Then(/^the table "(.*?)" should contain "(.*?)" rows$/) do |table, count|
+  expect(table_entries(table).count).to eq(count.to_i)
 end

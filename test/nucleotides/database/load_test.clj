@@ -33,7 +33,7 @@
   (test-data-loader
     {:fixtures [:metadata]
      :loader   #(ld/image-instances (get-in input-data [:inputs :image]))
-     :tables   [:image-instance :image-instance-task]}))
+     :tables   [:image-instance :image-version :image-task]}))
 
 (deftest load-biological-sources
   (test-data-loader

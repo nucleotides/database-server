@@ -44,7 +44,7 @@ Feature: Getting benchmarks from the API by their ID
       | complete        | false                           |
       | image/task      | "default"                       |
       | image/name      | "bioboxes/quast"                |
-      | image/sha256    | "digest_4"                      |
+      | image/sha256    | "digest_3"                      |
       | image/type      | "reference_assembly_evaluation" |
       | inputs/0/url    | "s3://ref"                      |
       | inputs/0/sha256 | "d421a4"                        |
@@ -54,11 +54,11 @@ Feature: Getting benchmarks from the API by their ID
     Given the database fixtures:
       | fixture                  |
       | successful_product_event |
-    When I get the url "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+    When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
-      | id       | "453e406dcee4d18174d4ff623f52dcd8"    |
+      | id       | "2f221a18eb86380369570b2ed147d8b4"    |
       | complete | false                                 |
       | type     | "illumina_isolate_reference_assembly" |
     And the JSON should not have "task_id"
@@ -67,11 +67,11 @@ Feature: Getting benchmarks from the API by their ID
       | complete        | true                               |
       | type            | "produce"                          |
       | image/task      | "default"                          |
-      | image/name      | "bioboxes/ray"                     |
+      | image/name      | "bioboxes/velvet"                  |
       | image/type      | "short_read_assembler"             |
-      | image/sha256    | "digest_2"                         |
+      | image/sha256    | "digest_1"                         |
       | inputs/0/url    | "s3://reads"                       |
-      | inputs/0/sha256 | "c1f0f"                            |
+      | inputs/0/sha256 | "7673a"                            |
       | inputs/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "task/0/inputs/1"
     And the JSON at "tasks/1" should have the following:
@@ -81,7 +81,7 @@ Feature: Getting benchmarks from the API by their ID
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
       | image/type      | "reference_assembly_evaluation"    |
-      | image/sha256    | "digest_4"                         |
+      | image/sha256    | "digest_3"                         |
       | inputs/0/url    | "s3://ref"                         |
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |
@@ -96,11 +96,11 @@ Feature: Getting benchmarks from the API by their ID
       | fixture                  |
       | successful_product_event |
       | successful_evaluate_event |
-    When I get the url "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
+    When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
-      | id       | "453e406dcee4d18174d4ff623f52dcd8"    |
+      | id       | "2f221a18eb86380369570b2ed147d8b4"    |
       | complete | true                                  |
       | type     | "illumina_isolate_reference_assembly" |
     And the JSON should not have "task_id"
@@ -109,11 +109,11 @@ Feature: Getting benchmarks from the API by their ID
       | complete        | true                               |
       | type            | "produce"                          |
       | image/task      | "default"                          |
-      | image/name      | "bioboxes/ray"                     |
+      | image/name      | "bioboxes/velvet"                  |
       | image/type      | "short_read_assembler"             |
-      | image/sha256    | "digest_2"                         |
+      | image/sha256    | "digest_1"                         |
       | inputs/0/url    | "s3://reads"                       |
-      | inputs/0/sha256 | "c1f0f"                            |
+      | inputs/0/sha256 | "7673a"                            |
       | inputs/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "task/0/inputs/1"
     And the JSON at "tasks/1" should have the following:
@@ -123,7 +123,7 @@ Feature: Getting benchmarks from the API by their ID
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |
       | image/type      | "reference_assembly_evaluation"    |
-      | image/sha256    | "digest_4"                         |
+      | image/sha256    | "digest_3"                         |
       | inputs/0/url    | "s3://ref"                         |
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |

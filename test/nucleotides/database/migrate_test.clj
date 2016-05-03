@@ -15,7 +15,8 @@
 
    :image-type
    :image-instance
-   :image-instance-task
+   :image-version
+   :image-task
 
    :biological-source
    :biological-source-reference-file
