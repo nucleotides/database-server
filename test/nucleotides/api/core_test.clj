@@ -65,7 +65,7 @@
      :url             (str "/tasks/" task-id)
      :fixtures        fixtures
      :response-tests  [resp/is-ok-response
-                       has-image-metadata
+                       (resp/is-not-empty-at [:image])
                        task-test/contains-task-entries
                        (resp/contains-file-entries  [:inputs] (map resp/file-entry files))
                        (resp/contains-event-entries [:events] events)]}))

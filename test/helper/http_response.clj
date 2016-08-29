@@ -18,6 +18,13 @@
   ([f response]
    (dispatch-response-body-test f [] response)))
 
+(defn is-not-empty-at
+  "Creates a function which given a http response ensures the collection
+  at the specified path is not empty"
+  [path]
+  (let [f #(is (not (empty? %)) (str "Collection at " path " is empty"))]
+    (partial dispatch-response-body-test f path)))
+
 (defn contains-file-entries [path entries]
   (let [test-empty    #(is (not (empty? %)))
         test-valid    #(dorun
@@ -33,6 +40,8 @@
                   (test-valid files)
                   (test-entries files))))]
     (partial dispatch-response-body-test f path)))
+
+
 
 (defn contains-event-entries [path entries]
   (let [f (fn [events]
