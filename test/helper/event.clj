@@ -41,12 +41,6 @@
 (def mock-json-event
   (comp json/write-str mock-event))
 
-(defn is-valid-event? [e]
-  (let [ks [:id :created_at :task :success :files :metrics]]
-    (dorun
-      (for [k ks]
-        (is (contains? e k))))))
-
 (defn has-event? [coll event]
   (let [events (into #{} (map #(dissoc % :created_at :id) coll))]
     (is (contains? events event))))

@@ -1,5 +1,7 @@
 (ns helper.http-response
   (:require [clojure.test       :refer :all]
+            [helper.validation  :refer :all]
+
             [clojure.data.json  :as json]
             [helper.database    :as db]
             [helper.event       :as evt]
@@ -25,27 +27,19 @@
   (let [f #(is (not (empty? %)) (str "Collection at " path " is empty"))]
     (partial dispatch-response-body-test f path)))
 
-(defn contains-file-entries [path entries]
-  (let [test-empty    #(is (not (empty? %)))
-        test-valid    #(dorun
-                         (for [f %]
-                           (for [key_ [:url :type :sha256]]
-                             (is (contains? f key_)))))
-        test-entries  #(dorun
-                         (for [e entries]
-                           (is (contains? % e))))
-        f (fn [xs]
-            (let [files (set xs)]
-              (do (test-empty files)
-                  (test-valid files)
-                  (test-entries files))))]
-    (partial dispatch-response-body-test f path)))
-
-
+(defn contains-entries-at?
+  "Creates a function which given a http response ensures the collection
+  at the specified path contains the given entries"
+  [path entries]
+  (partial dispatch-response-body-test
+           (fn [xs]
+             (let [coll (into #{} xs)
+                   f    #(is (contains? coll %))]
+               (dorun (map f entries))))
+           path))
 
 (defn contains-event-entries [path entries]
   (let [f (fn [events]
-            (dorun (map evt/is-valid-event? events))
             (dorun (map (partial evt/has-event? events) entries)))]
    (partial dispatch-response-body-test f path)))
 
@@ -69,13 +63,8 @@
 (defn is-not-empty-body [response]
   (is (not (empty? (json/read-str (:body response))))))
 
-(defn is-not-complete [response]
-  (let [f #(is (= false (:complete %)))]
-    (dispatch-response-body-test f [] response)))
-
-(defn is-complete [response]
-  (let [f #(is (= true (:complete %)))]
-    (dispatch-response-body-test f [] response)))
+(defn is-complete? [state]
+  (partial dispatch-response-body-test #(is (= % state)) [:complete]))
 
 (defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))
