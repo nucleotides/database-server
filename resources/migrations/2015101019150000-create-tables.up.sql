@@ -99,8 +99,10 @@ CREATE TABLE image_version(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
+  name			text		NOT NULL,
   sha256		text		UNIQUE NOT NULL,
   active		bool		NOT NULL DEFAULT true
+  CONSTRAINT image_name_idx UNIQUE(image_instance_id, name)
 );
 --;;
 CREATE TABLE image_task(
