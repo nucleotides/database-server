@@ -101,7 +101,7 @@ CREATE TABLE image_version(
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
   name			text		NOT NULL,
   sha256		text		UNIQUE NOT NULL,
-  active		bool		NOT NULL DEFAULT true
+  active		bool		NOT NULL DEFAULT true,
   CONSTRAINT image_name_idx UNIQUE(image_instance_id, name)
 );
 --;;

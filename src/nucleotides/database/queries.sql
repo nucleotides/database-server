@@ -85,8 +85,8 @@ ON CONFLICT DO NOTHING
 
 -- name: save-image-version<!
 -- Creates a new Docker version entry
-INSERT INTO image_version (sha256, image_instance_id)
-VALUES (:sha256, (SELECT id FROM image_instance WHERE name = :image_name))
+INSERT INTO image_version (sha256, name, image_instance_id)
+VALUES (:sha256, :version_name, (SELECT id FROM image_instance WHERE name = :image_name))
 ON CONFLICT DO NOTHING
 
 -- name: save-image-task<!

@@ -5,11 +5,11 @@ VALUES
 	((SELECT id FROM image_type WHERE name = 'reference_assembly_evaluation'), 'bioboxes/quast' );
 
 
-INSERT INTO "image_version" ("image_instance_id", "sha256")
+INSERT INTO "image_version" ("image_instance_id", "sha256", "name")
 VALUES
-	((SELECT id FROM image_instance WHERE name = 'bioboxes/velvet'), 'digest_1'),
-	((SELECT id FROM image_instance WHERE name = 'bioboxes/ray'   ), 'digest_2'),
-	((SELECT id FROM image_instance WHERE name = 'bioboxes/quast' ), 'digest_3');
+	((SELECT id FROM image_instance WHERE name = 'bioboxes/velvet'), 'digest_1', 'ver_1'),
+	((SELECT id FROM image_instance WHERE name = 'bioboxes/ray'   ), 'digest_2', 'ver_2'),
+	((SELECT id FROM image_instance WHERE name = 'bioboxes/quast' ), 'digest_3', 'ver_3');
 
 INSERT INTO "image_task" ("image_version_id", "name")
 VALUES
