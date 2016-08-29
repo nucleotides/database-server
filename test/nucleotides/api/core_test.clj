@@ -1,5 +1,7 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
+            [helper.validation  :refer :all]
+
             [ring.mock.request  :as mock]
             [clojure.data.json  :as json]
 
@@ -7,7 +9,6 @@
             [helper.fixture        :as fix]
             [helper.http-response  :as resp]
             [helper.database       :as db]
-            [helper.image          :as image]
 
             [nucleotides.api.benchmarks-test :as bench-test]
             [nucleotides.api.tasks-test      :as task-test]
@@ -64,7 +65,7 @@
      :url             (str "/tasks/" task-id)
      :fixtures        fixtures
      :response-tests  [resp/is-ok-response
-                       image/has-image-metadata
+                       has-image-metadata
                        task-test/contains-task-entries
                        (resp/contains-file-entries  [:inputs] (map resp/file-entry files))
                        (resp/contains-event-entries [:events] events)]}))

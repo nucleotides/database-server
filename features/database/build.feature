@@ -51,10 +51,10 @@ Feature: Migrating and loading input data for the database
       | bioboxes/quast        | $image_type?name='reference_assembly_evaluation' |
     And the table "image_version" should contain "3" rows
     And the table "image_version" should include the entries:
-      | sha256                                                           | image_instance_id                      |
-      | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
-      | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
-      | 1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc | $image_instance?name='bioboxes/quast'  |
+      | name | sha256                                                           | image_instance_id                      |
+      | v_1  | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
+      | v_2  | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
+      | v_3  | 1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc | $image_instance?name='bioboxes/quast'  |
     And the table "image_task" should contain "4" rows
     And the table "image_task" should include the entries:
       | name    | image_version_id                                                                         |
