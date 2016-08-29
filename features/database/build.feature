@@ -84,7 +84,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     And the file "data/inputs/image.yml" with:
       """
       ---
@@ -107,7 +107,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     When in bash I run:
       """
       docker run \
@@ -126,7 +126,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Loading and then reloading the database with the same data
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     And in bash I successfully run:
       """
       docker run \
