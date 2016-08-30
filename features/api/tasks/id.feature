@@ -33,7 +33,7 @@ Feature: Getting benchmarking tasks by ID
       | image/name      | "bioboxes/velvet"                  |
       | image/type      | "short_read_assembler"             |
       | image/sha256    | "digest_1"                         |
-      | image/version   | "v_1"                              |
+      | image/version   | "ver_1"                            |
       | inputs/0/url    | "s3://reads"                       |
       | inputs/0/sha256 | "7673a"                            |
       | inputs/0/type   | "short_read_fastq"                 |
