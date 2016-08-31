@@ -9,6 +9,7 @@
 
 (def image-keys
   {:image_name    :name,
+   :image_version :version,
    :image_sha256  :sha256,
    :image_task    :task
    :image_type    :type})

@@ -51,16 +51,16 @@ Feature: Migrating and loading input data for the database
       | bioboxes/quast        | $image_type?name='reference_assembly_evaluation' |
     And the table "image_version" should contain "3" rows
     And the table "image_version" should include the entries:
-      | sha256                                                           | image_instance_id                      |
-      | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
-      | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
-      | 1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc | $image_instance?name='bioboxes/quast'  |
+      | name   | sha256                                                           | image_instance_id                      |
+      | 1.2.0  | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
+      | 2.3.0  | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
+      | 4.2    | 5af634ee3f1bc3f80a749ce768883a20f793e1791f8f404a316d7d7012423cb9 | $image_instance?name='bioboxes/quast'  |
     And the table "image_task" should contain "4" rows
     And the table "image_task" should include the entries:
       | name    | image_version_id                                                                         |
       | default | $image_version?sha256='6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad' |
       | default | $image_version?sha256='faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29' |
-      | default | $image_version?sha256='1c70cbff3de254f26102cbd25e6c4cd0c30b2af99cd14297493690db7bfb4dbc' |
+      | default | $image_version?sha256='5af634ee3f1bc3f80a749ce768883a20f793e1791f8f404a316d7d7012423cb9' |
     And the table "benchmark_type" should contain "1" rows
     And the table "benchmark_type" should include the entries:
       | name                                          | product_image_type_id                      |
@@ -84,7 +84,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     And the file "data/inputs/image.yml" with:
       """
       ---
@@ -107,7 +107,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Migrating and loading the database using RDS_* ENV variables
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     When in bash I run:
       """
       docker run \
@@ -126,7 +126,7 @@ Feature: Migrating and loading input data for the database
 
   Scenario: Loading and then reloading the database with the same data
     Given an empty database without any tables
-    And I copy the directory "../../test/data" to "data"
+    And I copy the directory "../../tmp/input_data" to "data"
     And in bash I successfully run:
       """
       docker run \

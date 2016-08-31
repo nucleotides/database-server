@@ -70,9 +70,10 @@
                                  (keypath :versions)
                                  ALL
                                  (collect-one :sha256)
+                                 (collect-one :name)
                                  (keypath :tasks)
                                  ALL])
-                        (map (partial interleave [:image_type :image_name :sha256 :task]))
+                        (map (partial interleave [:image_type :image_name :sha256 :version_name :task]))
                         (map (partial apply hash-map)))
         f #(dorun (for [save [save-image-instance<! save-image-version<! save-image-task<!]]
                     (save %1 %2)))]

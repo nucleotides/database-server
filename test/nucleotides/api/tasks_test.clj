@@ -6,9 +6,6 @@
             [nucleotides.api.tasks            :as task]))
 
 
-(def contains-task-entries
-  (resp/does-http-body-contain [:id :benchmark :type :complete :image :inputs]))
-
 (use-fixtures :each (fn [f]
                       (do
                         (db/empty-database)

@@ -1,5 +1,7 @@
 (ns nucleotides.api.core-test
   (:require [clojure.test       :refer :all]
+            [helper.validation  :refer :all]
+
             [ring.mock.request  :as mock]
             [clojure.data.json  :as json]
 
@@ -7,7 +9,6 @@
             [helper.fixture        :as fix]
             [helper.http-response  :as resp]
             [helper.database       :as db]
-            [helper.image          :as image]
 
             [nucleotides.api.benchmarks-test :as bench-test]
             [nucleotides.api.tasks-test      :as task-test]
@@ -45,8 +46,8 @@
      :fixtures        fixtures
      :response-tests  [resp/is-ok-response
                        resp/is-not-empty-body
-                       (resp/does-http-body-contain [:task :success :created_at :metrics :id :files])
-                       (resp/contains-file-entries  [:files] (map resp/file-entry files))]}))
+                       (partial resp/dispatch-response-body-test is-valid-event?)
+                       (resp/contains-entries-at? [:files] (map resp/file-entry files))]}))
 
 
 (defn test-show-tasks [{:keys [fixtures expected]}]
@@ -64,10 +65,20 @@
      :url             (str "/tasks/" task-id)
      :fixtures        fixtures
      :response-tests  [resp/is-ok-response
-                       image/has-image-metadata
-                       task-test/contains-task-entries
-                       (resp/contains-file-entries  [:inputs] (map resp/file-entry files))
+                       (partial resp/dispatch-response-body-test is-valid-task?)
+                       (resp/contains-entries-at? [:inputs] (map resp/file-entry files))
                        (resp/contains-event-entries [:events] events)]}))
+
+(defn test-get-benchmark [{:keys [benchmark-id fixtures complete]}]
+  (test-app-response
+    {:method          :get
+     :url             (str "/benchmarks/" benchmark-id)
+     :fixtures        fixtures
+     :response-tests  [resp/is-ok-response
+                       resp/is-not-empty-body
+                       (partial resp/dispatch-response-body-test is-valid-benchmark?)
+                       (resp/is-complete? complete)]}))
+
 
 
 (deftest app
@@ -237,22 +248,12 @@
                            (resp/has-body "Benchmark not found: unknown")]}))
 
     (testing "a benchmark with no events"
-      (test-app-response
-        {:method          :get
-         :url             "/benchmarks/453e406dcee4d18174d4ff623f52dcd8"
-         :response-tests  [resp/is-ok-response
-                           resp/is-not-complete
-                           resp/is-not-empty-body
-                           bench-test/has-benchmark-fields
-                           bench-test/has-task-fields]}))
+      (test-get-benchmark
+        {:benchmark-id  "453e406dcee4d18174d4ff623f52dcd8"
+         :complete      false}))
 
     (testing "a completed benchmark"
-      (test-app-response
-        {:method          :get
-         :url             "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
-         :fixtures        [:successful_product_event :successful_evaluate_event]
-         :response-tests  [resp/is-ok-response
-                           resp/is-not-empty-body
-                           resp/is-complete
-                           bench-test/has-benchmark-fields
-                           bench-test/has-task-fields]}))))
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:successful_product_event :successful_evaluate_event]
+         :complete      true }))))
