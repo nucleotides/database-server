@@ -50,6 +50,7 @@ end
 
 def create_tables
   execute_sql_file('resources/migrations/2015101019150000-create-tables.up.sql')
+  execute_sql_file('resources/migrations/2016083110010000-create-functions.up.sql')
 end
 
 def execute_sql_fixture(fixture_name)
