@@ -111,7 +111,7 @@ tmp/input_data:
 	git clone https://github.com/nucleotides/nucleotides-data.git $@
 	cd ./$@ && git reset --hard d08f40d
 	find ./$@/inputs/data -type f ! -name 'amycolatopsis*' -delete
-	sed -i '' -n '1,6p; /amy/p' tmp/input_data/inputs/benchmark.yml
+	cp ./data/* ./$@/inputs
 
 .rdm_container: .rdm_image
 	docker run \

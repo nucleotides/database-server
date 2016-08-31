@@ -43,19 +43,19 @@ Feature: Migrating and loading input data for the database
       | file_instance_id                                                                         |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' |
       | $file_instance?sha256='573722ec83179cfb156f8a613691ee7c7d250770b42b111ae58720a8d22dae97' |
-    And the table "image_instance" should contain "6" rows
+    And the table "image_instance" should contain "3" rows
     And the table "image_instance" should include the entries:
       | name                  | image_type_id                                    |
       | bioboxes/velvet       | $image_type?name='short_read_assembler'          |
       | bioboxes/ray          | $image_type?name='short_read_assembler'          |
       | bioboxes/quast        | $image_type?name='reference_assembly_evaluation' |
-    And the table "image_version" should contain "6" rows
+    And the table "image_version" should contain "3" rows
     And the table "image_version" should include the entries:
       | name   | sha256                                                           | image_instance_id                      |
       | 1.2.0  | 6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad | $image_instance?name='bioboxes/velvet' |
       | 2.3.0  | faa7f64683ae2e9d364127a173dadb6a42f9fe90799625944cfcadb27fdd5a29 | $image_instance?name='bioboxes/ray'    |
       | 4.2    | 5af634ee3f1bc3f80a749ce768883a20f793e1791f8f404a316d7d7012423cb9 | $image_instance?name='bioboxes/quast'  |
-    And the table "image_task" should contain "10" rows
+    And the table "image_task" should contain "4" rows
     And the table "image_task" should include the entries:
       | name    | image_version_id                                                                         |
       | default | $image_version?sha256='6611675a6d3755515592aa71932bd4ea4c26bccad34fae7a3ec1198ddcccddad' |
@@ -69,12 +69,12 @@ Feature: Migrating and loading input data for the database
     And the table "benchmark_data" should include the entries:
       | benchmark_type_id                                                    |
       | $benchmark_type?name='illumina_isolate_reference_assembly'           |
-    And the table "benchmark_instance" should contain "45" rows
+    And the table "benchmark_instance" should contain "15" rows
     And the table "benchmark_instance" should include the entries:
       | file_instance_id                                                                         | benchmark_type_id                                                    | product_image_instance_id                   |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
       | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
-    And the table "task" should contain "90" rows
+    And the table "task" should contain "30" rows
     And the table "task_expanded_fields" should include the entries:
       | task_type | image_name                 | image_task |
       | produce   | bioboxes/velvet            | default    |
