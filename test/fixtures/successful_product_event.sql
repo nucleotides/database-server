@@ -4,7 +4,7 @@ WITH event_ AS (
 	RETURNING id
 ),
 files_ AS (
-	SELECT create_file_instance('66b8d', 'log', 's3://log_file')
+	SELECT create_file_instance('66b8d', 'container_log', 's3://log_file')
 	UNION ALL
 	SELECT create_file_instance('f7455', 'contig_fasta', 's3://contigs')
 )

@@ -10,14 +10,14 @@
                                :success  "false"
                                :files    [{:url     "s3://url"
                                            :sha256  "log_file"
-                                           :type    "log"}]}
+                                           :type    "container_log"}]}
 
          [:produce :success]  {:task     1
                                :success  true
                                :metrics  {}
                                :files    [{:url     "s3://log_file"
                                            :sha256  "66b8d"
-                                           :type    "log"},
+                                           :type    "container_log"},
                                           {:url     "s3://contigs"
                                            :sha256  "f7455"
                                            :type    "contig_fasta"}]}
@@ -26,7 +26,7 @@
                                :success  true
                                :files    [{:url     "s3://url"
                                            :sha256  "log_file"
-                                           :type    "log"}]
+                                           :type    "container_log"}]
                                :metrics  {"ng50" 20000, "lg50" 5}}
 
          [:evaluate :invalid-metric] (-> (mock-event :evaluate :success)

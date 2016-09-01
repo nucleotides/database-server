@@ -4,7 +4,7 @@ WITH event_ AS (
 	RETURNING id
 ),
 files_ AS (
-	SELECT create_file_instance('42ae5', 'log', 's3://log_file') AS id
+	SELECT create_file_instance('42ae5', 'container_log', 's3://log_file') AS id
 )
 INSERT INTO event_file_instance (file_instance_id, event_id)
 SELECT * FROM files_ CROSS JOIN event_

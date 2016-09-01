@@ -4,7 +4,7 @@ WITH event_ AS (
 	RETURNING id
 ),
 files_ AS (
-	SELECT create_file_instance('f6b8e', 'log', 's3://log_file') AS id
+	SELECT create_file_instance('f6b8e', 'container_log', 's3://log_file') AS id
 ),
 efi_ AS (
 	INSERT INTO event_file_instance (file_instance_id, event_id)
