@@ -1,0 +1,7 @@
+---
+- name: illumina_isolate_reference_assembly
+  desc: Evaluate genome assemblers using reads and reference genome
+  product_image_type: short_read_assembler
+  evaluation_image_type: reference_assembly_evaluation
+  data_sets:
+    - ['amycolatopsis_sulphurea_dsm_46092', 'regular_fragment_1']

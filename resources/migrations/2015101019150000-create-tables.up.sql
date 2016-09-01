@@ -99,8 +99,10 @@ CREATE TABLE image_version(
   id			serial		PRIMARY KEY,
   created_at		timestamp	DEFAULT current_timestamp,
   image_instance_id	integer		NOT NULL REFERENCES image_instance(id),
+  name			text		NOT NULL,
   sha256		text		UNIQUE NOT NULL,
-  active		bool		NOT NULL DEFAULT true
+  active		bool		NOT NULL DEFAULT true,
+  CONSTRAINT image_name_idx UNIQUE(image_instance_id, name)
 );
 --;;
 CREATE TABLE image_task(
@@ -213,6 +215,7 @@ task.benchmark_instance_id,
 benchmark_instance.external_id,
 task.task_type           AS task_type,
 image_instance.name      AS image_name,
+image_version.name       AS image_version,
 image_version.sha256     AS image_sha256,
 image_task.name          AS image_task,
 image_type.name          AS image_type,

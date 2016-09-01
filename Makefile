@@ -1,7 +1,4 @@
 name        := nucleotides-api
-credentials := .aws_credentials
-
-fetch_cred  = $$(./script/get_credential $(credentials) $(1))
 
 docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
 
@@ -25,13 +22,13 @@ jar := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
 #
 ################################################
 
-repl: $(credentials)
+repl:
 	@$(params) lein repl
 
-irb: $(credentials)
+irb:
 	@$(params) bundle exec ./script/irb
 
-ssh: .rdm_container .api_image $(credentials)
+ssh: .rdm_container .api_image
 	@docker run \
 	  --tty \
 	  --interactive \
@@ -68,7 +65,7 @@ test:
 autotest:
 	@$(params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
-.api_container: .rdm_container .api_image $(credentials)
+.api_container: .rdm_container .api_image
 	@docker run \
 	  --detach=true \
 	  --env="$(db_user)" \
@@ -105,19 +102,16 @@ $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.cl
 #
 ################################################
 
-bootstrap: Gemfile.lock $(credentials) .rdm_container tmp/input_data
+bootstrap: Gemfile.lock .rdm_container tmp/input_data
 	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
 tmp/input_data:
 	mkdir -p $(dir $@)
 	git clone https://github.com/nucleotides/nucleotides-data.git $@
-	cd ./$@/inputs/ && \
-		git reset --hard bb895e1 && \
-		rm data/saccharopolyspora_spinosa_dsm_44228.yml && \
-		sed '$$d' benchmark.yml > tmp && \
-		mv tmp benchmark.yml
-
+	cd ./$@ && git reset --hard d08f40d
+	find ./$@/inputs/data -type f ! -name 'amycolatopsis*' -delete
+	cp ./data/* ./$@/inputs
 
 .rdm_container: .rdm_image
 	docker run \
@@ -131,13 +125,10 @@ tmp/input_data:
 	docker pull kiasaki/alpine-postgres:9.5
 	touch $@
 
-$(credentials): ./script/create_aws_credentials
-	$< $@
-
 Gemfile.lock: Gemfile
 	bundle install --path vendor/bundle
 
 clean:
-	rm -f .image $(credentials)
+	rm -f .image
 
 .PHONY: test

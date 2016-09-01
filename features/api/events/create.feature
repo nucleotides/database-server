@@ -23,7 +23,7 @@ Feature: Posting events to the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             }
          ]
       }
@@ -43,7 +43,7 @@ Feature: Posting events to the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             },
             {
                "url":"s3://url",
@@ -111,7 +111,7 @@ Feature: Posting events to the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             }
          ]
       }
@@ -125,7 +125,7 @@ Feature: Posting events to the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             }
          ]
       }
