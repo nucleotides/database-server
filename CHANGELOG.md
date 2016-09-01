@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.8.0 - DATE
+
+### Fixed
+
+  * When multiple successful produce events are available for an evaluate event
+    only the first event is used to select which input files are used. This
+    ensures there will be problems arising from multiple files are the same
+    type being provided for an evaluate task.
+
 ## v0.7.0 - 2015-05-03
 
 ### Changed
