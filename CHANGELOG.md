@@ -3,7 +3,11 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## v0.8.0 - DATE
+## v0.8.0 - 2016-09-01
+
+### Added
+
+  * The API supports version strings for the biobox images.
 
 ### Fixed
 
@@ -12,7 +16,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
     ensures there will be problems arising from multiple files are the same
     type being provided for an evaluate task.
 
-## v0.7.0 - 2015-05-03
+## v0.7.0 - 2016-05-03
 
 ### Changed
 
