@@ -29,7 +29,7 @@ Feature: Getting events from the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             }
          ]
       }
@@ -38,13 +38,13 @@ Feature: Getting events from the API
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
-      | id             | 1          |
-      | task           | 1          |
-      | success        | false      |
-      | files/0/type   | "log"      |
-      | files/0/sha256 | "adef5c"   |
-      | files/0/url    | "s3://url" |
-      | metrics        | {}         |
+      | id             | 1               |
+      | task           | 1               |
+      | success        | false           |
+      | files/0/type   | "container_log" |
+      | files/0/sha256 | "adef5c"        |
+      | files/0/url    | "s3://url"      |
+      | metrics        | {}              |
 
   Scenario: Getting a successful event
     Given I successfully post to "/events" with the data:
@@ -56,7 +56,7 @@ Feature: Getting events from the API
             {
                "url":"s3://url",
                "sha256":"adef5c",
-               "type":"log"
+               "type":"container_log"
             },
             {
                "url":"s3://url",
@@ -74,14 +74,14 @@ Feature: Getting events from the API
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
-      | id             | 1              |
-      | task           | 1              |
-      | success        | true           |
-      | files/0/type   | "log"          |
-      | files/0/sha256 | "adef5c"       |
-      | files/0/url    | "s3://url"     |
-      | files/1/type   | "contig_fasta" |
-      | files/1/sha256 | "afd456"       |
-      | files/1/url    | "s3://url"     |
-      | metrics/ng50   | 20000.0        |
-      | metrics/lg50   | 10.0           |
+      | id             | 1               |
+      | task           | 1               |
+      | success        | true            |
+      | files/0/type   | "container_log" |
+      | files/0/sha256 | "adef5c"        |
+      | files/0/url    | "s3://url"      |
+      | files/1/type   | "contig_fasta"  |
+      | files/1/sha256 | "afd456"        |
+      | files/1/url    | "s3://url"      |
+      | metrics/ng50   | 20000.0         |
+      | metrics/lg50   | 10.0            |

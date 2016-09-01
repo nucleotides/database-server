@@ -1,9 +1,11 @@
 INSERT INTO file_type (name, description)
 VALUES
-	('log', 'Free form text output from benchmarking tools'),
+	('container_log', 'Free form text output produced by the container being benchmarked'),
+	('container_runtime_metrics', 'Runtime metrics collected while running the Docker container'),
 	('short_read_fastq', 'Short read sequences in FASTQ format'),
 	('reference_fasta', 'Reference sequence in FASTA format'),
-	('contig_fasta', 'contigs');
+	('contig_fasta', 'Reads assembled into larger contiguous sequences in FASTA format'),
+	('assembly_metrics', 'Quast genome assembly metrics file');
 
 INSERT INTO source_type (name, description)
 VALUES

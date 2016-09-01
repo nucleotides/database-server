@@ -4,10 +4,9 @@ WITH event_ AS (
 	RETURNING id
 ),
 files_ AS (
-	INSERT INTO file_instance (file_type_id, sha256, url)
-	VALUES ((SELECT id FROM file_type WHERE name = 'log'), '66b8d', 's3://log_file'),
-	       ((SELECT id FROM file_type WHERE name = 'contig_fasta'), 'f7455', 's3://contigs')
-	RETURNING id
+	SELECT create_file_instance('66b8d', 'container_log', 's3://log_file')
+	UNION ALL
+	SELECT create_file_instance('f7455', 'contig_fasta', 's3://contigs')
 )
 INSERT INTO event_file_instance (file_instance_id, event_id)
 SELECT * FROM files_ CROSS JOIN event_

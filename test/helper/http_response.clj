@@ -38,6 +38,14 @@
                (dorun (map f entries))))
            path))
 
+(defn is-length-at?
+  "Creates a function which given a http response ensures the collection
+  at the specified path contains the expected number of entires"
+  [path length]
+  (let [f #(is (= length (count %)))]
+    (partial dispatch-response-body-test f path)))
+
+
 (defn contains-event-entries [path entries]
   (let [f (fn [events]
             (dorun (map (partial evt/has-event? events) entries)))]

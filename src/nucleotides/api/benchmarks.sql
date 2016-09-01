@@ -16,7 +16,16 @@ WHERE benchmark_instance.id = :id::int
 WITH _benchmark AS (
   SELECT *
   FROM benchmark_instance
-  WHERE benchmark_instance.id = :id::int
+  WHERE benchmark_instance.id = 1
+),
+_first_successful_produce_event AS (
+  SELECT event.*
+  FROM _benchmark
+  LEFT JOIN task  ON task.benchmark_instance_id = _benchmark.id
+  LEFT JOIN event ON event.task_id = task.id
+  WHERE task.task_type = 'produce'
+  AND event.success = true
+  LIMIT 1
 ),
 reference_files AS (
   SELECT
@@ -29,12 +38,8 @@ reference_files AS (
 produce_files AS (
   SELECT
   event_file_instance.file_instance_id AS file_instance_id
-  FROM _benchmark
-  LEFT JOIN task                 ON task.benchmark_instance_id = _benchmark.id
-  LEFT JOIN event                ON event.task_id = task.id
-  LEFT JOIN event_file_instance  ON event_file_instance.event_id = event.id
-  WHERE task.task_type = 'produce'
-  AND event.success = true
+  FROM _first_successful_produce_event
+  LEFT JOIN event_file_instance  ON event_file_instance.event_id = _first_successful_produce_event.id
 ),
 _files AS (
   SELECT * FROM reference_files
@@ -48,7 +53,7 @@ file_type.name AS type
 FROM _files
 LEFT JOIN file_instance ON file_instance.id = _files.file_instance_id
 LEFT JOIN file_type     ON file_type.id = file_instance.file_type_id
-WHERE file_type.name != 'log'
+WHERE file_type.name NOT IN ('container_log', 'container_runtime_metrics')
 
 
 -- name: benchmark-by-id

@@ -143,7 +143,25 @@
         {:task-id 2
          :files [["reference_fasta" "s3://ref" "d421a4"]
                  ["contig_fasta"    "s3://contigs" "f7455"]]
-         :fixtures [:successful-product-event]}))
+         :fixtures [:successful-product-event]})
+
+    (testing "an evaluate task with multiple completed produce events"
+      (test-app-response
+        {:method          :get
+         :url             "/tasks/2"
+         :fixtures        [:successful-product-event
+                           :second-successful-product-event]
+         :response-tests  [(partial resp/dispatch-response-body-test is-valid-task?)
+                           (resp/is-length-at? [:inputs] 2)]})))
+
+
+(defn http-request
+  "Create a mock request to the API"
+  [{:keys [method url params body content] :or {params {}}}]
+  (-> (mock/request method url params)
+      (mock/body body)
+      (mock/content-type content)
+      ((md/middleware (app/api {:connection (con/create-connection)})))))
 
 
 

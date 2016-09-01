@@ -6,19 +6,8 @@ ON CONFLICT DO NOTHING
 
 -- name: save-biological-source-file<!
 -- Creates link between biological_source and reference file_instance
-WITH _existing_file AS (
-  SELECT id FROM file_instance WHERE sha256 = :sha256
-),
-_new_file AS (
-  INSERT INTO file_instance (file_type_id, sha256, url)
-  SELECT (SELECT id FROM file_type WHERE name = :file_type), :sha256, :url
-  WHERE NOT EXISTS (SELECT 1 FROM _existing_file)
-  RETURNING id
-),
-_file AS (
-  SELECT * FROM _existing_file
-  UNION ALL
-  SELECT * FROM _new_file
+WITH _file AS (
+  SELECT create_file_instance(:sha256, :file_type, :url) AS id
 ),
 _biological_source AS (
   SELECT * FROM biological_source WHERE name = :source_name
@@ -51,19 +40,8 @@ ON CONFLICT DO NOTHING
 
 -- name: save-input-data-file<!
 -- Creates link between 'input_data_file_set' and 'file_instance'
-WITH _existing_file AS (
-  SELECT id FROM file_instance WHERE sha256 = :sha256
-),
-_new_file AS (
-  INSERT INTO file_instance (file_type_id, sha256, url)
-  SELECT (SELECT id FROM file_type WHERE name = :file_type), :sha256, :url
-  WHERE NOT EXISTS (SELECT 1 FROM _existing_file)
-  RETURNING id
-),
-_file AS (
-  SELECT * FROM _existing_file
-  UNION ALL
-  SELECT * FROM _new_file
+WITH _file AS (
+  SELECT create_file_instance(:sha256, :file_type, :url) AS id
 ),
 _input_data_file_set AS (
   SELECT *
