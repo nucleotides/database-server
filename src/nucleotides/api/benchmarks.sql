@@ -16,7 +16,7 @@ WHERE benchmark_instance.id = :id::int
 WITH _benchmark AS (
   SELECT *
   FROM benchmark_instance
-  WHERE benchmark_instance.id = 1
+  WHERE benchmark_instance.id = :id::int
 ),
 _first_successful_produce_event AS (
   SELECT event.*

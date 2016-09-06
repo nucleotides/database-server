@@ -56,10 +56,14 @@ deploy: .api_image
 #
 ################################################
 
+hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
+error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
+
 feature: Gemfile.lock .api_container
 	@$(params) bundle exec cucumber $(ARGS) --require features
 
 test:
+	@if [ ! -z "$(hard_coded_ids)" ]; then echo $(error_msg) >&1; exit 1; fi
 	@$(params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 autotest:
