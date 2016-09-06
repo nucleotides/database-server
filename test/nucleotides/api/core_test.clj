@@ -126,7 +126,7 @@
         {:task-id 1
          :files [["short_read_fastq" "s3://reads" "7673a"]]}))
 
-    (testing "an successfully completed produce task"
+    (testing "a successfully completed produce task"
       (test-get-task
         {:task-id 1
          :files [["short_read_fastq" "s3://reads" "7673a"]]

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.8.1 - 2016-09-06
+
+### Fixed
+
+  * Fixed bug where database benchmark ID was hard coded into SQL query for
+    evaluate input files. Added test to ensure database IDs are not hard coded
+    in future.
+
 ## v0.8.0 - 2016-09-01
 
 ### Added
