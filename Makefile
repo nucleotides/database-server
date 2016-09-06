@@ -129,6 +129,8 @@ Gemfile.lock: Gemfile
 	bundle install --path vendor/bundle
 
 clean:
-	rm -f .image
+	@docker kill $(shell cat .rdm_container 2> /dev/null) 2> /dev/null; true
+	@docker kill $(shell cat .api_container 2> /dev/null) 2> /dev/null; true
+	@rm -f .*_container
 
 .PHONY: test
