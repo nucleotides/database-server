@@ -20,6 +20,7 @@ Feature: Getting benchmarking tasks by ID
     Then the returned HTTP status code should be "404"
     And the returned body should equal "Task not found: 1000"
 
+
   Scenario: Getting an incomplete produce task by ID
     When I get the url "/tasks/1"
     Then the returned HTTP status code should be "200"
@@ -38,6 +39,7 @@ Feature: Getting benchmarking tasks by ID
       | inputs/0/sha256 | "7673a"                            |
       | inputs/0/type   | "short_read_fastq"                 |
     And the JSON response should not have "benchmark_instance_id"
+
 
   Scenario: Getting a complete produce task by ID
     Given the database fixtures:
@@ -61,16 +63,19 @@ Feature: Getting benchmarking tasks by ID
       | inputs/0/type           | "short_read_fastq"                 |
       | events/0/id             | 1                                  |
       | events/0/success        | true                               |
-      | events/0/files/0/type   | "container_log"                    |
-      | events/0/files/0/sha256 | "66b8d"                            |
-      | events/0/files/0/url    | "s3://log_file"                    |
-      | events/0/files/1/type   | "contig_fasta"                     |
-      | events/0/files/1/sha256 | "f7455"                            |
-      | events/0/files/1/url    | "s3://contigs"                     |
+      | events/0/files/0/type   | "container_runtime_metrics"        |
+      | events/0/files/0/sha256 | "12def"                            |
+      | events/0/files/0/url    | "s3://metrics"                     |
+      | events/0/files/1/type   | "container_log"                    |
+      | events/0/files/1/sha256 | "66b8d"                            |
+      | events/0/files/1/url    | "s3://log_file"                    |
+      | events/0/files/2/type   | "contig_fasta"                     |
+      | events/0/files/2/sha256 | "f7455"                            |
+      | events/0/files/2/url    | "s3://contigs"                     |
     And the JSON response should have "events/0/created_at"
 
 
-  Scenario: Getting a incomplete produce task with failed event by ID
+  Scenario: Getting an incomplete produce task with failed event by ID
     Given the database fixtures:
       | fixture                    |
       | unsuccessful_product_event |
@@ -81,6 +86,7 @@ Feature: Getting benchmarking tasks by ID
       | complete            | false |
       | events/0/id         | 1     |
       | events/0/success    | false |
+
 
   Scenario: Getting an incomplete evaluate task by ID
     When I get the url "/tasks/2"
@@ -99,6 +105,7 @@ Feature: Getting benchmarking tasks by ID
       | inputs/0/sha256 | "d421a4"                           |
       | inputs/0/type   | "reference_fasta"                  |
     And the JSON response should not have "benchmark_instance_id"
+
 
   Scenario: Getting an evaluate task with an unsuccessful product event by ID
     Given the database fixtures:
@@ -121,6 +128,7 @@ Feature: Getting benchmarking tasks by ID
       | inputs/0/type   | "reference_fasta"                  |
     And the JSON response should not have "benchmark_instance_id"
     And the JSON response should not have "inputs/1"
+
 
   Scenario: Getting an evaluate task with a successful product event by ID
     Given the database fixtures:
@@ -146,6 +154,7 @@ Feature: Getting benchmarking tasks by ID
       | inputs/1/type   | "contig_fasta"                     |
     And the JSON response should not have "benchmark_instance_id"
     And the JSON response should not have "inputs/2"
+
 
   Scenario: Getting an evaluate task by ID with two successful product events
     Given the database fixtures:

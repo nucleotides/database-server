@@ -15,7 +15,10 @@
          [:produce :success]  {:task     1
                                :success  true
                                :metrics  {}
-                               :files    [{:url     "s3://log_file"
+                               :files    [{:url     "s3://metrics"
+                                           :sha256  "12def"
+                                           :type    "container_runtime_metrics"},
+                                          {:url     "s3://log_file"
                                            :sha256  "66b8d"
                                            :type    "container_log"},
                                           {:url     "s3://contigs"
