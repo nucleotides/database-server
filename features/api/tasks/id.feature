@@ -63,12 +63,15 @@ Feature: Getting benchmarking tasks by ID
       | inputs/0/type           | "short_read_fastq"                 |
       | events/0/id             | 1                                  |
       | events/0/success        | true                               |
-      | events/0/files/0/type   | "container_log"                    |
-      | events/0/files/0/sha256 | "66b8d"                            |
-      | events/0/files/0/url    | "s3://log_file"                    |
-      | events/0/files/1/type   | "contig_fasta"                     |
-      | events/0/files/1/sha256 | "f7455"                            |
-      | events/0/files/1/url    | "s3://contigs"                     |
+      | events/0/files/0/type   | "container_runtime_metrics"        |
+      | events/0/files/0/sha256 | "12def"                            |
+      | events/0/files/0/url    | "s3://metrics"                     |
+      | events/0/files/1/type   | "container_log"                    |
+      | events/0/files/1/sha256 | "66b8d"                            |
+      | events/0/files/1/url    | "s3://log_file"                    |
+      | events/0/files/2/type   | "contig_fasta"                     |
+      | events/0/files/2/sha256 | "f7455"                            |
+      | events/0/files/2/url    | "s3://contigs"                     |
     And the JSON response should have "events/0/created_at"
 
 
