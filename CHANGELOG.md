@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## v0.8.2 - 2016-09-29
+
+  * Fixed bug where the code transforming the keyword file name in the input
+    file dictionary back to a snake case string for use in the database added
+    underscores between a characters and a numbers treating them as a word
+    boundaries. This code was removed and strings were used for file names.
+
 ## v0.8.1 - 2016-09-06
 
 ### Fixed
