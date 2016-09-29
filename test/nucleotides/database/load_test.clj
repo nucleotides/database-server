@@ -32,7 +32,7 @@
 (deftest load-image-instances
   (test-data-loader
     {:fixtures [:metadata]
-     :loader   #(ld/image-instances (get-in input-data [:inputs :image]))
+     :loader   #(ld/image-instances (get-in input-data [:inputs "image"]))
      :tables   [:image-instance :image-version :image-task]}))
 
 (deftest load-biological-sources
@@ -62,13 +62,13 @@
 (deftest load-benchmark-types
   (test-data-loader
     {:fixtures [:metadata]
-     :loader   #(ld/benchmark-types (get-in input-data [:inputs :benchmark]))
+     :loader   #(ld/benchmark-types (get-in input-data [:inputs "benchmark"]))
      :tables   [:benchmark-type]}))
 
 (deftest load-benchmark-data
   (test-data-loader
     {:fixtures [:metadata :biological-source :input-data-file-set :benchmark-type]
-     :loader   #(ld/benchmark-data (get-in input-data [:inputs :benchmark]))
+     :loader   #(ld/benchmark-data (get-in input-data [:inputs "benchmark"]))
      :tables   [:benchmark-data]}))
 
 (deftest load-benchmark-instances

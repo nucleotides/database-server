@@ -7,8 +7,7 @@
 
   :description "REST API for nucleotid.es bioinformatics benchmarking"
 
-  :dependencies [[camel-snake-kebab          "0.3.2"]
-                 [circleci/clj-yaml          "0.5.5"]
+  :dependencies [[circleci/clj-yaml          "0.5.5"]
                  [clj-time                   "0.11.0"]
                  [clojure.jdbc/clojure.jdbc-c3p0 "0.3.2"]
                  [com.rpl/specter            "0.9.2"]

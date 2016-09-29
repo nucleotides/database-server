@@ -3,7 +3,6 @@
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
     [taoensso.timbre                 :as log]
-    [camel-snake-kebab.core          :as ksk]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
@@ -30,7 +29,7 @@
 (def biological-sources
   "Loads input data sources into the database"
   (let [f (fn [[k v]]
-            (assoc (:source v) :name (ksk/->snake_case_string k)))]
+            (assoc (:source v) :name k))]
    (load-entries (partial map f) save-biological-source<!)))
 
 (def biological-source-files
@@ -39,7 +38,7 @@
             (->> (get-in v [:source :references])
                  (flatten)
                  (remove empty?)
-                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+                 (map #(assoc % :source_name k))))]
    (load-entries (partial mapcat f) save-biological-source-file<!)))
 
 (def input-data-file-set
@@ -47,7 +46,7 @@
   (let [f (fn [[k v]]
             (->>
               (:data v)
-              (map #(assoc % :source_name (ksk/->snake_case_string k)))
+              (map #(assoc % :source_name k))
               (map #(dissoc % :files))))]
   (load-entries (partial mapcat f) save-input-data-file-set<!)))
 
@@ -57,7 +56,7 @@
             (->> (:data v)
                  (select [ALL (collect-one :name) (keypath :files) ALL])
                  (map #(assoc (last %) :file_set_name (first %)))
-                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+                 (map #(assoc % :source_name k))))]
    (load-entries (partial mapcat f) save-input-data-file<!)))
 
 (def image-instances
@@ -90,13 +89,13 @@
     (load-entries (partial mapcat f) save-benchmark-data<!)))
 
 (def loaders
-  [[image-instances          [:inputs :image]]
+  [[image-instances          [:inputs "image"]]
    [biological-sources       [:data]]
    [biological-source-files  [:data]]
    [input-data-file-set      [:data]]
    [input-data-files         [:data]]
-   [benchmark-types          [:inputs :benchmark]]
-   [benchmark-data           [:inputs :benchmark]]])
+   [benchmark-types          [:inputs "benchmark"]]
+   [benchmark-data           [:inputs "benchmark"]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"
