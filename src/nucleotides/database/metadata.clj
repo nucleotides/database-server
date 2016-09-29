@@ -1,6 +1,5 @@
 (ns nucleotides.database.metadata
   (:require
-    [camel-snake-kebab.core           :as ksk]
     [clojure.java.jdbc                :as sql]
     [nucleotides.database.connection  :as con]))
 
@@ -12,7 +11,7 @@
                RETURNING id;"]
     (sql/query (con/create-connection)
                (format query
-                       (str (ksk/->snake_case_string table-name) "_type")
+                       (str table-name "_type")
                        (:name entry)
                        (:desc entry)))))
 

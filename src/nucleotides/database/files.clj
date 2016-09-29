@@ -6,10 +6,9 @@
     [camel-snake-kebab.core  :as ksb]))
 
 
-(def filename->keyword
+(def filename->species-name
   #(-> (.getName %)
-       (st/replace ".yml" "")
-       (ksb/->kebab-case-keyword)))
+       (st/replace ".yml" "")))
 
 (def list-yaml-files
   (comp (partial filter #(.endsWith (.getName %) ".yml"))
@@ -21,7 +20,7 @@
   [directory]
   (->> directory
        (list-yaml-files)
-       (map (juxt filename->keyword (comp yaml/parse-string slurp)))
+       (map (juxt filename->species-name (comp yaml/parse-string slurp)))
        (into {})))
 
 (defn load-data-files [directory]
