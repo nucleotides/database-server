@@ -82,6 +82,40 @@ Feature: Migrating and loading input data for the database
       | produce   | bioboxes/velvet            | careful    |
       | evaluate  | bioboxes/quast             | default    |
 
+  Scenario: Migrating and loading the database with a non-standard camel case name
+    Given an empty database without any tables
+    And I copy the directory "../../tmp/input_data" to "data"
+    And in bash I run:
+    """
+    mv data/inputs/data/amycolatopsis_sulphurea_dsm_46092.yml data/inputs/data/text1.yml
+    """
+    And the file "data/inputs/benchmark.yml" with:
+      """
+      ---
+      - name: illumina_isolate_reference_assembly
+        desc: Evaluate genome assemblers using reads and reference genome
+        product_image_type: short_read_assembler
+        evaluation_image_type: reference_assembly_evaluation
+        data_sets:
+          - ['text1', 'regular_fragment_1']
+      """
+    When in bash I run:
+      """
+      docker run \
+        --env=RDS_PORT=5433 \
+        --env=RDS_USERNAME=${POSTGRES_USER} \
+        --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=RDS_HOSTNAME=localhost \
+        --env=RDS_DB_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    Then the stderr excluding logging info should not contain anything
+    And the exit status should be 0
+
+
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables
     And I copy the directory "../../tmp/input_data" to "data"

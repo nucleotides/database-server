@@ -1,12 +1,15 @@
 (ns helper.database
   (:require [clojure.java.jdbc               :as sql]
             [taoensso.timbre                 :as log]
+            [taoensso.timbre.appenders.core  :as appenders]
             [migratus.core                   :as mg]
             [camel-snake-kebab.core          :as ksk]
             [nucleotides.database.connection :as con]
             [nucleotides.database.migrate    :as build]))
 
-(log/set-config! [:appenders :standard-out :enabled? false])
+(log/set-config!
+  {:appenders {:spit (appenders/spit-appender {:fname "./tmp/nucleotides.log"})}
+   :level     :debug})
 
 ; Turn off logging for c3p0
 (System/setProperties

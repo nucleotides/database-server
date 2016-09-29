@@ -2,16 +2,10 @@
   (:require
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
-    [camel-snake-kebab.core          :as ksk]
+    [taoensso.timbre                 :as log]
     [nucleotides.database.connection :as con]))
 
 (defqueries "nucleotides/database/queries.sql")
-
-(defn select-file-entries [k entries]
-  (->> entries
-       (mapcat (partial select [(collect-one :name) (keypath k) ALL]))
-       (remove empty?)
-       (map #(assoc (last %) :source_name (first %)))))
 
 (defn unfold-by-key [collection-key singleton-key entry]
   (map
@@ -23,16 +17,19 @@
   applies 'transform' and then maps the 'save' over the data."
   ([f save]
    (fn [data]
-     (->> (f data)
-          (map #(save % {:connection (con/create-connection)}))
-          (dorun))))
+     (let [log-and-save (fn [inputs]
+                          (log/debug (str "Executing " save " with values " inputs))
+                          (save inputs {:connection (con/create-connection)}))]
+      (->> (f data)
+           (map log-and-save)
+           (dorun)))))
   ([save]
    (load-entries identity save)))
 
 (def biological-sources
   "Loads input data sources into the database"
   (let [f (fn [[k v]]
-            (assoc (:source v) :name (ksk/->snake_case_string k)))]
+            (assoc (:source v) :name k))]
    (load-entries (partial map f) save-biological-source<!)))
 
 (def biological-source-files
@@ -41,7 +38,7 @@
             (->> (get-in v [:source :references])
                  (flatten)
                  (remove empty?)
-                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+                 (map #(assoc % :source_name k))))]
    (load-entries (partial mapcat f) save-biological-source-file<!)))
 
 (def input-data-file-set
@@ -49,7 +46,7 @@
   (let [f (fn [[k v]]
             (->>
               (:data v)
-              (map #(assoc % :source_name (ksk/->snake_case_string k)))
+              (map #(assoc % :source_name k))
               (map #(dissoc % :files))))]
   (load-entries (partial mapcat f) save-input-data-file-set<!)))
 
@@ -59,7 +56,7 @@
             (->> (:data v)
                  (select [ALL (collect-one :name) (keypath :files) ALL])
                  (map #(assoc (last %) :file_set_name (first %)))
-                 (map #(assoc % :source_name (ksk/->snake_case_string k)))))]
+                 (map #(assoc % :source_name k))))]
    (load-entries (partial mapcat f) save-input-data-file<!)))
 
 (def image-instances
@@ -92,13 +89,13 @@
     (load-entries (partial mapcat f) save-benchmark-data<!)))
 
 (def loaders
-  [[image-instances          [:inputs :image]]
+  [[image-instances          [:inputs "image"]]
    [biological-sources       [:data]]
    [biological-source-files  [:data]]
    [input-data-file-set      [:data]]
    [input-data-files         [:data]]
-   [benchmark-types          [:inputs :benchmark]]
-   [benchmark-data           [:inputs :benchmark]]])
+   [benchmark-types          [:inputs "benchmark"]]
+   [benchmark-data           [:inputs "benchmark"]]])
 
 (defn load-all-input-data
   "Load and update benchmark data in the database"
