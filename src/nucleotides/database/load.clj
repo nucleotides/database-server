@@ -8,12 +8,6 @@
 
 (defqueries "nucleotides/database/queries.sql")
 
-(defn select-file-entries [k entries]
-  (->> entries
-       (mapcat (partial select [(collect-one :name) (keypath k) ALL]))
-       (remove empty?)
-       (map #(assoc (last %) :source_name (first %)))))
-
 (defn unfold-by-key [collection-key singleton-key entry]
   (map
     #(-> entry (dissoc collection-key) (assoc singleton-key %))
