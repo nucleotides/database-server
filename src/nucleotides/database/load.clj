@@ -2,6 +2,7 @@
   (:require
     [com.rpl.specter          :refer :all]
     [yesql.core               :refer [defqueries]]
+    [taoensso.timbre                 :as log]
     [camel-snake-kebab.core          :as ksk]
     [nucleotides.database.connection :as con]))
 
@@ -23,9 +24,12 @@
   applies 'transform' and then maps the 'save' over the data."
   ([f save]
    (fn [data]
-     (->> (f data)
-          (map #(save % {:connection (con/create-connection)}))
-          (dorun))))
+     (let [log-and-save (fn [inputs]
+                          (log/debug (str "Executing " save " with values " inputs))
+                          (save inputs {:connection (con/create-connection)}))]
+      (->> (f data)
+           (map log-and-save)
+           (dorun)))))
   ([save]
    (load-entries identity save)))
 
