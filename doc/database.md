@@ -175,8 +175,10 @@ all the files for each input data file set.
 
   * **file_instance_id** - INT. Foreign key the generic file instances table.
 
-
 ## input_data_file_expanded_fields
+
+A materialised view which denormalises the biological_source, input_data_file,
+input_data_file_set tables along with all the *_type metadata tables.
 
 ## Benchmarks
 
