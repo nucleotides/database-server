@@ -68,6 +68,31 @@ Tables used to store the input data used the benchmarks. Examples of these may
 be FASTQ files containing reads from sequencing and FASTA files containing the
 improved draft quality genomes for comparison.
 
+### source_type
+
+Enumeration of the possible different biological sources used in nucleotides.
+
+  * **name** - VARCHAR. The string name is used to indentify this source type,
+    e.g. "microbe".
+
+  * **description** - VARCHAR. Longer text description of the source type, e.g.
+    "a single colony isolated microorganism".
+
+### biological_source
+
+Groups the different sets of data used for benchmarking by their name and
+description.
+
+  * **name** - VARCHAR. The string name is used to indentify this biological
+    source, e.g. "amycolatopsis_sulphurea_dsm_46092".
+
+  * **description** - VARCHAR. Longer text description of the biological
+    source, e.g. "A microbe with a improved-draft reference genome generated
+    using PacBio at the JGI."
+
+  * **source_type_id" - INT. Foreign key to source_type table used to describe
+    the type of biological source.
+
 ### input_data_file_set
 
 Groups the different sets of data used for benchmarking by their name and
