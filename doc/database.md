@@ -64,21 +64,44 @@ image.
 
 ## Input Data
 
-Tables used to store the data used in benchmarking
+Tables used to store the input data used the benchmarks. Examples of these may
+be FASTQ files containing reads from sequencing and FASTA files containing the
+improved draft quality genomes for comparison.
 
-### data_set
+### input_data_file_set
 
 Groups the different sets of data used for benchmarking by their name and
 description.
 
-  * **name** - VARCHAR. The name is used to indentify the data when populating
-    the database from file. Examples of this would be "jgi_isolate_microbe_2x150"
+  * **name** - VARCHAR. The string name is used to indentify the data when
+    populating the database. Examples of this would be "regular_fragment"
+    should be unique for each biological source.
 
   * **description** - VARCHAR. Examples are "Illumina 2x150 isolated microbe
     sequenced at the JGI".
 
   * **active** - BOOLEAN. Indicate whether this data set should still be used.
     A false value indicates this data set is deprecated.
+
+  * **biological_source_id** - INT. Foreign key to the biological_source table
+    from which this input data came from.
+
+  * **platfom_type_id** - INT. Foreign key to the platform_type table used to
+    identify what laboratory hardware was used to generate this data.
+
+  * **protocol_type_id** - INT. Foreign key to the protocol_type table used to
+    identify what laboratory protocol was used to generate this data.
+
+  * **material_type_id** - INT. Foreign key to the material_type table used to
+    identify what kind of biological material this data came from.
+
+  * **extraction_method_type_id** - INT. Foreign key to the
+    extraction_method_type table used to identify the laboratory material used
+    to extract source material for this data.
+
+  * **run_mode_type_id** - INT. Foreign key to the run_mode_type table used to
+    describe what mode the laboratory hardware was run with to generate the
+    source data.
 
 ### data_record
 
@@ -99,6 +122,8 @@ benchmarking and evaluating the output.
 
   * **active** - BOOLEAN. Indicate whether this data record should still be
     used. A false value indicates this data record is deprecated.
+
+## input_data_file_expanded_fields
 
 ## Benchmarks
 
@@ -165,3 +190,4 @@ Record values for benchmark metrics.
   * **benchmark_event_id** - INT. Foreign key to the benchmark_event_id table.
 
   * **value** - DOUBLE. Estimated metric value from benchmarking.
+
