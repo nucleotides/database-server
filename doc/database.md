@@ -122,6 +122,15 @@ description.
   * **source_type_id" - INT. Foreign key to source_type table used to describe
     the type of biological source.
 
+### biological_source_reference_file
+
+Links biological_source with the reference files in the file_instance table.
+
+  * **file_instance_id** - INT. Foreign key the generic file instances table.
+
+  * **biological_source_id** - INT. Foreign key to the biological_source table
+    for which this is a reference file.
+
 ### input_data_file_set
 
 Groups the different sets of data used for benchmarking by their name and
