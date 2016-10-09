@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## 0.9.0 - DATE
+
+  * Added a materialised view for input data files fields. This is a
+    denormalised table of all the tables related to input files, with the
+    addition of indicies for all foreign key IDs. This table is populated after
+    loading input data but before populating the benchmark tasks. This table
+    should increase performance as the common joins of input_data_file,
+    input_data_file_set, biological_source, and biological_source_type will
+    already be present in the database as a table. This table should also
+    simplify queries where the the joins of these tables are used.
 
 ## v0.8.2 - 2016-09-29
 
