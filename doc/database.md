@@ -128,25 +128,14 @@ description.
     describe what mode the laboratory hardware was run with to generate the
     source data.
 
-### data_record
+### input_data_file
 
-Lists the individual files locations which contain the data used for
-benchmarking and evaluating the output.
+Many to many join table for input_data_file_set and file_instance table. Lists
+all the files for each input data file set.
 
-  * **data_set_id** - INT. Foreign key to the `data_set` table.
+  * **input_data_file_set_id** - INT. Foreign key for the input file sets.
 
-  * **replicate** - INT. The replicate number for this data.
-
-  * **input_url** - VARCHAR. The URL where the input data can be found.
-
-  * **reference_url** - VARCHAR. The URL where the reference data can be found.
-
-  * **input_md5sum** - INT. The md5sum of the input data file.
-
-  * **reference_md5sum** - VARCHAR. The md5sum of the reference data file.
-
-  * **active** - BOOLEAN. Indicate whether this data record should still be
-    used. A false value indicates this data record is deprecated.
+  * **file_instance_id** - INT. Foreign key the generic file instances table.
 
 ## input_data_file_expanded_fields
 
