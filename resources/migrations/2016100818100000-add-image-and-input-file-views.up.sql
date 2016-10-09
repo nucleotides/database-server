@@ -40,7 +40,7 @@ LEFT JOIN platform_type          ON platform_type.id = input_data_file_set.platf
 LEFT JOIN protocol_type          ON protocol_type.id = input_data_file_set.protocol_type_id
 LEFT JOIN material_type          ON material_type.id = input_data_file_set.material_type_id
 LEFT JOIN extraction_method_type ON extraction_method_type.id = input_data_file_set.extraction_method_type_id
-LEFT JOIN run_mode_type          ON run_mode_type.id = input_data_file_set.run_mode_type_id
+LEFT JOIN run_mode_type          ON run_mode_type.id = input_data_file_set.run_mode_type_id;
 --;;
 CREATE INDEX input_data_file_expanded_fields_file_instance_id  ON input_data_file_expanded_fields (file_instance_id);
 --;;
@@ -62,10 +62,36 @@ CREATE INDEX input_data_file_expanded_fields_extraction_method_type_id  ON input
 --;;
 CREATE INDEX input_data_file_expanded_fields_run_mode_type_id  ON input_data_file_expanded_fields (run_mode_type_id);
 --;;
---;; Rebuild materialised views, should be used after loading nucleotides input data
+--;; Updated function for populating all benchmark_instance and task
 --;;
-CREATE FUNCTION rebuild_input_materialised_views () RETURNS void AS $$
+CREATE OR REPLACE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
 REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
+INSERT INTO benchmark_instance(
+	benchmark_type_id,
+	product_image_instance_id,
+	product_image_version_id,
+	product_image_task_id,
+	input_data_file_id,
+	file_instance_id)
+SELECT
+benchmark_type.id,
+image_instance.id,
+image_version.id,
+image_task.id,
+inputs.input_data_file_id,
+inputs.file_instance_id
+FROM benchmark_type
+LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
+LEFT JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_set_id = benchmark_data.input_data_file_set_id
+LEFT JOIN image_type          ON image_type.id = benchmark_type.product_image_type_id
+INNER JOIN image_instance     ON image_instance.image_type_id = image_type.id
+LEFT JOIN image_version       ON image_version.image_instance_id = image_instance.id
+LEFT JOIN image_task          ON image_task.image_version_id = image_instance.id
+ORDER BY benchmark_type.id,
+	inputs.input_data_file_id,
+	image_instance.id,
+	image_task.id ASC
+ON CONFLICT DO NOTHING;
 END; $$
 LANGUAGE PLPGSQL;
