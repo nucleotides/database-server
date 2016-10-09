@@ -1,13 +1,11 @@
 -- name: benchmark-produce-files-by-id
 -- Get all input produce files by benchmark-instance-id
 SELECT
-file_instance.sha256,
-file_instance.url,
-file_type.name AS type
+inputs.sha256,
+inputs.url,
+inputs.file_type AS type
 FROM benchmark_instance
-LEFT JOIN input_data_file ON input_data_file.id = benchmark_instance.input_data_file_id
-LEFT JOIN file_instance   ON file_instance.id = input_data_file.file_instance_id
-LEFT JOIN file_type       ON file_type.id = file_instance.file_type_id
+LEFT JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_id = benchmark_instance.input_data_file_id
 WHERE benchmark_instance.id = :id::int
 
 
