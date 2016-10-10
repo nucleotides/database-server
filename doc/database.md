@@ -218,15 +218,22 @@ each `data_record` via the m:n mappings in the `benchmark_type` table.
 
 ## Benchmarking Events
 
-Tables for recording the results of benchmarking.
+Tables for recording the results of the benchmarking tasks.
 
 ### event
 
 Record benchmark events as they occur.
 
-  * **benchmark_instance_id** - INT. Foreign key to benchmark instance table.
+  * **task_id** - INT. Foreign key to the benchmarking task table.
 
-  * **benchmarking_event_status_id** - INT. Foreign key to status table.
+  * **success** - BOOLEAN. Set the status of the benchmarking event, TRUE means
+    the event was successfully completed.
+
+### events_prioritised_by_successful
+
+View of the events table, selecting only one event per **task_id**,
+prioritising the completed events over the failed events, and the oldest events
+over the newest events.
 
 ### metric_type
 
@@ -242,7 +249,8 @@ Record values for benchmark metrics.
 
   * **metric_type_id** - INT. Foreign key to the metric type table
 
-  * **benchmark_event_id** - INT. Foreign key to the benchmark_event_id table.
+  * **event_id** - INT. Foreign key to the event from which this metric was
+    generated.
 
   * **value** - DOUBLE. Estimated metric value from benchmarking.
 

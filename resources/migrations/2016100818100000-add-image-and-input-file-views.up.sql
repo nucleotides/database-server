@@ -156,3 +156,11 @@ EXCEPT
 ORDER BY benchmark_instance_id, image_task_id, task_type ASC;
 END; $$
 LANGUAGE PLPGSQL;
+--;;
+--;; Single events per task prioritised by the successful over the failed and
+--;; oldest first
+--;;
+CREATE VIEW events_prioritised_by_successful AS
+SELECT DISTINCT ON (task_id) *
+FROM event
+ORDER by task_id, success DESC, created_at ASC
