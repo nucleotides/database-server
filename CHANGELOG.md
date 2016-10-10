@@ -5,14 +5,28 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ## 0.9.0 - DATE
 
-  * Added a materialised view for input data files fields. This is a
-    denormalised table of all the tables related to input files, with the
-    addition of indicies for all foreign key IDs. This table is populated after
-    loading input data but before populating the benchmark tasks. This table
-    should increase performance as the common joins of input_data_file,
-    input_data_file_set, biological_source, and biological_source_type will
-    already be present in the database as a table. This table should also
-    simplify queries where the the joins of these tables are used.
+### Added
+
+  * Created `input_data_file_expanded_fields` materialised view for input data
+    files tables. This is a denormalised table of all the tables related to
+    input files, with the addition of indices for all foreign key IDs, includes
+    the common joins of input_data_file, input_data_file_set,
+    biological_source, and biological_source_type.
+
+  * Created `image_expanded_fields` materialised view for Docker image tables.
+    This is a denormalised table of all the tables related Docker images, with
+    the addition of indices for all foreign key IDs, includes the common joins
+    of image_type, image_instance, image_version, and image_task.
+
+  * Created `events_prioritised_by_successful` view showing events for each
+    task prioritised by completion status and oldest first.
+
+### Changed
+
+  * Simplified the populate_benchmark_instance, and populate_task functions to
+    use the two materialised views image_expanded_fields,
+    input_data_file_expanded_fields. As less joins are required with the
+    materialised views the two queries in these functions are simpler.
 
 ## v0.8.2 - 2016-09-29
 
