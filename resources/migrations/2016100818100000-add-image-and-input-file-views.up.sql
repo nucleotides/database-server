@@ -110,22 +110,19 @@ INSERT INTO benchmark_instance(
 	file_instance_id)
 SELECT
 benchmark_type.id,
-image_instance.id,
-image_version.id,
-image_task.id,
+images.image_instance_id,
+images.image_version_id,
+images.image_task_id,
 inputs.input_data_file_id,
 inputs.file_instance_id
 FROM benchmark_type
-LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
+LEFT JOIN benchmark_data                            ON benchmark_data.benchmark_type_id = benchmark_type.id
 LEFT JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_set_id = benchmark_data.input_data_file_set_id
-LEFT JOIN image_type          ON image_type.id = benchmark_type.product_image_type_id
-INNER JOIN image_instance     ON image_instance.image_type_id = image_type.id
-LEFT JOIN image_version       ON image_version.image_instance_id = image_instance.id
-LEFT JOIN image_task          ON image_task.image_version_id = image_instance.id
+LEFT JOIN image_expanded_fields           AS images ON images.image_type_id = benchmark_type.product_image_type_id
 ORDER BY benchmark_type.id,
 	inputs.input_data_file_id,
-	image_instance.id,
-	image_task.id ASC
+	images.image_instance_id,
+	images.image_task_id ASC
 ON CONFLICT DO NOTHING;
 END; $$
 LANGUAGE PLPGSQL;
