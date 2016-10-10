@@ -117,8 +117,8 @@ inputs.input_data_file_id,
 inputs.file_instance_id
 FROM benchmark_type
 INNER JOIN benchmark_data                            ON benchmark_data.benchmark_type_id = benchmark_type.id
-INNER JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_set_id = benchmark_data.input_data_file_set_id
 INNER JOIN image_expanded_fields           AS images ON images.image_type_id = benchmark_type.product_image_type_id
+INNER JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_set_id)
 ORDER BY benchmark_type.id,
 	inputs.input_data_file_id,
 	images.image_instance_id,
