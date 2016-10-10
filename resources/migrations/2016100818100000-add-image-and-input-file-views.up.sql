@@ -163,4 +163,23 @@ LANGUAGE PLPGSQL;
 CREATE VIEW events_prioritised_by_successful AS
 SELECT DISTINCT ON (task_id) *
 FROM event
-ORDER by task_id, success DESC, created_at ASC
+ORDER by task_id, success DESC, created_at ASC;
+--;;
+--;; Simplify task view table using new materialsed views
+--;;
+CREATE OR REPLACE VIEW task_expanded_fields AS
+SELECT
+task.id,
+task.benchmark_instance_id,
+benchmark_instance.external_id,
+task.task_type                   AS task_type,
+image_instance_name              AS image_name,
+image_version_name               AS image_version,
+image_version_sha256             AS image_sha256,
+image_task_name                  AS image_task,
+image_type_name                  AS image_type,
+COALESCE (events.success, FALSE) AS complete
+FROM task
+LEFT JOIN image_expanded_fields            AS images ON images.image_task_id = task.image_task_id
+LEFT JOIN benchmark_instance                         ON benchmark_instance.id = task.benchmark_instance_id
+LEFT JOIN events_prioritised_by_successful AS events ON events.task_id = task.id;
