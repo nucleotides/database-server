@@ -42,25 +42,25 @@ LEFT JOIN material_type          ON material_type.id = input_data_file_set.mater
 LEFT JOIN extraction_method_type ON extraction_method_type.id = input_data_file_set.extraction_method_type_id
 LEFT JOIN run_mode_type          ON run_mode_type.id = input_data_file_set.run_mode_type_id;
 --;;
-CREATE INDEX input_data_file_expanded_fields_file_instance_id  ON input_data_file_expanded_fields (file_instance_id);
+CREATE INDEX ON input_data_file_expanded_fields (file_instance_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_file_type_id  ON input_data_file_expanded_fields (file_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (file_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_input_data_file_set_id  ON input_data_file_expanded_fields (input_data_file_set_id);
+CREATE INDEX ON input_data_file_expanded_fields (input_data_file_set_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_input_data_file_id  ON input_data_file_expanded_fields (input_data_file_id);
+CREATE INDEX ON input_data_file_expanded_fields (input_data_file_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_biological_source_id  ON input_data_file_expanded_fields (biological_source_id);
+CREATE INDEX ON input_data_file_expanded_fields (biological_source_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_platform_type_id  ON input_data_file_expanded_fields (platform_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (platform_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_protocol_type_id  ON input_data_file_expanded_fields (protocol_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (protocol_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_material_type_id  ON input_data_file_expanded_fields (material_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (material_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_extraction_method_type_id  ON input_data_file_expanded_fields (extraction_method_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (extraction_method_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_run_mode_type_id  ON input_data_file_expanded_fields (run_mode_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (run_mode_type_id);
 --;;
 --;; Materialised view of denormalised image data
 --;;
@@ -84,16 +84,16 @@ INNER JOIN image_instance ON image_instance.image_type_id = image_type.id
 INNER JOIN image_version  ON image_version.image_instance_id = image_instance.id
 INNER JOIN image_task     ON image_task.image_version_id = image_version.id;
 --;;
-CREATE INDEX image_expanded_fields_image_type_idx  ON image_expanded_fields (image_type_id);
+CREATE INDEX ON image_expanded_fields (image_type_id);
 --;;
-CREATE INDEX image_expanded_fields_image_instance_idx  ON image_expanded_fields (image_instance_id);
+CREATE INDEX ON image_expanded_fields (image_instance_id);
 --;;
-CREATE INDEX image_expanded_fields_image_version_idx  ON image_expanded_fields (image_version_id);
+CREATE INDEX ON image_expanded_fields (image_version_id);
 --;;
-CREATE INDEX image_expanded_fields_image_task_idx  ON image_expanded_fields (image_task_id);
+CREATE INDEX ON image_expanded_fields (image_task_id);
 --;;
 --;; Combination of image fields are unique
-CREATE UNIQUE INDEX image_expanded_fields_unique_idx ON image_expanded_fields (image_type_id, image_instance_id, image_version_id, image_task_id);
+CREATE UNIQUE INDEX ON image_expanded_fields (image_type_id, image_instance_id, image_version_id, image_task_id);
 --;;
 --;; Updated function for populating all benchmark_instance and task
 --;;
