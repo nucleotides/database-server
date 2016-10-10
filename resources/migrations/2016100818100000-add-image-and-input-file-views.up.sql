@@ -62,11 +62,45 @@ CREATE INDEX input_data_file_expanded_fields_extraction_method_type_id  ON input
 --;;
 CREATE INDEX input_data_file_expanded_fields_run_mode_type_id  ON input_data_file_expanded_fields (run_mode_type_id);
 --;;
+--;; Materialised view of denormalised image data
+--;;
+CREATE MATERIALIZED VIEW image_expanded_fields AS
+SELECT
+image_type.id             AS image_type_id,
+image_instance.id         AS image_instance_id,
+image_version.id          AS image_version_id,
+image_task.id             AS image_task_id,
+image_type.created_at     AS image_type_created_at,
+image_instance.created_at AS image_instance_created_at,
+image_version.created_at  AS image_version_created_at,
+image_task.created_at     AS image_task_created_at,
+image_type.name           AS image_type_name,
+image_instance.name       AS image_instance_name,
+image_version.name        AS image_version_name,
+image_version.sha256      AS image_version_sha256,
+image_task.name           AS image_task_name
+FROM image_type
+INNER JOIN image_instance ON image_instance.image_type_id = image_type.id
+INNER JOIN image_version  ON image_version.image_instance_id = image_instance.id
+INNER JOIN image_task     ON image_task.image_version_id = image_version.id;
+--;;
+CREATE INDEX image_expanded_fields_image_type_idx  ON image_expanded_fields (image_type_id);
+--;;
+CREATE INDEX image_expanded_fields_image_instance_idx  ON image_expanded_fields (image_instance_id);
+--;;
+CREATE INDEX image_expanded_fields_image_version_idx  ON image_expanded_fields (image_version_id);
+--;;
+CREATE INDEX image_expanded_fields_image_task_idx  ON image_expanded_fields (image_task_id);
+--;;
+--;; Combination of image fields are unique
+CREATE UNIQUE INDEX image_expanded_fields_unique_idx ON image_expanded_fields (image_type_id, image_instance_id, image_version_id, image_task_id);
+--;;
 --;; Updated function for populating all benchmark_instance and task
 --;;
 CREATE OR REPLACE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
 REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
+REFRESH MATERIALIZED VIEW image_expanded_fields;
 INSERT INTO benchmark_instance(
 	benchmark_type_id,
 	product_image_instance_id,
