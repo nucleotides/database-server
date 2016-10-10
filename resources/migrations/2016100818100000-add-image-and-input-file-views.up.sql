@@ -95,7 +95,8 @@ CREATE INDEX ON image_expanded_fields (image_task_id);
 --;; Combination of image fields are unique
 CREATE UNIQUE INDEX ON image_expanded_fields (image_type_id, image_instance_id, image_version_id, image_task_id);
 --;;
---;; Updated function for populating all benchmark_instance and task
+--;; Updated function for populating benchmark_instances using
+--;; the new materialised views for data and images
 --;;
 CREATE OR REPLACE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
@@ -124,5 +125,34 @@ ORDER BY benchmark_type.id,
 	images.image_instance_id,
 	images.image_task_id ASC
 ON CONFLICT DO NOTHING;
+END; $$
+LANGUAGE PLPGSQL;
+--;;
+--;; Updated function for populating tasks using
+--;; the new materialised views for data and images
+--;;
+CREATE OR REPLACE FUNCTION populate_task () RETURNS void AS $$
+BEGIN
+INSERT INTO task (benchmark_instance_id, image_task_id, task_type)
+	SELECT
+	benchmark_instance.id   AS benchmark_instance_id,
+	images.image_task_id,
+	'evaluate'::task_type   AS task_type
+	FROM benchmark_instance
+	INNER JOIN benchmark_type                  ON benchmark_type.id = benchmark_instance.benchmark_type_id
+	INNER JOIN image_expanded_fields AS images ON images.image_type_id = benchmark_type.evaluation_image_type_id
+UNION
+	SELECT
+	benchmark_instance.id	                 AS benchmark_instance_id,
+	benchmark_instance.product_image_task_id AS image_task_id,
+	'produce'::task_type                     AS task_type
+	FROM benchmark_instance
+EXCEPT
+	SELECT
+	benchmark_instance_id,
+	image_task_id,
+	task_type
+	FROM task
+ORDER BY benchmark_instance_id, image_task_id, task_type ASC;
 END; $$
 LANGUAGE PLPGSQL;
