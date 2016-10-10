@@ -59,7 +59,7 @@
                        #(is (= (sort (json/read-str (:body %))) (sort expected)))]}))
 
 
-(defn test-get-task [{:keys [task-id fixtures files events]}]
+(defn test-get-task [{:keys [task-id fixtures files events completed]}]
   (test-app-response
     {:method          :get
      :url             (str "/tasks/" task-id)
@@ -67,7 +67,8 @@
      :response-tests  [resp/is-ok-response
                        (partial resp/dispatch-response-body-test is-valid-task?)
                        (resp/contains-entries-at? [:inputs] (map resp/file-entry files))
-                       (resp/contains-event-entries [:events] events)]}))
+                       (resp/contains-event-entries [:events] events)
+                       (resp/is-complete? completed)]}))
 
 (defn test-get-benchmark [{:keys [benchmark-id fixtures complete]}]
   (test-app-response
@@ -121,26 +122,38 @@
          :response-tests  [resp/is-client-error-response
                            (resp/has-body "Task not found: unknown")]})))
 
-    (testing "an incomplete produce task"
+    (testing "a produce task with no events"
       (test-get-task
         {:task-id 1
-         :files [["short_read_fastq" "s3://reads" "7673a"]]}))
+         :files [["short_read_fastq" "s3://reads" "7673a"]]
+         :completed false}))
 
-    (testing "a successfully completed produce task"
+    (testing "a produce task with a successful event"
       (test-get-task
         {:task-id 1
+         :completed true
          :files [["short_read_fastq" "s3://reads" "7673a"]]
          :fixtures [:successful-product-event]
          :events [(mock-event :produce :success)]}))
 
+    (testing "a produce task with a failed event"
+      (test-get-task
+        {:task-id 1
+         :completed false
+         :files [["short_read_fastq" "s3://reads" "7673a"]]
+         :fixtures [:unsuccessful-product-event]
+         :events [(mock-event :produce :failure)]}))
+
     (testing "an incomplete evaluate task with no produce files"
       (test-get-task
         {:task-id 2
+         :completed false
          :files [["reference_fasta" "s3://ref" "d421a4"]]}))
 
     (testing "an incomplete evaluate task with a successful produce task"
       (test-get-task
         {:task-id 2
+         :completed false
          :files [["reference_fasta" "s3://ref" "d421a4"]
                  ["contig_fasta"    "s3://contigs" "f7455"]]
          :fixtures [:successful-product-event]})

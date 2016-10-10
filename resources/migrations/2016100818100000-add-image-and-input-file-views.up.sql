@@ -42,31 +42,66 @@ LEFT JOIN material_type          ON material_type.id = input_data_file_set.mater
 LEFT JOIN extraction_method_type ON extraction_method_type.id = input_data_file_set.extraction_method_type_id
 LEFT JOIN run_mode_type          ON run_mode_type.id = input_data_file_set.run_mode_type_id;
 --;;
-CREATE INDEX input_data_file_expanded_fields_file_instance_id  ON input_data_file_expanded_fields (file_instance_id);
+CREATE INDEX ON input_data_file_expanded_fields (file_instance_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_file_type_id  ON input_data_file_expanded_fields (file_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (file_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_input_data_file_set_id  ON input_data_file_expanded_fields (input_data_file_set_id);
+CREATE INDEX ON input_data_file_expanded_fields (input_data_file_set_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_input_data_file_id  ON input_data_file_expanded_fields (input_data_file_id);
+CREATE INDEX ON input_data_file_expanded_fields (input_data_file_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_biological_source_id  ON input_data_file_expanded_fields (biological_source_id);
+CREATE INDEX ON input_data_file_expanded_fields (biological_source_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_platform_type_id  ON input_data_file_expanded_fields (platform_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (platform_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_protocol_type_id  ON input_data_file_expanded_fields (protocol_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (protocol_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_material_type_id  ON input_data_file_expanded_fields (material_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (material_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_extraction_method_type_id  ON input_data_file_expanded_fields (extraction_method_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (extraction_method_type_id);
 --;;
-CREATE INDEX input_data_file_expanded_fields_run_mode_type_id  ON input_data_file_expanded_fields (run_mode_type_id);
+CREATE INDEX ON input_data_file_expanded_fields (run_mode_type_id);
 --;;
---;; Updated function for populating all benchmark_instance and task
+--;; Materialised view of denormalised image data
+--;;
+CREATE MATERIALIZED VIEW image_expanded_fields AS
+SELECT
+image_type.id             AS image_type_id,
+image_instance.id         AS image_instance_id,
+image_version.id          AS image_version_id,
+image_task.id             AS image_task_id,
+image_type.created_at     AS image_type_created_at,
+image_instance.created_at AS image_instance_created_at,
+image_version.created_at  AS image_version_created_at,
+image_task.created_at     AS image_task_created_at,
+image_type.name           AS image_type_name,
+image_instance.name       AS image_instance_name,
+image_version.name        AS image_version_name,
+image_version.sha256      AS image_version_sha256,
+image_task.name           AS image_task_name
+FROM image_type
+INNER JOIN image_instance ON image_instance.image_type_id = image_type.id
+INNER JOIN image_version  ON image_version.image_instance_id = image_instance.id
+INNER JOIN image_task     ON image_task.image_version_id = image_version.id;
+--;;
+CREATE INDEX ON image_expanded_fields (image_type_id);
+--;;
+CREATE INDEX ON image_expanded_fields (image_instance_id);
+--;;
+CREATE INDEX ON image_expanded_fields (image_version_id);
+--;;
+CREATE INDEX ON image_expanded_fields (image_task_id);
+--;;
+--;; Combination of image fields are unique
+CREATE UNIQUE INDEX ON image_expanded_fields (image_type_id, image_instance_id, image_version_id, image_task_id);
+--;;
+--;; Updated function for populating benchmark_instances using
+--;; the new materialised views for data and images
 --;;
 CREATE OR REPLACE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
 REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
+REFRESH MATERIALIZED VIEW image_expanded_fields;
 INSERT INTO benchmark_instance(
 	benchmark_type_id,
 	product_image_instance_id,
@@ -76,22 +111,75 @@ INSERT INTO benchmark_instance(
 	file_instance_id)
 SELECT
 benchmark_type.id,
-image_instance.id,
-image_version.id,
-image_task.id,
+images.image_instance_id,
+images.image_version_id,
+images.image_task_id,
 inputs.input_data_file_id,
 inputs.file_instance_id
 FROM benchmark_type
-LEFT JOIN benchmark_data      ON benchmark_data.benchmark_type_id = benchmark_type.id
-LEFT JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_set_id = benchmark_data.input_data_file_set_id
-LEFT JOIN image_type          ON image_type.id = benchmark_type.product_image_type_id
-INNER JOIN image_instance     ON image_instance.image_type_id = image_type.id
-LEFT JOIN image_version       ON image_version.image_instance_id = image_instance.id
-LEFT JOIN image_task          ON image_task.image_version_id = image_instance.id
+INNER JOIN benchmark_data                            ON benchmark_data.benchmark_type_id = benchmark_type.id
+INNER JOIN image_expanded_fields           AS images ON images.image_type_id = benchmark_type.product_image_type_id
+INNER JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_set_id)
 ORDER BY benchmark_type.id,
 	inputs.input_data_file_id,
-	image_instance.id,
-	image_task.id ASC
+	images.image_instance_id,
+	images.image_task_id ASC
 ON CONFLICT DO NOTHING;
 END; $$
 LANGUAGE PLPGSQL;
+--;;
+--;; Updated function for populating tasks using
+--;; the new materialised views for data and images
+--;;
+CREATE OR REPLACE FUNCTION populate_task () RETURNS void AS $$
+BEGIN
+INSERT INTO task (benchmark_instance_id, image_task_id, task_type)
+	SELECT
+	benchmark_instance.id   AS benchmark_instance_id,
+	images.image_task_id,
+	'evaluate'::task_type   AS task_type
+	FROM benchmark_instance
+	INNER JOIN benchmark_type                  ON benchmark_type.id = benchmark_instance.benchmark_type_id
+	INNER JOIN image_expanded_fields AS images ON images.image_type_id = benchmark_type.evaluation_image_type_id
+UNION
+	SELECT
+	benchmark_instance.id	                 AS benchmark_instance_id,
+	benchmark_instance.product_image_task_id AS image_task_id,
+	'produce'::task_type                     AS task_type
+	FROM benchmark_instance
+EXCEPT
+	SELECT
+	benchmark_instance_id,
+	image_task_id,
+	task_type
+	FROM task
+ORDER BY benchmark_instance_id, image_task_id, task_type ASC;
+END; $$
+LANGUAGE PLPGSQL;
+--;;
+--;; Single events per task prioritised by the successful over the failed and
+--;; oldest first
+--;;
+CREATE VIEW events_prioritised_by_successful AS
+SELECT DISTINCT ON (task_id) *
+FROM event
+ORDER by task_id, success DESC, created_at ASC;
+--;;
+--;; Simplify task view table using new materialsed views
+--;;
+CREATE OR REPLACE VIEW task_expanded_fields AS
+SELECT
+task.id,
+task.benchmark_instance_id,
+benchmark_instance.external_id,
+task.task_type                   AS task_type,
+image_instance_name              AS image_name,
+image_version_name               AS image_version,
+image_version_sha256             AS image_sha256,
+image_task_name                  AS image_task,
+image_type_name                  AS image_type,
+COALESCE (events.success, FALSE) AS complete
+FROM task
+LEFT JOIN image_expanded_fields            AS images ON images.image_task_id = task.image_task_id
+LEFT JOIN benchmark_instance                         ON benchmark_instance.id = task.benchmark_instance_id
+LEFT JOIN events_prioritised_by_successful AS events ON events.task_id = task.id;
