@@ -71,9 +71,8 @@ Feature: Migrating and loading input data for the database
       | $benchmark_type?name='illumina_isolate_reference_assembly'           |
     And the table "benchmark_instance" should contain "15" rows
     And the table "benchmark_instance" should include the entries:
-      | file_instance_id                                                                         | benchmark_type_id                                                    | product_image_instance_id                   |
-      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/velvet'      |
-      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           | $image_instance?name='bioboxes/ray'         |
+      | file_instance_id                                                                         | benchmark_type_id                                                    |
+      | $file_instance?sha256='4376581c14355fcf38cc9fdb962b41b8fe68e2d6637efbfdbe10089ce8019c07' | $benchmark_type?name='illumina_isolate_reference_assembly'           |
     And the table "task" should contain "30" rows
     And the table "task_expanded_fields" should include the entries:
       | task_type | image_name                 | image_task |
