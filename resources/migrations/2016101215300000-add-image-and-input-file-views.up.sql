@@ -3,16 +3,16 @@
 --;;
 CREATE MATERIALIZED VIEW input_data_file_expanded_fields AS
 SELECT
-file_instance.id                               AS file_instance_id,
-file_type.id                                   AS file_type_id,
-input_data_file_set.id                         AS input_data_file_set_id,
-input_data_file.id                             AS input_data_file_id,
-biological_source.id                           AS biological_source_id,
-input_data_file_set.platform_type_id,
-input_data_file_set.protocol_type_id,
-input_data_file_set.material_type_id,
-input_data_file_set.extraction_method_type_id,
-input_data_file_set.run_mode_type_id,
+file_instance_id,
+file_type_id,
+input_data_file_set_id,
+input_data_file_id,
+biological_source_id,
+platform_type_id,
+protocol_type_id,
+material_type_id,
+extraction_method_type_id,
+run_mode_type_id,
 file_instance.created_at                       AS file_instance_created_at,
 input_data_file_set.created_at                 AS input_file_set_created_at,
 input_data_file.created_at                     AS input_file_created_at,
@@ -28,19 +28,19 @@ input_data_file_set.name                       AS input_file_set_name,
 input_data_file_set.active                     AS input_file_set_active,
 input_data_file.active                         AS input_file_active,
 biological_source.active                       AS biological_source_active,
-file_instance.sha256,
-file_instance.url
+sha256,
+url
 FROM input_data_file
-LEFT JOIN file_instance          ON file_instance.id = input_data_file.file_instance_id
-LEFT JOIN input_data_file_set    ON input_data_file.input_data_file_set_id = input_data_file_set.id
-LEFT JOIN biological_source      ON input_data_file_set.biological_source_id = biological_source.id
-LEFT JOIN source_type            ON biological_source.source_type_id = source_type.id
-LEFT JOIN file_type              ON file_type.id = file_instance.file_type_id
-LEFT JOIN platform_type          ON platform_type.id = input_data_file_set.platform_type_id
-LEFT JOIN protocol_type          ON protocol_type.id = input_data_file_set.protocol_type_id
-LEFT JOIN material_type          ON material_type.id = input_data_file_set.material_type_id
-LEFT JOIN extraction_method_type ON extraction_method_type.id = input_data_file_set.extraction_method_type_id
-LEFT JOIN run_mode_type          ON run_mode_type.id = input_data_file_set.run_mode_type_id;
+INNER JOIN file_instance          USING (file_instance_id)
+INNER JOIN input_data_file_set    USING (input_data_file_set_id)
+INNER JOIN biological_source      USING (biological_source_id)
+INNER JOIN source_type            USING (source_type_id)
+INNER JOIN file_type              USING (file_type_id)
+INNER JOIN platform_type          USING (platform_type_id)
+INNER JOIN protocol_type          USING (protocol_type_id)
+INNER JOIN material_type          USING (material_type_id)
+INNER JOIN extraction_method_type USING (extraction_method_type_id)
+INNER JOIN run_mode_type          USING (run_mode_type_id);
 --;;
 CREATE INDEX ON input_data_file_expanded_fields (file_instance_id);
 --;;
@@ -66,10 +66,10 @@ CREATE INDEX ON input_data_file_expanded_fields (run_mode_type_id);
 --;;
 CREATE MATERIALIZED VIEW image_expanded_fields AS
 SELECT
-image_type.id             AS image_type_id,
-image_instance.id         AS image_instance_id,
-image_version.id          AS image_version_id,
-image_task.id             AS image_task_id,
+image_type_id,
+image_instance_id,
+image_version_id,
+image_task_id,
 image_type.created_at     AS image_type_created_at,
 image_instance.created_at AS image_instance_created_at,
 image_version.created_at  AS image_version_created_at,
@@ -80,9 +80,9 @@ image_version.name        AS image_version_name,
 image_version.sha256      AS image_version_sha256,
 image_task.name           AS image_task_name
 FROM image_type
-INNER JOIN image_instance ON image_instance.image_type_id = image_type.id
-INNER JOIN image_version  ON image_version.image_instance_id = image_instance.id
-INNER JOIN image_task     ON image_task.image_version_id = image_version.id;
+INNER JOIN image_instance USING (image_type_id)
+INNER JOIN image_version  USING (image_instance_id)
+INNER JOIN image_task     USING (image_version_id);
 --;;
 CREATE INDEX ON image_expanded_fields (image_type_id);
 --;;
@@ -104,26 +104,19 @@ REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
 REFRESH MATERIALIZED VIEW image_expanded_fields;
 INSERT INTO benchmark_instance(
 	benchmark_type_id,
-	product_image_instance_id,
-	product_image_version_id,
 	product_image_task_id,
 	input_data_file_id,
 	file_instance_id)
 SELECT
-benchmark_type.id,
-images.image_instance_id,
-images.image_version_id,
-images.image_task_id,
-inputs.input_data_file_id,
-inputs.file_instance_id
+benchmark_type_id,
+image_task_id,
+input_data_file_id,
+file_instance_id
 FROM benchmark_type
-INNER JOIN benchmark_data                            ON benchmark_data.benchmark_type_id = benchmark_type.id
+INNER JOIN benchmark_data                            USING (benchmark_type_id)
 INNER JOIN image_expanded_fields           AS images ON images.image_type_id = benchmark_type.product_image_type_id
 INNER JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_set_id)
-ORDER BY benchmark_type.id,
-	inputs.input_data_file_id,
-	images.image_instance_id,
-	images.image_task_id ASC
+ORDER BY benchmark_type_id, input_data_file_id, image_instance_id, image_task_id ASC
 ON CONFLICT DO NOTHING;
 END; $$
 LANGUAGE PLPGSQL;
@@ -135,15 +128,15 @@ CREATE OR REPLACE FUNCTION populate_task () RETURNS void AS $$
 BEGIN
 INSERT INTO task (benchmark_instance_id, image_task_id, task_type)
 	SELECT
-	benchmark_instance.id   AS benchmark_instance_id,
+	benchmark_instance_id,
 	images.image_task_id,
-	'evaluate'::task_type   AS task_type
+	'evaluate'::task_type AS task_type
 	FROM benchmark_instance
-	INNER JOIN benchmark_type                  ON benchmark_type.id = benchmark_instance.benchmark_type_id
+	INNER JOIN benchmark_type                  USING (benchmark_type_id)
 	INNER JOIN image_expanded_fields AS images ON images.image_type_id = benchmark_type.evaluation_image_type_id
 UNION
 	SELECT
-	benchmark_instance.id	                 AS benchmark_instance_id,
+	benchmark_instance_id,
 	benchmark_instance.product_image_task_id AS image_task_id,
 	'produce'::task_type                     AS task_type
 	FROM benchmark_instance
@@ -169,10 +162,10 @@ ORDER by task_id, success DESC, created_at ASC;
 --;;
 CREATE OR REPLACE VIEW task_expanded_fields AS
 SELECT
-task.id,
-task.benchmark_instance_id,
+task_id,
+benchmark_instance_id,
 benchmark_instance.external_id,
-task.task_type                   AS task_type,
+task_type,
 image_instance_name              AS image_name,
 image_version_name               AS image_version,
 image_version_sha256             AS image_sha256,
@@ -180,6 +173,6 @@ image_task_name                  AS image_task,
 image_type_name                  AS image_type,
 COALESCE (events.success, FALSE) AS complete
 FROM task
-LEFT JOIN image_expanded_fields            AS images ON images.image_task_id = task.image_task_id
-LEFT JOIN benchmark_instance                         ON benchmark_instance.id = task.benchmark_instance_id
-LEFT JOIN events_prioritised_by_successful AS events ON events.task_id = task.id;
+LEFT JOIN image_expanded_fields            AS images USING (image_task_id)
+LEFT JOIN benchmark_instance                         USING (benchmark_instance_id)
+LEFT JOIN events_prioritised_by_successful AS events USING (task_id);
