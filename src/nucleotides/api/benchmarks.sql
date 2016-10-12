@@ -5,8 +5,8 @@ inputs.sha256,
 inputs.url,
 inputs.file_type AS type
 FROM benchmark_instance
-LEFT JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_id)j
-WHERE benchmark_instance.id = :id::int
+LEFT JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_id)
+WHERE benchmark_instance_id = :id::int
 
 
 -- name: benchmark-evaluate-files-by-id
