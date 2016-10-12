@@ -2,11 +2,11 @@
 -- Look up a single task
 SELECT *
 FROM task_expanded_fields AS task
-WHERE task.id = :id::int
+WHERE task_id = :id::int
 
 -- name: events-by-task-id
 -- Get all events for a given task
-SELECT id FROM event WHERE event.task_id = :id::int
+SELECT event_id FROM event WHERE task_id = :id::int
 
 -- name: incomplete-tasks
 -- Get all incomplete tasks
@@ -16,7 +16,7 @@ WITH successful_event AS (
 incomplete_task AS (
   SELECT task.*
   FROM task
-  LEFT JOIN successful_event ON successful_event.task_id = task.id
+  LEFT JOIN successful_event USING (task_id)
   WHERE successful_event.task_id IS NULL
 ),
 incomplete_produce_task AS (
@@ -27,7 +27,7 @@ incomplete_produce_task AS (
 complete_produce_task AS (
   SELECT *
   FROM task
-  LEFT JOIN successful_event ON successful_event.task_id = task.id
+  LEFT JOIN successful_event USING (task_id)
   WHERE task.task_type = 'produce'
   AND successful_event.task_id IS NOT NULL
 ),
@@ -35,8 +35,8 @@ incomplete_evaluate_task AS (
   SELECT
   incomplete_task.*
   FROM complete_produce_task
-  LEFT JOIN benchmark_instance ON benchmark_instance.id = complete_produce_task.benchmark_instance_id
-  LEFT JOIN incomplete_task    ON incomplete_task.benchmark_instance_id = benchmark_instance.id
+  LEFT JOIN benchmark_instance USING (benchmark_instance_id)
+  LEFT JOIN incomplete_task    USING (benchmark_instance_id)
   WHERE incomplete_task.task_type = 'evaluate'
 )
 SELECT * FROM incomplete_produce_task

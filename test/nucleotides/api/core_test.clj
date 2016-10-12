@@ -154,17 +154,6 @@
          :response-tests  [(partial resp/dispatch-response-body-test is-valid-task?)
                            (resp/is-length-at? [:inputs] 2)]})))
 
-
-(defn http-request
-  "Create a mock request to the API"
-  [{:keys [method url params body content] :or {params {}}}]
-  (-> (mock/request method url params)
-      (mock/body body)
-      (mock/content-type content)
-      ((md/middleware (app/api {:connection (con/create-connection)})))))
-
-
-
   (testing "GET /event/:id"
 
     (testing "a valid unknown event id"

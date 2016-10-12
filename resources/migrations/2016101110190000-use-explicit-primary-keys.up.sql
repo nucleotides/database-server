@@ -178,3 +178,33 @@ RETURNS integer AS $$
   ON CONFLICT DO NOTHING;
   SELECT file_instance_id FROM file_instance WHERE sha256 = $1
 $$ LANGUAGE SQL;
+--;;
+--;; Expanded view of tasks using new fields
+--;;
+DROP VIEW task_expanded_fields;
+--;;
+CREATE VIEW task_expanded_fields AS
+WITH successful_event AS (
+  SELECT DISTINCT ON (task_id)
+  task_id
+  FROM event
+  WHERE success = TRUE
+)
+SELECT
+task_id,
+benchmark_instance_id,
+benchmark_instance.external_id,
+task_type,
+image_instance.name      AS image_name,
+image_version.name       AS image_version,
+image_version.sha256     AS image_sha256,
+image_task.name          AS image_task,
+image_type.name          AS image_type,
+successful_event.task_id IS NOT NULL AS complete
+FROM task
+LEFT JOIN image_task          USING (image_task_id)
+LEFT JOIN image_version       USING (image_version_id)
+LEFT JOIN image_instance      USING (image_instance_id)
+LEFT JOIN image_type          USING (image_type_id)
+LEFT JOIN benchmark_instance  USING (benchmark_instance_id)
+LEFT JOIN successful_event    USING (task_id);
