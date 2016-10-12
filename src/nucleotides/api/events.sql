@@ -5,4 +5,4 @@ VALUES (:task::integer, :success::boolean)
 
 -- name: get-event
 -- Get an event by its ID
-SELECT * FROM event WHERE id = :id::int
+SELECT * FROM event WHERE event_id = :id::int

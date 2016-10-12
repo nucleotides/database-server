@@ -33,14 +33,14 @@
   "Fetch all events for a given task"
   [db-client task-id]
   (doall
-    (map #(event/lookup db-client (:id %) {})
+    (map #(event/lookup db-client (:event_id %) {})
          (events-by-task-id {:id task-id} db-client))))
 
 (defn show
   "Returns all incomplete tasks"
   [db-client _]
   (->> (incomplete-tasks {} db-client)
-       (map :id)))
+       (map :task_id)))
 
 (defn lookup
   "Gets a single task entry by its ID"
@@ -52,7 +52,7 @@
         (assoc :inputs files)
         (assoc :events events)
         (dissoc :benchmark_instance_id)
-        (st/rename-keys {:external_id :benchmark, :task_type :type})
+        (st/rename-keys {:external_id :benchmark, :task_type :type, :task_id :id})
         (create-submap image-keys :image))))
 
 (def exists?

@@ -5,7 +5,7 @@ inputs.sha256,
 inputs.url,
 inputs.file_type AS type
 FROM benchmark_instance
-LEFT JOIN input_data_file_expanded_fields AS inputs ON inputs.input_data_file_id = benchmark_instance.input_data_file_id
+LEFT JOIN input_data_file_expanded_fields AS inputs USING (input_data_file_id)j
 WHERE benchmark_instance.id = :id::int
 
 
@@ -14,30 +14,30 @@ WHERE benchmark_instance.id = :id::int
 WITH _benchmark AS (
   SELECT *
   FROM benchmark_instance
-  WHERE benchmark_instance.id = :id::int
+  WHERE benchmark_instance.benchmark_instance_id = :id::int
 ),
 _first_successful_produce_event AS (
   SELECT event.*
   FROM _benchmark
-  LEFT JOIN task  ON task.benchmark_instance_id = _benchmark.id
-  LEFT JOIN event ON event.task_id = task.id
+  LEFT JOIN task  USING (benchmark_instance_id)
+  LEFT JOIN event USING (task_id)
   WHERE task.task_type = 'produce'
   AND event.success = true
   LIMIT 1
 ),
 reference_files AS (
   SELECT
-  biological_source_reference_file.file_instance_id AS file_instance_id
+  biological_source_reference_file.file_instance_id
   FROM _benchmark
-  LEFT JOIN input_data_file                  ON input_data_file.id = _benchmark.input_data_file_id
-  LEFT JOIN input_data_file_set              ON input_data_file_set.id = input_data_file.input_data_file_set_id
-  LEFT JOIN biological_source_reference_file ON biological_source_reference_file.biological_source_id = input_data_file_set.biological_source_id
+  LEFT JOIN input_data_file                  USING (input_data_file_id)
+  LEFT JOIN input_data_file_set              USING (input_data_file_set_id)
+  LEFT JOIN biological_source_reference_file USING (biological_source_id)
 ),
 produce_files AS (
   SELECT
-  event_file_instance.file_instance_id AS file_instance_id
+  event_file_instance.file_instance_id
   FROM _first_successful_produce_event
-  LEFT JOIN event_file_instance  ON event_file_instance.event_id = _first_successful_produce_event.id
+  LEFT JOIN event_file_instance  USING (event_id)
 ),
 _files AS (
   SELECT * FROM reference_files
@@ -49,8 +49,8 @@ file_instance.sha256,
 file_instance.url,
 file_type.name AS type
 FROM _files
-LEFT JOIN file_instance ON file_instance.id = _files.file_instance_id
-LEFT JOIN file_type     ON file_type.id = file_instance.file_type_id
+LEFT JOIN file_instance USING (file_instance_id)
+LEFT JOIN file_type     USING (file_type_id)
 WHERE file_type.name NOT IN ('container_log', 'container_runtime_metrics')
 
 
@@ -59,8 +59,8 @@ WHERE file_type.name NOT IN ('container_log', 'container_runtime_metrics')
 SELECT
 benchmark_instance.external_id	AS id,
 benchmark_type.name		AS type,
-task.id				AS task_id
+task_id
 FROM benchmark_instance
-LEFT JOIN benchmark_type	ON benchmark_type.id = benchmark_instance.benchmark_type_id
-LEFT JOIN task			ON task.benchmark_instance_id = benchmark_instance.id
+LEFT JOIN benchmark_type  USING (benchmark_type_id)
+LEFT JOIN task            USING (benchmark_instance_id)
 WHERE external_id = :id

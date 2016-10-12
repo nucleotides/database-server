@@ -8,12 +8,15 @@
   (let [query "INSERT INTO %1$s (name, description)
                VALUES ('%2$s', '%3$s')
                ON CONFLICT DO NOTHING
-               RETURNING id;"]
+               RETURNING %4$s;"]
     (sql/query (con/create-connection)
                (format query
                        (str table-name "_type")
                        (:name entry)
-                       (:desc entry)))))
+                       (:desc entry)
+                       (str table-name "_type_id")
+
+                       ))))
 
 (defn load-all-metadata [data]
   (dorun
