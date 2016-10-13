@@ -3,8 +3,6 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## 0.9.0 - DATE
-
 ### Added
 
   * Created `input_data_file_expanded_fields` materialised view for input data
@@ -27,6 +25,15 @@ project adheres to [Semantic Versioning](http://semver.org/).
     use the two materialised views image_expanded_fields,
     input_data_file_expanded_fields. As less joins are required with the
     materialised views the two queries in these functions are simpler.
+
+  * Renamed all database primary keys to be explicitly named after the table,
+    e.g. `task.id` is now `task.task_id`. The aim of this change is to prevent
+    tables being accidentally joined on the wrong primary keys through human
+    error. The cause of this is two tables can be accidentally joined on the
+    `.id` column when because all tables use this column name as the primary
+    key. Explicitly naming the primary keys means two tables in a join must
+    have matching primary and foreign keys. This will not eliminate human error
+    when writing joins but should hopefully reduce the chance of it happening.
 
 ## v0.8.2 - 2016-09-29
 
