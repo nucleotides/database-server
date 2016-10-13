@@ -2,19 +2,14 @@
 -- Creates a new input data source entry
 INSERT INTO biological_source (name, description, source_type_id)
 VALUES (:name, :desc, (SELECT source_type_id FROM source_type WHERE name = :source_type))
-ON CONFLICT DO NOTHING
+ON CONFLICT DO NOTHING;
 
 -- name: save-biological-source-file<!
 -- Creates link between biological_source and reference file_instance
-WITH _file AS (
-  SELECT create_file_instance(:sha256, :file_type, :url) AS file_instance_id
-),
-_biological_source AS (
-  SELECT * FROM biological_source WHERE name = :source_name
-)
 INSERT INTO biological_source_reference_file (biological_source_id, file_instance_id)
-VALUES ((SELECT biological_source_id FROM _biological_source), (SELECT file_instance_id FROM _file))
-ON CONFLICT DO NOTHING
+VALUES ((SELECT biological_source_id FROM biological_source WHERE name = :source_name),
+	(SELECT create_file_instance(:sha256, :file_type, :url)))
+ON CONFLICT DO NOTHING;
 
 -- name: save-input-data-file-set<!
 -- Creates a new input_data_file_set entry
@@ -40,19 +35,12 @@ ON CONFLICT DO NOTHING
 
 -- name: save-input-data-file<!
 -- Creates link between 'input_data_file_set' and 'file_instance'
-WITH _file AS (
-  SELECT create_file_instance(:sha256, :file_type, :url) AS file_instance_id
-),
-_input_data_file_set AS (
-  SELECT *
-  FROM input_data_file_set
-  WHERE name                 = :file_set_name
-    AND biological_source_id = (SELECT biological_source_id
-				FROM biological_source
-				WHERE name = :source_name)
-)
 INSERT INTO input_data_file (input_data_file_set_id, file_instance_id)
-VALUES ((SELECT input_data_file_set_id FROM _input_data_file_set), (SELECT file_instance_id FROM _file))
+VALUES ((SELECT input_data_file_set_id
+	 FROM biological_source_input_data_file_set
+	 WHERE biological_source_name = :source_name
+         AND input_data_file_set_name = :file_set_name),
+	(SELECT create_file_instance(:sha256, :file_type, :url)))
 ON CONFLICT DO NOTHING
 
 -- name: save-image-instance<!
@@ -84,21 +72,12 @@ ON CONFLICT DO NOTHING
 
 -- name: save-benchmark-data<!
 -- Creates a new benchmark type entry
-WITH _input_data_file_set AS (
-  SELECT input_data_file_set_id
-  FROM input_data_file_set
-  WHERE name                 = :file_set_name
-    AND biological_source_id = (SELECT biological_source_id
-				FROM biological_source
-				WHERE name = :source_name)
-),
-_benchmark AS (
-  SELECT benchmark_type_id
-  FROM benchmark_type
-  WHERE name = :benchmark_name
-)
 INSERT INTO benchmark_data (input_data_file_set_id, benchmark_type_id)
-VALUES ((SELECT input_data_file_set_id FROM _input_data_file_set), (SELECT benchmark_type_id FROM _benchmark))
+VALUES ((SELECT input_data_file_set_id
+	 FROM biological_source_input_data_file_set
+	 WHERE biological_source_name = :source_name
+         AND input_data_file_set_name = :file_set_name),
+	(SELECT benchmark_type_id FROM benchmark_type WHERE name = :benchmark_name))
 ON CONFLICT DO NOTHING
 
 -- name: populate-instance-and-task!

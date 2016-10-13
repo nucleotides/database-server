@@ -176,3 +176,15 @@ FROM task
 LEFT JOIN image_expanded_fields            AS images USING (image_task_id)
 LEFT JOIN benchmark_instance                         USING (benchmark_instance_id)
 LEFT JOIN events_prioritised_by_successful AS events USING (task_id);
+--;;
+--;; View for linking biological_source and input_data_set_names
+--;; Cannot be materialised view as used during migration
+--;;
+CREATE VIEW biological_source_input_data_file_set AS
+SELECT
+input_data_file_set_id,
+biological_source_id,
+input_data_file_set.name AS input_data_file_set_name,
+biological_source.name   AS biological_source_name
+FROM input_data_file_set
+INNER JOIN biological_source USING (biological_source_id)

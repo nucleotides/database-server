@@ -11,7 +11,7 @@ metric_type.name,
 metric_instance.value
 FROM metric_instance
 LEFT JOIN metric_type USING (metric_type_id)
-WHERE metric_instance.event_id = :id::int
+WHERE event_id = :id::int
 
 -- name: all-metric-types
 -- Get list of all available metric types
