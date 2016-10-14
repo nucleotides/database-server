@@ -1,0 +1,9 @@
+---
+- name: image_type_1
+  desc: dummy
+- name: image_type_2
+  desc: dummy
+- name: image_type_3
+  desc: dummy
+- name: non_existing_image
+  desc: dummy
