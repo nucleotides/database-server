@@ -81,6 +81,40 @@ Feature: Migrating and loading input data for the database
       | produce   | bioboxes/velvet            | careful    |
       | evaluate  | bioboxes/quast             | default    |
 
+
+  Scenario: Migrating and loading the database twice using real data and the RDS_* ENV variables
+    Given an empty database without any tables
+    And I copy the directory "../../tmp/prod_nucleotides_data" to "data"
+    And in bash I successfully run:
+      """
+      docker run \
+        --env=RDS_PORT=5433 \
+        --env=RDS_USERNAME=${POSTGRES_USER} \
+        --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=RDS_HOSTNAME=localhost \
+        --env=RDS_DB_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    And in bash I run:
+      """
+      docker run \
+        --env=RDS_PORT=5433 \
+        --env=RDS_USERNAME=${POSTGRES_USER} \
+        --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
+        --env=RDS_HOSTNAME=localhost \
+        --env=RDS_DB_NAME=${POSTGRES_NAME} \
+        --volume=$(realpath data):/data:ro \
+        --net=host \
+        nucleotides-api \
+        migrate
+      """
+    Then the stderr excluding logging info should not contain anything
+    And the exit status should be 0
+
+
   Scenario: Migrating and loading the database with a non-standard camel case name
     Given an empty database without any tables
     And I copy the directory "../../tmp/input_data" to "data"
@@ -114,7 +148,6 @@ Feature: Migrating and loading input data for the database
     Then the stderr excluding logging info should not contain anything
     And the exit status should be 0
 
-
   Scenario: Migrating and loading the database when there are no images for a benchmark type
     Given an empty database without any tables
     And I copy the directory "../../tmp/input_data" to "data"
@@ -130,55 +163,6 @@ Feature: Migrating and loading input data for the database
         --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
         --env=RDS_HOSTNAME=localhost \
         --env=RDS_DB_NAME=${POSTGRES_NAME} \
-        --volume=$(realpath data):/data:ro \
-        --net=host \
-        nucleotides-api \
-        migrate
-      """
-    Then the stderr excluding logging info should not contain anything
-    And the exit status should be 0
-
-  Scenario: Migrating and loading the database using RDS_* ENV variables
-    Given an empty database without any tables
-    And I copy the directory "../../tmp/input_data" to "data"
-    When in bash I run:
-      """
-      docker run \
-        --env=RDS_PORT=5433 \
-        --env=RDS_USERNAME=${POSTGRES_USER} \
-        --env=RDS_PASSWORD=${POSTGRES_PASSWORD} \
-        --env=RDS_HOSTNAME=localhost \
-        --env=RDS_DB_NAME=${POSTGRES_NAME} \
-        --volume=$(realpath data):/data:ro \
-        --net=host \
-        nucleotides-api \
-        migrate
-      """
-    Then the stderr excluding logging info should not contain anything
-    And the exit status should be 0
-
-  Scenario: Loading and then reloading the database with the same data
-    Given an empty database without any tables
-    And I copy the directory "../../tmp/input_data" to "data"
-    And in bash I successfully run:
-      """
-      docker run \
-        --env=POSTGRES_HOST=//localhost:5433 \
-        --env=POSTGRES_USER=${POSTGRES_USER} \
-        --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-        --env=POSTGRES_NAME=${POSTGRES_NAME} \
-        --volume=$(realpath data):/data:ro \
-        --net=host \
-        nucleotides-api \
-        migrate
-      """
-    When in bash I run:
-      """
-      docker run \
-        --env=POSTGRES_HOST=//localhost:5433 \
-        --env=POSTGRES_USER=${POSTGRES_USER} \
-        --env=POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-        --env=POSTGRES_NAME=${POSTGRES_NAME} \
         --volume=$(realpath data):/data:ro \
         --net=host \
         nucleotides-api \
