@@ -84,6 +84,5 @@ ON CONFLICT DO NOTHING
 -- Populates benchmark instance table with combinations of data record and image task
 DO $$
 BEGIN
-PERFORM populate_benchmark_instance();
-PERFORM populate_task();
+PERFORM rebuild_benchmarks();
 END$$

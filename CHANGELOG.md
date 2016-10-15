@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.9.0 - DATE
+
 ### Added
 
   * Created `input_data_file_expanded_fields` materialised view for input data
@@ -19,6 +21,13 @@ project adheres to [Semantic Versioning](http://semver.org/).
   * Created `events_prioritised_by_successful` view showing events for each
     task prioritised by completion status and oldest first.
 
+  * Created `benchmark_instance_name` view providing a name for a benchmark
+    instance from the concatenated sub fields.
+
+  * Create `rebuild_benchmarks` function providing a single database function
+    call to refresh all materialised vies, add any additional rows to the
+    benchmark instance and task table, and reindex these tables.
+
 ### Changed
 
   * Simplified the populate_benchmark_instance, and populate_task functions to
@@ -34,6 +43,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
     key. Explicitly naming the primary keys means two tables in a join must
     have matching primary and foreign keys. This will not eliminate human error
     when writing joins but should hopefully reduce the chance of it happening.
+
+  * Simplified existing and added additional feature tests for more complex
+    input data during migration of database. This feature test simulates
+    different combinations of benchmarks, input data sets, image versions and
+    tasks, and evaluation tasks. The aim is to add stricter tests for the
+    importing of data.
 
 ## v0.8.2 - 2016-09-29
 

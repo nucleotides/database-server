@@ -100,8 +100,6 @@ CREATE UNIQUE INDEX ON image_expanded_fields (image_type_id, image_instance_id, 
 --;;
 CREATE OR REPLACE FUNCTION populate_benchmark_instance () RETURNS void AS $$
 BEGIN
-REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
-REFRESH MATERIALIZED VIEW image_expanded_fields;
 INSERT INTO benchmark_instance(
 	benchmark_type_id,
 	product_image_task_id,
@@ -187,4 +185,40 @@ biological_source_id,
 input_data_file_set.name AS input_data_file_set_name,
 biological_source.name   AS biological_source_name
 FROM input_data_file_set
-INNER JOIN biological_source USING (biological_source_id)
+INNER JOIN biological_source USING (biological_source_id);
+--;;
+--;; Create identifiable name for each benchmark instance
+--;;
+CREATE VIEW benchmark_instance_name AS
+SELECT
+benchmark_instance_id,
+benchmark_type.name
+  || ' '
+  || image_instance_name
+  || '/'
+  || image_version_name
+  || '/'
+  || image_task_name
+  || ' '
+  || biological_source_name
+  || '/'
+  || input_file_set_name
+  || '/'
+  || sha256 AS name
+FROM benchmark_instance
+INNER JOIN benchmark_type                            USING (benchmark_type_id)
+INNER JOIN image_expanded_fields           AS images ON images.image_task_id = benchmark_instance.product_image_task_id
+INNER JOIN input_data_file_expanded_fields AS inputs USING (file_instance_id);
+--;;
+--;; Function rebuild all benchmark instances and tasks
+--;;
+CREATE OR REPLACE FUNCTION rebuild_benchmarks () RETURNS void AS $$
+BEGIN
+REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
+REFRESH MATERIALIZED VIEW image_expanded_fields;
+PERFORM populate_benchmark_instance();
+PERFORM populate_task();
+REINDEX TABLE benchmark_instance;
+REINDEX TABLE task;
+END; $$
+LANGUAGE PLPGSQL;
