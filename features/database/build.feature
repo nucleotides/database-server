@@ -92,6 +92,28 @@ Feature: Migrating and loading input data for the database
       | $benchmark_type?name='benchmark_2' | $file_instance?sha256='data_set_2_data_1_digest_1' | $image_task?name='image_2_task'   |
       | $benchmark_type?name='benchmark_2' | $file_instance?sha256='data_set_2_data_1_digest_1' | $image_task?name='image_4_task'   |
     And the table "task" should contain "18" rows
+    And the table "task" should include the entries:
+      | task_type | benchmark_instance_id                                                                                                         |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.1/image_1_task_1 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.1/image_1_task_1 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_1' |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.1/image_1_task_1 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.1/image_1_task_1 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+      | produce   | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+      | evaluate  | $benchmark_instance_name?name='benchmark_1 image_1/v1.2/image_1_task_2 source_1/data_set_1_data_1/data_set_1_data_1_digest_2' |
+    And the table "task" should include the entries:
+       | task_type | image_task_id                     | benchmark_instance_id                                                                                                                   |
+       | produce   | $image_task?name='image_2_task'   | $benchmark_instance_name?name='benchmark_2 image_2/v2/image_2_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
+       | evaluate  | $image_task?name='image_3_task_1' | $benchmark_instance_name?name='benchmark_2 image_2/v2/image_2_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
+       | evaluate  | $image_task?name='image_3_task_2' | $benchmark_instance_name?name='benchmark_2 image_2/v2/image_2_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
+       | produce   | $image_task?name='image_4_task'   | $benchmark_instance_name?name='benchmark_2 image_4/v4/image_4_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
+       | evaluate  | $image_task?name='image_3_task_1' | $benchmark_instance_name?name='benchmark_2 image_4/v4/image_4_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
+       | evaluate  | $image_task?name='image_3_task_2' | $benchmark_instance_name?name='benchmark_2 image_4/v4/image_4_task bad_camel_case_source2/data_set_2_data_1/data_set_2_data_1_digest_1' |
 
 
   Scenario: Migrating and loading the database twice using real data and the RDS_* ENV variables
