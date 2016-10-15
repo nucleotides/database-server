@@ -109,13 +109,20 @@ $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.cl
 #
 ################################################
 
-bootstrap: Gemfile.lock .rdm_container tmp/input_data
+bootstrap: Gemfile.lock .rdm_container tmp/input_data tmp/prod_nucleotides_data
 	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
 	lein deps
 
 tmp/prod_nucleotides_data:
 	mkdir -p $(dir $@)
 	git clone https://github.com/nucleotides/nucleotides-data.git $@
+
+tmp/input_data:
+	mkdir -p $(dir $@)
+	git clone https://github.com/nucleotides/nucleotides-data.git $@
+	cd ./$@ && git reset --hard d08f40d
+	find ./$@/inputs/data -type f ! -name 'amycolatopsis*' -delete
+	cp ./data/pseudo_real/* ./$@/inputs
 
 .rdm_container: .rdm_image
 	docker run \
