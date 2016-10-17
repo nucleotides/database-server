@@ -14,9 +14,8 @@
                        (str table-name "_type")
                        (:name entry)
                        (:desc entry)
-                       (str table-name "_type_id")
+                       (str table-name "_type_id")))))
 
-                       ))))
 
 (defn load-all-metadata [data]
   (dorun

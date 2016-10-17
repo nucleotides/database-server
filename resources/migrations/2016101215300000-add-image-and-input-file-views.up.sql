@@ -13,21 +13,21 @@ protocol_type_id,
 material_type_id,
 extraction_method_type_id,
 run_mode_type_id,
-file_instance.created_at                       AS file_instance_created_at,
-input_data_file_set.created_at                 AS input_file_set_created_at,
-input_data_file.created_at                     AS input_file_created_at,
-file_type.name                                 AS file_type,
-platform_type.name                             AS platform,
-protocol_type.name                             AS protocol,
-material_type.name                             AS material,
-extraction_method_type.name                    AS extraction_method,
-run_mode_type.name                             AS run_mode,
-source_type.name                               AS biological_source_type,
-biological_source.name                         AS biological_source_name,
-input_data_file_set.name                       AS input_file_set_name,
-input_data_file_set.active                     AS input_file_set_active,
-input_data_file.active                         AS input_file_active,
-biological_source.active                       AS biological_source_active,
+file_instance.created_at       AS file_instance_created_at,
+input_data_file_set.created_at AS input_file_set_created_at,
+input_data_file.created_at     AS input_file_created_at,
+file_type.name                 AS file_type,
+platform_type.name             AS platform,
+protocol_type.name             AS protocol,
+material_type.name             AS material,
+extraction_method_type.name    AS extraction_method,
+run_mode_type.name             AS run_mode,
+source_type.name               AS biological_source_type,
+biological_source.name         AS biological_source_name,
+input_data_file_set.name       AS input_file_set_name,
+input_data_file_set.active     AS input_file_set_active,
+input_data_file.active         AS input_file_active,
+biological_source.active       AS biological_source_active,
 sha256,
 url
 FROM input_data_file
@@ -295,7 +295,7 @@ CREATE VIEW completed_benchmark_metrics AS
  INNER JOIN metric_instance                                USING (event_id)
  INNER JOIN metric_type                                    USING (metric_type_id)
       WHERE state.benchmark_finished   = true
-        AND state.benchmark_successful = true
+        AND state.benchmark_successful = true;
 
 
 
