@@ -1,7 +1,7 @@
 WITH event_ AS (
 	INSERT INTO event (task_id, success)
 	VALUES (1, true)
-	RETURNING id
+	RETURNING event_id
 ),
 files_ AS (
 	SELECT create_file_instance('12def', 'container_runtime_metrics', 's3://metrics')

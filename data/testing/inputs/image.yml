@@ -1,0 +1,28 @@
+---
+- image_type: image_type_1
+  name: image_1
+  versions:
+    - sha256: image_1_digest_1
+      tasks:  ["image_1_task_1"]
+      name: "v1.1"
+    - sha256: image_1_digest_2
+      tasks:  ["image_1_task_2"]
+      name: "v1.2"
+- image_type: image_type_3
+  name: image_2
+  versions:
+    - sha256: image_2_digest
+      tasks:  ["image_2_task"]
+      name: "v2"
+- image_type: image_type_2
+  name: image_3
+  versions:
+    - sha256: image_3_digest
+      tasks: ["image_3_task_1", "image_3_task_2"]
+      name: "v3"
+- image_type: image_type_3
+  name: image_4
+  versions:
+    - sha256: image_4_digest
+      tasks: ["image_4_task"]
+      name: "v4"

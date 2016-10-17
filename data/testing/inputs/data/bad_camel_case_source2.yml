@@ -1,0 +1,20 @@
+---
+source:
+  desc: desc
+  source_type: microbe
+  references:
+    - file_type: reference_fasta
+      sha256: reference_2_digest
+      url: s3://data_set_2_url_1
+data:
+  - name: data_set_2_data_1
+    extraction_method_type: cultured_colony_isolate
+    platform_type: miseq
+    protocol_type: unamplified_regular_fragment
+    run_mode_type: 2x150_300
+    material_type: dna
+    desc: desc
+    files:
+      - sha256: data_set_2_data_1_digest_1
+        file_type: short_read_fastq
+        url: s3://data_set_2_url_2

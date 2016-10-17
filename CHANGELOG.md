@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.9.0 - DATE
+
+### Added
+
+  * Created `input_data_file_expanded_fields` materialised view for input data
+    files tables. This is a denormalised table of all the tables related to
+    input files, with the addition of indices for all foreign key IDs, includes
+    the common joins of input_data_file, input_data_file_set,
+    biological_source, and biological_source_type.
+
+  * Created `image_expanded_fields` materialised view for Docker image tables.
+    This is a denormalised table of all the tables related Docker images, with
+    the addition of indices for all foreign key IDs, includes the common joins
+    of image_type, image_instance, image_version, and image_task.
+
+  * Created `events_prioritised_by_successful` view showing events for each
+    task prioritised by completion status and oldest first.
+
+  * Created `benchmark_instance_name` view providing a name for a benchmark
+    instance from the concatenated sub fields.
+
+  * Create `rebuild_benchmarks` function providing a single database function
+    call to refresh all materialised vies, add any additional rows to the
+    benchmark instance and task table, and reindex these tables.
+
+### Changed
+
+  * Simplified the populate_benchmark_instance, and populate_task functions to
+    use the two materialised views image_expanded_fields,
+    input_data_file_expanded_fields. As less joins are required with the
+    materialised views the two queries in these functions are simpler.
+
+  * Renamed all database primary keys to be explicitly named after the table,
+    e.g. `task.id` is now `task.task_id`. The aim of this change is to prevent
+    tables being accidentally joined on the wrong primary keys through human
+    error. The cause of this is two tables can be accidentally joined on the
+    `.id` column when because all tables use this column name as the primary
+    key. Explicitly naming the primary keys means two tables in a join must
+    have matching primary and foreign keys. This will not eliminate human error
+    when writing joins but should hopefully reduce the chance of it happening.
+
+  * Simplified existing and added additional feature tests for more complex
+    input data during migration of database. This feature test simulates
+    different combinations of benchmarks, input data sets, image versions and
+    tasks, and evaluation tasks. The aim is to add stricter tests for the
+    importing of data.
 
 ## v0.8.2 - 2016-09-29
 

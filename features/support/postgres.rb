@@ -28,7 +28,7 @@ def entry_lookup(entry)
   return entry unless entry.start_with?('$')
   table, query_string = entry[1..-1].split("?")
   query_params = query_string.split("&").map{|i| i.split('=').join(" = ")}.join(" and ")
-  query = "select id from #{table} where #{query_params}"
+  query = "select * from #{table} where #{query_params}"
   result = db.exec(query).values
   if result.length > 1
     raise "The query \"#{query}\" returned multiple IDs"
@@ -49,8 +49,9 @@ def drop_all_tables
 end
 
 def create_tables
-  execute_sql_file('resources/migrations/2015101019150000-create-tables.up.sql')
-  execute_sql_file('resources/migrations/2016083110010000-create-functions.up.sql')
+  Dir["resources/migrations/*.up.sql"].each do |f|
+    execute_sql_file(f)
+  end
 end
 
 def execute_sql_fixture(fixture_name)
