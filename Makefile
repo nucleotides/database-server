@@ -29,7 +29,7 @@ irb:
 	@$(params) bundle exec ./script/irb
 
 db_logs:
-	docker logs $(shell cat .rdm_container) | less
+	docker logs $(shell cat .rdm_container) 2>&1 | less
 
 ssh: .rdm_container .api_image
 	@docker run \
