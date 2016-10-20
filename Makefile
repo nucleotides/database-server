@@ -2,29 +2,27 @@ name        := nucleotides-api
 
 docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
 
-db_user := POSTGRES_USER=postgres
-db_pass := POSTGRES_PASSWORD=pass
-db_name := POSTGRES_NAME=postgres
+db_user := PGUSER=postgres
+db_pass := PGPASSWORD=pass
+db_name := PGDATABASE=postgres
+db_port := PGPORT=5433
 
 ifdef docker_host
-       db_host  := POSTGRES_HOST=//$(docker_host):5433
+       db_host  := PGHOST=$(docker_host)
 else
-       db_host  := POSTGRES_HOST=//localhost:5433
+       db_host  := PGHOST=localhost
 endif
 
-params := $(db_user) $(db_pass) $(db_name) $(db_host)
+params := $(db_user) $(db_pass) $(db_name) $(db_host) $(db_port)
 
 jar := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
 
 docker_db := @docker run \
 	--env="$(db_user)" \
 	--env="$(db_name)" \
-	--env="PGHOST=$(docker_host)" \
-	--env="PGPASSWORD=pass" \
-	--env="PGUSER=postgres" \
-	--env="PGPORT=5433" \
-	--env="PGDATABASE=postgres" \
-	--env=POSTGRES_HOST=//localhost:5433 \
+	--env="$(db_pass)" \
+	--env="$(db_host)" \
+	--env="$(db_port)" \
 	--net=host
 
 
@@ -33,7 +31,6 @@ docker_db := @docker run \
 # Consoles
 #
 ################################################
-
 
 
 repl:
@@ -46,13 +43,10 @@ db_logs:
 	docker logs $(shell cat .rdm_container) 2>&1 | less
 
 ssh: .rdm_container .api_image
-	@docker run \
+	$(docker_db) \
 	  --tty \
 	  --interactive \
 	  --link $(shell cat $<):postgres \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-	  --env="$(db_name)" \
 	  $(name) \
 	  /bin/bash
 
@@ -87,14 +81,9 @@ autotest:
 	@$(params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 .api_container: .rdm_container .api_image
-	@docker run \
-	  --detach=true \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-	  --env="$(db_name)" \
-	  --env=POSTGRES_HOST=//localhost:5433 \
-	  --net=host \
+	$(docker_db) \
 	  --publish 80:80 \
+	  --detach=true \
 	  $(name) \
 	  server > $@
 
@@ -141,9 +130,7 @@ test/fixtures/testing_db_state.sql: .rdm_container .api_image $(shell find src d
 	  --entrypoint=psql \
 	  kiasaki/alpine-postgres:9.5 \
 	  --command="drop schema public cascade; create schema public;"
-	sleep 2
 	$(docker_db) \
-	  --env="$(db_pass)" \
 	  --volume=$(abspath data/testing):/data:ro \
 	  $(name) \
 	  migrate
@@ -164,12 +151,14 @@ tmp/input_data:
 	cp ./data/pseudo_real/* ./$@/inputs
 
 .rdm_container: .rdm_image
-	docker run \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-          --publish=5433:5432 \
-	  --detach=true \
-	  kiasaki/alpine-postgres:9.5 > $@
+	@export $(params) && \
+		docker run \
+		--env=POSTGRES_PASSWORD="$${PGPASSWORD}" \
+		--env=POSTGRES_USER="$${PGUSER}" \
+		--publish=$${PGPORT}:5432 \
+		--detach=true \
+		kiasaki/alpine-postgres:9.5 > $@
+	@sleep 2
 
 .rdm_image:
 	docker pull kiasaki/alpine-postgres:9.5
