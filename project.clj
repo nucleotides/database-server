@@ -18,6 +18,7 @@
                  [org.clojure/clojure        "1.7.0"]
                  [org.clojure/core.match     "0.3.0-alpha4"]
                  [org.clojure/data.json      "0.2.6"]
+                 [org.clojure/data.csv       "0.1.3"]
                  [org.clojure/java.jdbc      "0.4.2"]
                  [postgresql/postgresql      "9.3-1102.jdbc41"]
                  [ring-logger-timbre         "0.7.5"]

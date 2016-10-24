@@ -2,18 +2,22 @@
 
 set -o errexit
 
-if [ -z "${POSTGRES_USER}" ]; then
-	export POSTGRES_USER=${RDS_USERNAME}
+if [ -z "${PGUSER}" ]; then
+	export PGUSER=${RDS_USERNAME}
 fi
 
-if [ -z "${POSTGRES_PASSWORD}" ]; then
-	export POSTGRES_PASSWORD=${RDS_PASSWORD}
+if [ -z "${PGPASSWORD}" ]; then
+	export PGPASSWORD=${RDS_PASSWORD}
 fi
 
-if [ -z "${POSTGRES_NAME}" ]; then
-	export POSTGRES_NAME=${RDS_DB_NAME}
+if [ -z "${PGDATABASE}" ]; then
+	export PGDATABASE=${RDS_DB_NAME}
 fi
 
-if [ -z "${POSTGRES_HOST}" ]; then
-	export POSTGRES_HOST="//${RDS_HOSTNAME}:${RDS_PORT}"
+if [ -z "${PGHOST}" ]; then
+	export PGHOST="${RDS_HOSTNAME}"
+fi
+
+if [ -z "${PGPORT}" ]; then
+	export PGPORT="${RDS_PORT}"
 fi

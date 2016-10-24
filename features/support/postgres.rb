@@ -1,8 +1,9 @@
 PARAMS = {
-  user:      "POSTGRES_USER",
-  password:  "POSTGRES_PASSWORD",
-  host:      "POSTGRES_HOST",
-  dbname:    "POSTGRES_NAME"
+  user:      "PGUSER",
+  password:  "PGPASSWORD",
+  host:      "PGHOST",
+  port:      "PGPORT",
+  dbname:    "PGDATABASE"
 }
 
 def db
@@ -11,8 +12,6 @@ def db
   params = Hash[PARAMS.map do |k,v|
     [k, ENV[v]]
   end]
-  params[:port] = params[:host].split(':').last
-  params[:host] = params[:host].split(':').first.gsub("//","")
 
   @conn ||= PG.connect(params)
   @conn.exec("set client_min_messages = warning")

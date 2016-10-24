@@ -1,7 +1,8 @@
 (ns nucleotides.api.core
   (:gen-class)
-  (:require [compojure.core  :refer [GET POST routes]]
-            [liberator.core  :refer [defresource]]
+  (:require [compojure.core           :refer [GET POST routes]]
+            [liberator.core           :refer [defresource]]
+            [liberator.representation :refer [ring-response]]
 
             [ring.adapter.jetty  :refer [run-jetty]]
 
@@ -10,7 +11,11 @@
             [nucleotides.api.middleware       :as md]
             [nucleotides.api.benchmarks       :as benchmarks]
             [nucleotides.api.tasks            :as tasks]
-            [nucleotides.api.events           :as events]))
+            [nucleotides.api.events           :as events]
+            [nucleotides.api.results          :as results]))
+
+(def content-types
+  {:json "application/json;charset=UTF-8", :csv "text/csv;charset=UTF-8"})
 
 
 ;; Allows dates to be converted to JSON by liberator
@@ -56,15 +61,24 @@
   :handle-not-found       (fn [_] (str "Task not found: " id))
   :handle-ok              (fn [_] (tasks/lookup db id {})))
 
+(defresource results-complete [db]
+  :available-media-types  ["application/json" "text/csv"]
+  :allowed-methods        [:get]
+  :handle-ok              (fn [request]
+                            (let [response-format (keyword (get-in request [:request :params :format] :json))
+                                  response        {:headers {"Content-Type" (content-types response-format)}
+                                                   :body    (results/complete db response-format)}]
+                              (ring-response response))))
+
 
 (defn api [db]
   (routes
-
-    (GET  "/events/:id"           [id] (event-lookup db id))
-    (POST "/events"               []   (event-create db))
-    (GET  "/benchmarks/:id"       [id] (benchmark db id))
-    (GET  "/tasks/show.json"      []   (task-show db))
-    (GET  "/tasks/:id"            [id] (task-lookup db id))))
+    (GET  "/events/:id"             [id] (event-lookup db id))
+    (POST "/events"                 []   (event-create db))
+    (GET  "/benchmarks/:id"         [id] (benchmark db id))
+    (GET  "/tasks/show.json"        []   (task-show db))
+    (GET  "/tasks/:id"              [id] (task-lookup db id))
+    (GET  "/results/complete"       []   (results-complete db))))
 
 (defn -main [& _]
   (-> {:connection (con/create-connection)}

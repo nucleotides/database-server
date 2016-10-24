@@ -2,25 +2,36 @@ name        := nucleotides-api
 
 docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
 
-db_user := POSTGRES_USER=postgres
-db_pass := POSTGRES_PASSWORD=pass
-db_name := POSTGRES_NAME=postgres
+db_user := PGUSER=postgres
+db_pass := PGPASSWORD=pass
+db_name := PGDATABASE=postgres
+db_port := PGPORT=5433
 
 ifdef docker_host
-       db_host  := POSTGRES_HOST=//$(docker_host):5433
+       db_host  := PGHOST=$(docker_host)
 else
-       db_host  := POSTGRES_HOST=//localhost:5433
+       db_host  := PGHOST=localhost
 endif
 
-params := $(db_user) $(db_pass) $(db_name) $(db_host)
+params := $(db_user) $(db_pass) $(db_name) $(db_host) $(db_port)
 
 jar := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
+
+docker_db := @docker run \
+	--env="$(db_user)" \
+	--env="$(db_name)" \
+	--env="$(db_pass)" \
+	--env="$(db_host)" \
+	--env="$(db_port)" \
+	--net=host
+
 
 ################################################
 #
 # Consoles
 #
 ################################################
+
 
 repl:
 	@$(params) lein repl
@@ -29,16 +40,13 @@ irb:
 	@$(params) bundle exec ./script/irb
 
 db_logs:
-	docker logs $(shell cat .rdm_container) | less
+	docker logs $(shell cat .rdm_container) 2>&1 | less
 
 ssh: .rdm_container .api_image
-	@docker run \
+	$(docker_db) \
 	  --tty \
 	  --interactive \
 	  --link $(shell cat $<):postgres \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-	  --env="$(db_name)" \
 	  $(name) \
 	  /bin/bash
 
@@ -62,10 +70,10 @@ deploy: .api_image
 hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
 error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
 
-feature: Gemfile.lock .api_container
+feature: Gemfile.lock .api_container test/fixtures/testing_data/initial_state.sql
 	@$(params) bundle exec cucumber $(ARGS) --require features
 
-test:
+test: test/fixtures/testing_data/initial_state.sql
 	@if [ ! -z "$(hard_coded_ids)" ]; then echo $(error_msg) >&1; exit 1; fi
 	@$(params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
@@ -73,14 +81,9 @@ autotest:
 	@$(params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 .api_container: .rdm_container .api_image
-	@docker run \
-	  --detach=true \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-	  --env="$(db_name)" \
-	  --env=POSTGRES_HOST=//localhost:5433 \
-	  --net=host \
+	$(docker_db) \
 	  --publish 80:80 \
+	  --detach=true \
 	  $(name) \
 	  server > $@
 
@@ -109,9 +112,32 @@ $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.cl
 #
 ################################################
 
-bootstrap: Gemfile.lock .rdm_container tmp/input_data tmp/prod_nucleotides_data
-	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
+bootstrap: \
+	Gemfile.lock \
+	.rdm_container \
+	tmp/input_data \
+	tmp/prod_nucleotides_data \
+	test/fixtures/testing_data/initial_state.sql \
+	.base_image
 	lein deps
+
+.base_image: Dockerfile
+	docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ')
+	touch $@
+
+test/fixtures/testing_data/initial_state.sql: .rdm_container .api_image $(shell find src data/testing resources)
+	$(docker_db) \
+	  --entrypoint=psql \
+	  kiasaki/alpine-postgres:9.5 \
+	  --command="drop schema public cascade; create schema public;"
+	$(docker_db) \
+	  --volume=$(abspath data/testing):/data:ro \
+	  $(name) \
+	  migrate
+	$(docker_db) \
+	  --entrypoint=pg_dump \
+	  kiasaki/alpine-postgres:9.5 \
+	  --inserts | grep -v 'SET row_security = off;' > $@
 
 tmp/prod_nucleotides_data:
 	mkdir -p $(dir $@)
@@ -125,12 +151,14 @@ tmp/input_data:
 	cp ./data/pseudo_real/* ./$@/inputs
 
 .rdm_container: .rdm_image
-	docker run \
-	  --env="$(db_user)" \
-	  --env="$(db_pass)" \
-          --publish=5433:5432 \
-	  --detach=true \
-	  kiasaki/alpine-postgres:9.5 > $@
+	@export $(params) && \
+		docker run \
+		--env=POSTGRES_PASSWORD="$${PGPASSWORD}" \
+		--env=POSTGRES_USER="$${PGUSER}" \
+		--publish=$${PGPORT}:5432 \
+		--detach=true \
+		kiasaki/alpine-postgres:9.5 > $@
+	@sleep 2
 
 .rdm_image:
 	docker pull kiasaki/alpine-postgres:9.5
@@ -142,6 +170,6 @@ Gemfile.lock: Gemfile
 clean:
 	@docker kill $(shell cat .rdm_container 2> /dev/null) 2> /dev/null; true
 	@docker kill $(shell cat .api_container 2> /dev/null) 2> /dev/null; true
-	@rm -f .*_container
+	@rm -f .*_container test/fixtures/testing_data/initial_state.sql
 
 .PHONY: test
