@@ -40,20 +40,6 @@ required to start a benchmarking task from `/tasks/:id`.
     # Remaining list of task IDs omitted
 ]
 
-
-### GET /benchmarks/completed.json
-
-Lists the status for each image benchmark and returns all benchmark metrics for
-the successfully completed benchmarks. A complete benchmark is where all
-'produce' and 'evaluate' tasks have been completed all on available data for a
-a given image. If all 'produce' and 'evaluate' tasks have been completed for
-image X but some tasks are still outstanding or have failed for image Y, then
-the state for image Y will be listed as 'in progress' or 'failed' respectively.
-
-
-
-
-
 ### GET /benchmarks/:id
 
 /benchmarks/:id
@@ -149,8 +135,31 @@ the state for image Y will be listed as 'in progress' or 'failed' respectively.
 }
 ~~~
 
+### GET /results/complete
 
-TODO: Get benchmark by id. Is necessary?
+Lists the status for each image benchmark and returns all benchmark metrics for
+the successfully completed benchmarks. A complete benchmark is where all
+'produce' and 'evaluate' tasks have been completed all on available data for a
+a given image task. If all 'produce' and 'evaluate' tasks have been completed
+for image task X but some tasks are still outstanding or have failed for image
+task Y, then only the metrics for image task X will be returned. JSON or CSV
+formatted results are available.
+
+#### Parameters
+
+  * **?format=<csv|json>**
+
+    **Optional**: An optional format to return the results in, can either be
+    CSV where each row corresponds to a single metric, or JSON where the
+    results are nested based on the input data hierarchy.
+
+#### Example request
+
+GET /results/complete?format=json
+
+
+
+
 
 
 

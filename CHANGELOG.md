@@ -8,7 +8,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
   * Added `/results/complete` API route. This allows the collection of the
-    completed benchmarking results in either JSON or CSV format
+    completed benchmarking results in either JSON or CSV format using the
+    `?format=json` query parameters. This returns only the results for the
+    image tasks when all benchmarking tasks related to that image task have
+    been completed. If any benchmarking tasks have failed or not been completed
+    then all the metrics for that image task are not returned.
 
   * Created `input_data_file_expanded_fields` materialised view for input data
     files tables. This is a denormalised table of all the tables related to
