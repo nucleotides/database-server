@@ -7,6 +7,9 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+  * Added `/results/complete` API route. This allows the collection of the
+    completed benchmarking results in either JSON or CSV format
+
   * Created `input_data_file_expanded_fields` materialised view for input data
     files tables. This is a denormalised table of all the tables related to
     input files, with the addition of indices for all foreign key IDs, includes
