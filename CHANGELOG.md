@@ -57,6 +57,12 @@ project adheres to [Semantic Versioning](http://semver.org/).
     tasks, and evaluation tasks. The aim is to add stricter tests for the
     importing of data.
 
+### Fixed
+
+  * Nucleotides input data containing benchmarks without Docker images or input
+    file sets, and input file sets without files no longer throws a database
+    error.
+
 ## v0.8.2 - 2016-09-29
 
   * Fixed bug where the code transforming the keyword file name in the input
