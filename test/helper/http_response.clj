@@ -95,6 +95,9 @@
 (defn is-complete? [state]
   (partial dispatch-response-body-test #(is (= % state)) [:complete]))
 
+(defn is-successful? [state]
+  (partial dispatch-response-body-test #(is (= % state)) [:success]))
+
 (defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))
 

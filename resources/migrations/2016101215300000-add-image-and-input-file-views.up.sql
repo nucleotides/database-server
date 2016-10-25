@@ -193,7 +193,8 @@ image_version_name               AS image_version,
 image_version_sha256             AS image_sha256,
 image_task_name                  AS image_task,
 image_type_name                  AS image_type,
-COALESCE (events.success, FALSE) AS complete
+events.event_id IS NOT NULL      AS complete,
+COALESCE (events.success, FALSE) AS success
 FROM task
 LEFT JOIN image_expanded_fields            AS images USING (image_task_id)
 LEFT JOIN benchmark_instance                         USING (benchmark_instance_id)

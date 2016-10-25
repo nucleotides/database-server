@@ -22,11 +22,12 @@ WITH reference_files AS (
 produce_files AS (
       SELECT file_instance_id,
              benchmark_instance_id
-        FROM task_expanded_fields
+        FROM task_expanded_fields AS task
   INNER JOIN events_prioritised_by_successful USING (task_id)
   INNER JOIN event_file_instance              USING (event_id)
        WHERE task_type = 'produce'
-         AND complete = true
+         AND task.complete  = true
+         AND task.success   = true
 )
     SELECT sha256,
            url,
