@@ -60,6 +60,7 @@
          :url             "/tasks/show.json"
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")
                            #(is (= (sort (json/read-str (:body %))) (sort expected)))]}))
 
 
@@ -77,7 +78,12 @@
         {:fixtures  [:successful-product-event]
          :expected  [2 3 5 7 9 11]}))
 
-    (testing "getting incomplete tasks with successful produce task"
+    (testing "getting incomplete tasks with an unsuccessful evaluate task"
+      (test-show-tasks
+        {:fixtures  [:successful-product-event :unsuccessful-evaluate-event]
+         :expected  [2 3 5 7 9 11]}))
+
+    (testing "getting incomplete tasks with successful produce and evaluate task"
       (test-show-tasks
         {:fixtures  [:successful-product-event :successful-evaluate-event]
          :expected  [3 5 7 9 11]})))
@@ -92,6 +98,7 @@
          :url             (str "/tasks/" task-id)
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")
                            (partial resp/dispatch-response-body-test is-valid-task?)
                            (resp/contains-entries-at? [:inputs] (map resp/file-entry files))
                            (resp/contains-event-entries [:events] events)
@@ -210,7 +217,7 @@
          :body            (mock-json-event :produce :failure)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location" "/events/1")]
+                           (resp/has-header "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -221,7 +228,7 @@
          :body            (mock-json-event :evaluate :success)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location" "/events/1")]
+                           (resp/has-header "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -259,7 +266,7 @@
           (merge params
                  {:keep-db?        true
                   :response-tests  [resp/is-ok-response
-                                    #(resp/has-header % "Location" "/events/2")]
+                                    (resp/has-header "Location" "/events/2")]
                   :db-tests       {"event" 2
                                    "event_file_instance" 2}})))))
 
@@ -308,7 +315,7 @@
          :testing-data    true
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Content-Type" (app/content-types (keyword resp-format)))
+                           (resp/has-header "Content-Type" (app/content-types (keyword resp-format)))
                            (resp/is-length-at? entries)]}))
 
 
