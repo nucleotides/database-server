@@ -294,7 +294,7 @@
 
   (testing "GET /benchmarks/:id"
 
-    (defn test-get-benchmark [{:keys [benchmark-id fixtures complete]}]
+    (defn test-get-benchmark [{:keys [benchmark-id fixtures complete successful]}]
       (test-app-response
         {:method          :get
          :url             (str "/benchmarks/" benchmark-id)
@@ -302,7 +302,8 @@
          :response-tests  [resp/is-ok-response
                            resp/is-not-empty-body
                            (partial resp/dispatch-response-body-test is-valid-benchmark?)
-                           (resp/is-complete? complete)]}))
+                           (resp/is-complete? complete)
+                           (resp/is-successful? successful)]}))
 
 
 
@@ -315,14 +316,37 @@
 
     (testing "a benchmark with no events"
       (test-get-benchmark
-        {:benchmark-id  "453e406dcee4d18174d4ff623f52dcd8"
-         :complete      false}))
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :complete      false
+         :successful    false}))
+
+    (testing "a benchmark with a completed produce task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:successful_product_event]
+         :complete      false
+         :successful    false}))
+
+    (testing "a benchmark with a failed produce task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:unsuccessful_product_event]
+         :complete      true
+         :successful    false}))
+
+    (testing "a benchmark with a failed evaluate task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:successful_product_event :unsuccessful_evaluate_event]
+         :complete      true
+         :successful    false}))
 
     (testing "a completed benchmark"
       (test-get-benchmark
         {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
          :fixtures      [:successful_product_event :successful_evaluate_event]
-         :complete      true })))
+         :complete      true
+         :successful    true})))
 
 
 

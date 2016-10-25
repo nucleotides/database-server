@@ -182,11 +182,14 @@ ORDER by task_id, success DESC, created_at ASC;
 --;;
 --;; Simplify task view table using new materialsed views
 --;;
+DROP VIEW task_expanded_fields;
+--;;
 CREATE OR REPLACE VIEW task_expanded_fields AS
 SELECT
 task_id,
 benchmark_instance_id,
 benchmark_instance.external_id,
+benchmark_type.name              AS benchmark_type_name,
 task_type,
 image_instance_name              AS image_name,
 image_version_name               AS image_version,
@@ -198,6 +201,7 @@ COALESCE (events.success, FALSE) AS success
 FROM task
 LEFT JOIN image_expanded_fields            AS images USING (image_task_id)
 LEFT JOIN benchmark_instance                         USING (benchmark_instance_id)
+LEFT JOIN benchmark_type                             USING (benchmark_type_id)
 LEFT JOIN events_prioritised_by_successful AS events USING (task_id);
 
 
