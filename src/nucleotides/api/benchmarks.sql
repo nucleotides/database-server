@@ -22,11 +22,12 @@ WITH reference_files AS (
 produce_files AS (
       SELECT file_instance_id,
              benchmark_instance_id
-        FROM task_expanded_fields
+        FROM task_expanded_fields AS task
   INNER JOIN events_prioritised_by_successful USING (task_id)
   INNER JOIN event_file_instance              USING (event_id)
        WHERE task_type = 'produce'
-         AND complete = true
+         AND task.complete  = true
+         AND task.success   = true
 )
     SELECT sha256,
            url,
@@ -42,11 +43,27 @@ INNER JOIN file_type     USING (file_type_id)
 
 -- name: benchmark-by-id
 -- Get a benchmark entry by ID
-SELECT
-external_id	     AS id,
-benchmark_type.name  AS type,
-task_id
-FROM benchmark_instance
-LEFT JOIN benchmark_type  USING (benchmark_type_id)
-LEFT JOIN task            USING (benchmark_instance_id)
-WHERE external_id = :id
+WITH benchmark AS (
+  SELECT *
+    FROM task_expanded_fields
+   WHERE external_id = :id
+),
+status AS (
+  SELECT benchmark_instance_id,
+         (produce_task.complete AND NOT produce_task.success)
+      OR bool_and(benchmark.complete) AS complete,
+         bool_and(benchmark.success)  AS success
+    FROM benchmark
+    JOIN (SELECT *
+            FROM benchmark
+           WHERE task_type = 'produce'
+           LIMIT 1) AS produce_task USING (benchmark_instance_id)
+GROUP BY benchmark_instance_id, produce_task.complete, produce_task.success
+)
+SELECT external_id         AS id,
+       benchmark_type_name AS type,
+       task_id,
+       status.complete,
+       status.success
+  FROM benchmark
+  JOIN status USING (benchmark_instance_id)

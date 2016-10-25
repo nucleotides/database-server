@@ -78,10 +78,10 @@
 (defn is-client-error-response [response]
   (is (contains? #{404 422} (:status response))))
 
-(defn has-header [response header value]
-  (let [hdrs (:headers response)]
-    (is (contains? hdrs header))
-    (is (= value (hdrs header)))))
+(defn has-header [header value]
+  (fn [{:keys [headers]}]
+    (is (contains? headers header))
+    (is (= value (headers header)))))
 
 (defn has-body [body]
   #(is (= body (:body %))))
@@ -94,6 +94,9 @@
 
 (defn is-complete? [state]
   (partial dispatch-response-body-test #(is (= % state)) [:complete]))
+
+(defn is-successful? [state]
+  (partial dispatch-response-body-test #(is (= % state)) [:success]))
 
 (defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))

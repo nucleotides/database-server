@@ -60,7 +60,8 @@
          :url             "/tasks/show.json"
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
-                           #(is (= (sort (json/read-str (:body %))) (sort expected)))]}))
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")
+                           (partial resp/dispatch-response-body-test #(is (= (sort %) (sort expected))))]}))
 
 
 
@@ -70,14 +71,19 @@
     (testing "getting incomplete tasks with an unsuccessful produce task"
       (test-show-tasks
         {:fixtures  [:unsuccessful-product-event]
-         :expected  [1 3 5 7 9 11]}))
+         :expected  [3 5 7 9 11]}))
 
     (testing "getting incomplete tasks with successful produce task"
       (test-show-tasks
         {:fixtures  [:successful-product-event]
          :expected  [2 3 5 7 9 11]}))
 
-    (testing "getting incomplete tasks with successful produce task"
+    (testing "getting incomplete tasks with an unsuccessful evaluate task"
+      (test-show-tasks
+        {:fixtures  [:successful-product-event :unsuccessful-evaluate-event]
+         :expected  [3 5 7 9 11]}))
+
+    (testing "getting incomplete tasks with successful produce and evaluate task"
       (test-show-tasks
         {:fixtures  [:successful-product-event :successful-evaluate-event]
          :expected  [3 5 7 9 11]})))
@@ -86,16 +92,18 @@
 
   (testing "GET /tasks/:id"
 
-    (defn test-get-task [{:keys [task-id fixtures files events completed]}]
+    (defn test-get-task [{:keys [task-id fixtures files events completed successful]}]
       (test-app-response
         {:method          :get
          :url             (str "/tasks/" task-id)
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")
                            (partial resp/dispatch-response-body-test is-valid-task?)
                            (resp/contains-entries-at? [:inputs] (map resp/file-entry files))
                            (resp/contains-event-entries [:events] events)
-                           (resp/is-complete? completed)]}))
+                           (resp/is-complete? completed)
+                           (resp/is-successful? successful)]}))
 
 
 
@@ -117,12 +125,14 @@
       (test-get-task
         {:task-id 1
          :files [["short_read_fastq" "s3://reads" "7673a"]]
-         :completed false}))
+         :completed  false
+         :successful false }))
 
     (testing "a produce task with a successful event"
       (test-get-task
         {:task-id 1
          :completed true
+         :successful true
          :files [["short_read_fastq" "s3://reads" "7673a"]]
          :fixtures [:successful-product-event]
          :events [(mock-event :produce :success)]}))
@@ -130,7 +140,8 @@
     (testing "a produce task with a failed event"
       (test-get-task
         {:task-id 1
-         :completed false
+         :completed true
+         :successful false
          :files [["short_read_fastq" "s3://reads" "7673a"]]
          :fixtures [:unsuccessful-product-event]
          :events [(mock-event :produce :failure)]}))
@@ -139,15 +150,31 @@
       (test-get-task
         {:task-id 2
          :completed false
+         :successful false
          :files [["reference_fasta" "s3://ref" "d421a4"]]}))
 
     (testing "an incomplete evaluate task with a successful produce task"
       (test-get-task
         {:task-id 2
          :completed false
+         :successful false
          :files [["reference_fasta" "s3://ref" "d421a4"]
                  ["contig_fasta"    "s3://contigs" "f7455"]]
          :fixtures [:successful-product-event]})
+
+      (testing "a failed evaluate task with a successful produce task"
+        (test-get-task
+          {:task-id 2
+           :completed true
+           :successful false
+           :fixtures [:successful-product-event :unsuccessful-evaluate-event]}))
+
+      (testing "a successful evaluate task with a successful produce task"
+        (test-get-task
+          {:task-id 2
+           :completed true
+           :successful true
+           :fixtures [:successful-product-event :successful-evaluate-event]}))
 
     (testing "an evaluate task where multiple produce events have been completed"
       (test-app-response
@@ -210,7 +237,7 @@
          :body            (mock-json-event :produce :failure)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location" "/events/1")]
+                           (resp/has-header "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -221,7 +248,7 @@
          :body            (mock-json-event :evaluate :success)
          :content         "application/json"
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Location" "/events/1")]
+                           (resp/has-header "Location" "/events/1")]
          :db-tests       {"event" 1
                           "event_file_instance" 1}}))
 
@@ -259,7 +286,7 @@
           (merge params
                  {:keep-db?        true
                   :response-tests  [resp/is-ok-response
-                                    #(resp/has-header % "Location" "/events/2")]
+                                    (resp/has-header "Location" "/events/2")]
                   :db-tests       {"event" 2
                                    "event_file_instance" 2}})))))
 
@@ -267,7 +294,7 @@
 
   (testing "GET /benchmarks/:id"
 
-    (defn test-get-benchmark [{:keys [benchmark-id fixtures complete]}]
+    (defn test-get-benchmark [{:keys [benchmark-id fixtures complete successful]}]
       (test-app-response
         {:method          :get
          :url             (str "/benchmarks/" benchmark-id)
@@ -275,7 +302,8 @@
          :response-tests  [resp/is-ok-response
                            resp/is-not-empty-body
                            (partial resp/dispatch-response-body-test is-valid-benchmark?)
-                           (resp/is-complete? complete)]}))
+                           (resp/is-complete? complete)
+                           (resp/is-successful? successful)]}))
 
 
 
@@ -288,14 +316,37 @@
 
     (testing "a benchmark with no events"
       (test-get-benchmark
-        {:benchmark-id  "453e406dcee4d18174d4ff623f52dcd8"
-         :complete      false}))
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :complete      false
+         :successful    false}))
+
+    (testing "a benchmark with a completed produce task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:successful_product_event]
+         :complete      false
+         :successful    false}))
+
+    (testing "a benchmark with a failed produce task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:unsuccessful_product_event]
+         :complete      true
+         :successful    false}))
+
+    (testing "a benchmark with a failed evaluate task"
+      (test-get-benchmark
+        {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
+         :fixtures      [:successful_product_event :unsuccessful_evaluate_event]
+         :complete      true
+         :successful    false}))
 
     (testing "a completed benchmark"
       (test-get-benchmark
         {:benchmark-id  "2f221a18eb86380369570b2ed147d8b4"
          :fixtures      [:successful_product_event :successful_evaluate_event]
-         :complete      true })))
+         :complete      true
+         :successful    true})))
 
 
 
@@ -308,7 +359,7 @@
          :testing-data    true
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
-                           #(resp/has-header % "Content-Type" (app/content-types (keyword resp-format)))
+                           (resp/has-header "Content-Type" (app/content-types (keyword resp-format)))
                            (resp/is-length-at? entries)]}))
 
 

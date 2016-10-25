@@ -57,11 +57,20 @@ project adheres to [Semantic Versioning](http://semver.org/).
     tasks, and evaluation tasks. The aim is to add stricter tests for the
     importing of data.
 
+  * Unsuccessful benchmarking tasks no longer appear in `/tasks/show.json`.
+
+  * Tasks returned in `/tasks/:id`, and benchmarks returned in
+    `/benchmarks/:id` now have `success` boolean field. This indicates if the
+    task or benchmark was successfully completed. The `complete` field denotes
+    whether the task or benchmark was completed at all. A task or benchmark
+    will appear as completed if the tasks were attempted but unsuccessful.
+
 ### Fixed
 
   * Nucleotides input data containing benchmarks without Docker images or input
     file sets, and input file sets without files no longer throws a database
     error.
+
 
 ## v0.8.2 - 2016-09-29
 
