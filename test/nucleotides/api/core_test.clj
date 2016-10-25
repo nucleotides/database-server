@@ -61,7 +61,7 @@
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
                            (resp/has-header "Content-Type" "application/json;charset=UTF-8")
-                           #(is (= (sort (json/read-str (:body %))) (sort expected)))]}))
+                           (partial resp/dispatch-response-body-test #(is (= (sort %) (sort expected))))]}))
 
 
 
