@@ -71,6 +71,8 @@ project adheres to [Semantic Versioning](http://semver.org/).
     file sets, and input file sets without files no longer throws a database
     error.
 
+  * Fixed bug in population of benchmarking tasks where Docker image tables
+    were accidently joined on the wrong columns.
 
 ## v0.8.2 - 2016-09-29
 
