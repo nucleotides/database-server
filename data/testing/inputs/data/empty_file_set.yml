@@ -1,0 +1,9 @@
+---
+source:
+  desc: desc
+  source_type: microbe
+  references:
+    - file_type: reference_fasta
+      sha256: reference_3_digest
+      url: s3://data_set_3_url_3
+data: []
