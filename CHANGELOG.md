@@ -59,6 +59,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
 
   * Unsuccessful benchmarking tasks no longer appear in `/tasks/show.json`.
 
+  * Benchmarking tasks in `/tasks/show.json` are shorted by SHA256 digest to
+    ensure that similar image benchmarks are run on the same machine as much as
+    possible.
+
   * Tasks returned in `/tasks/:id`, and benchmarks returned in
     `/benchmarks/:id` now have `success` boolean field. This indicates if the
     task or benchmark was successfully completed. The `complete` field denotes
