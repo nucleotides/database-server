@@ -18,13 +18,25 @@
   (dorun (map is-valid-file? (:files event))))
 
 (defn is-valid-task? [task]
-  (validate-fields [:id :benchmark :type :complete :image :inputs :events] task)
+  (validate-fields [:id :benchmark :type :complete :success :image :inputs :events] task)
   (is-valid-image? (:image task))
   (dorun (map is-valid-file? (:inputs task)))
   (dorun (map is-valid-event? (:events task))))
 
 (defn is-valid-benchmark? [bench]
-  (validate-fields [:id :complete :type :tasks] bench)
+  (validate-fields [:id :complete :success :type :tasks] bench)
   (is (not (contains? bench :task_id)))
   (is (not (empty? (:tasks bench))))
   (dorun (map is-valid-task? (:tasks bench))))
+
+(defn is-valid-status? [status]
+  (validate-fields [:tasks] status)
+
+  (let [sub-tasks [:all :produce :evaluate]]
+    (validate-fields sub-tasks (:tasks status))
+    (doall
+      (for [t sub-tasks]
+        (validate-fields
+          [:n :n_successful :n_errorful :n_outstanding :n_executed
+           :percent_successful :percent_errorful :percent_outstanding :percent_executed]
+          (get-in status [:tasks t]))))))
