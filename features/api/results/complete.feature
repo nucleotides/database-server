@@ -8,6 +8,7 @@ Feature: Getting the results for completed benchmarks
 
   Scenario Outline: Getting the benchmark results when none have been completed
     When I get the url "/results/complete?format=<name>"
+    Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
       | header       | value          |
       | Content-Type | <content-type> |

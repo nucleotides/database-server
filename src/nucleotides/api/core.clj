@@ -9,6 +9,7 @@
             [clojure.data.json                :as json]
             [nucleotides.database.connection  :as con]
             [nucleotides.api.middleware       :as md]
+            [nucleotides.api.status           :as status]
             [nucleotides.api.benchmarks       :as benchmarks]
             [nucleotides.api.tasks            :as tasks]
             [nucleotides.api.events           :as events]
@@ -70,9 +71,15 @@
                                                    :body    (results/complete db response-format)}]
                               (ring-response response))))
 
+(defresource status-show [db]
+  :available-media-types  ["application/json"]
+  :allowed-methods        [:get]
+  :handle-ok              (fn [_] (status/show db)))
+
 
 (defn api [db]
   (routes
+    (GET  "/status.json"            []   (status-show db))
     (GET  "/events/:id"             [id] (event-lookup db id))
     (POST "/events"                 []   (event-create db))
     (GET  "/benchmarks/:id"         [id] (benchmark db id))

@@ -350,6 +350,22 @@
 
 
 
+  (testing "GET /status.json"
+
+    (defn test-get-status [{:keys [fixtures]}]
+      (test-app-response
+        {:method          :get
+         :url             "/status.json"
+         :testing-data    true
+         :fixtures        fixtures
+         :response-tests  [resp/is-ok-response
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")]}))
+
+    (testing "when no tasks have been completed"
+      (test-get-status {})))
+
+
+
   (testing "GET /results/complete"
 
     (defn test-get-results [{:keys [fixtures resp-format entries]}]
