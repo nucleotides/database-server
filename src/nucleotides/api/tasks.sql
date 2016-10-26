@@ -34,6 +34,7 @@ incomplete_evaluate_task AS (
   LEFT JOIN incomplete_task    USING (benchmark_instance_id)
       WHERE incomplete_task.task_type = 'evaluate'
 )
-SELECT task_id FROM incomplete_produce_task
+SELECT image_sha256, task_id FROM incomplete_produce_task
 UNION ALL
-SELECT task_id FROM incomplete_evaluate_task;
+SELECT image_sha256, task_id FROM incomplete_evaluate_task
+ORDER BY image_sha256 ASC;
