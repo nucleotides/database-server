@@ -12,8 +12,9 @@
                    (group-by :task_type)
                    (m/map-vals #(dissoc (first %) :task_type)))
 
-        benchmarks (->> (benchmark-summary {} {:connection (con/create-connection)})
+        benchmarks (->> (benchmark-summary {} db-client)
                         (group-by :benchmark_type)
                         (m/map-vals #(dissoc (first %) :benchmark_type)))]
     {:tasks       tasks
-     :benchmarks  benchmarks}))
+     :benchmarks  benchmarks
+     :summary     (first (global-summary {} db-client))}))

@@ -30,10 +30,21 @@
   (dorun (map is-valid-task? (:tasks bench))))
 
 (defn is-valid-status? [status]
-  (validate-fields [:tasks :benchmarks] status)
+
+  ;; Top level keys
+  (validate-fields [:summary :tasks :benchmarks] status)
+
+  ;; Summary keys
+  (validate-fields [:n_files_generated :n_metrics_collected :total_cpu_time_in_days
+                    :total_wall_clock_time_in_days :length_of_all_contigs_generated_in_gb
+                    :n_contigs_generated]
+                   (:summary status))
+  ;; Task and benchmark keys
   (validate-fields [:all :produce :evaluate] (:tasks status))
   (validate-fields [:all] (:benchmarks status))
-  (let [summary-keys [:n :n_successful :n_errorful :n_outstanding :n_executed
+
+  ;; Summary keys for tasks and benchmarks
+  (let [summary-keys [:n :is_executed :n_successful :n_errorful :n_outstanding :n_executed
                       :percent_successful :percent_errorful :percent_outstanding :percent_executed]]
     (doall
       (for [x (map last (concat (:tasks status) (:benchmarks status)))]
