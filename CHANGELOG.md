@@ -3,9 +3,13 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
-## v0.9.0 - DATE
+## v0.9.0 - 2016-10-27
 
 ### Added
+
+  * Added `/status.json` API route. This shows the current status of the tasks
+    and the benchmarks in the nucleotides database. This provides a global view
+    of how the benchmarking is proceeding.
 
   * Added `/results/complete` API route. This allows the collection of the
     completed benchmarking results in either JSON or CSV format using the
