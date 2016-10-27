@@ -30,13 +30,13 @@
   (dorun (map is-valid-task? (:tasks bench))))
 
 (defn is-valid-status? [status]
-  (validate-fields [:tasks] status)
-
-  (let [sub-tasks [:all :produce :evaluate]]
-    (validate-fields sub-tasks (:tasks status))
+  (validate-fields [:tasks :benchmarks] status)
+  (validate-fields [:all :produce :evaluate] (:tasks status))
+  (validate-fields [:all] (:benchmarks status))
+  (let [summary-keys [:n :n_successful :n_errorful :n_outstanding :n_executed
+                      :percent_successful :percent_errorful :percent_outstanding :percent_executed]]
     (doall
-      (for [t sub-tasks]
-        (validate-fields
-          [:n :n_successful :n_errorful :n_outstanding :n_executed
-           :percent_successful :percent_errorful :percent_outstanding :percent_executed]
-          (get-in status [:tasks t]))))))
+      (for [x (map last (concat (:tasks status) (:benchmarks status)))]
+        (validate-fields summary-keys x)))))
+
+

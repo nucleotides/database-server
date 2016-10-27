@@ -1,2 +1,5 @@
--- name: benchmark-task-status
-SELECT * FROM benchmark_task_status
+-- name: task-summary
+SELECT * FROM task_summary
+
+-- name: benchmark-summary
+SELECT * FROM benchmark_summary
