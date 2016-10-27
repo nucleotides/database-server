@@ -14,6 +14,7 @@
                  [com.taoensso/timbre        "4.2.1"]
                  [liberator                  "0.13"]
                  [compojure                  "1.4.0"]
+                 [medley                     "0.8.3"]
                  [migratus                   "0.8.9"]
                  [org.clojure/clojure        "1.7.0"]
                  [org.clojure/core.match     "0.3.0-alpha4"]

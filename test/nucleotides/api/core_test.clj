@@ -4,15 +4,11 @@
             [clojure.core.match :refer [match]]
 
             [ring.mock.request  :as mock]
-            [clojure.data.json  :as json]
 
             [helper.event          :refer :all]
             [helper.fixture        :as fix]
             [helper.http-response  :as resp]
             [helper.database       :as db]
-
-            [nucleotides.api.benchmarks-test :as bench-test]
-            [nucleotides.api.tasks-test      :as task-test]
 
             [nucleotides.database.connection  :as con]
             [nucleotides.api.middleware       :as md]
@@ -384,4 +380,21 @@
       (test-get-results
         {:resp-format "csv"
          :entries     2
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]}))))
+         :fixtures    ["testing_data/two_benchmark_instances_completed"]})))
+
+
+
+  (testing "GET /status.json"
+
+    (defn test-get-status [{:keys [fixtures]}]
+      (test-app-response
+        {:method          :get
+         :url             "/status.json"
+         :testing-data    true
+         :fixtures        fixtures
+         :response-tests  [resp/is-ok-response
+                           (resp/has-header "Content-Type" "application/json;charset=UTF-8")
+                           (partial resp/dispatch-response-body-test is-valid-status?)]}))
+
+    (testing "when no tasks have been completed"
+      (test-get-status {}))))

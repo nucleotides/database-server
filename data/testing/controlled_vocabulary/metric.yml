@@ -1,3 +1,11 @@
 ---
 - name: metric_1
   desc: Metric for testing purposes
+- name: total_wall_clock_time_in_seconds
+  desc: desc
+- name: max_cpu_usage
+  desc: desc
+- name: n_contigs_gt_0
+  desc: desc
+- name: total_length_gt_0
+  desc: desc
