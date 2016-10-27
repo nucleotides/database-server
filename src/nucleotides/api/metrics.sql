@@ -1,7 +1,7 @@
 -- name: create-metric-instance<!
 -- Create a new metric instance
 INSERT INTO metric_instance (metric_type_id, event_id, value)
-VALUES ((SELECT id FROM metric_type WHERE name = :name LIMIT 1), :id, :value::float)
+VALUES ((SELECT metric_type_id FROM metric_type WHERE name = :name LIMIT 1), :id, :value::float)
 
 
 -- name: metrics-by-event-id
@@ -10,8 +10,8 @@ SELECT
 metric_type.name,
 metric_instance.value
 FROM metric_instance
-LEFT JOIN metric_type ON metric_type.id = metric_instance.metric_type_id
-WHERE metric_instance.event_id = :id::int
+LEFT JOIN metric_type USING (metric_type_id)
+WHERE event_id = :id::int
 
 -- name: all-metric-types
 -- Get list of all available metric types

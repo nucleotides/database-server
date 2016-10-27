@@ -17,7 +17,7 @@ Feature: Getting all incomplete tasks from the API
   Scenario: Listing all tasks
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [1,3,5,7,9,11]
+    And the JSON should be [1,3,7,9,5,11]
 
   Scenario: Listing all tasks with an unsuccessful produce event
     Given the database fixtures:
@@ -25,7 +25,7 @@ Feature: Getting all incomplete tasks from the API
       | unsuccessful_product_event |
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [1,3,5,7,9,11]
+    And the JSON should be [3,7,9,5,11]
 
   Scenario: Listing all tasks with a successful produce event
     Given the database fixtures:
@@ -33,7 +33,7 @@ Feature: Getting all incomplete tasks from the API
       | successful_product_event |
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [3,5,7,9,11,2]
+    And the JSON should be [3,7,9,5,11,2]
 
   Scenario: Listing all tasks with a unsuccessful followed by successful produce event
     Given the database fixtures:
@@ -42,7 +42,7 @@ Feature: Getting all incomplete tasks from the API
       | successful_product_event   |
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [3,5,7,9,11,2]
+    And the JSON should be [3,7,9,5,11,2]
 
   Scenario: Listing all tasks with successful produce and unsuccessful evaluate events
     Given the database fixtures:
@@ -51,7 +51,7 @@ Feature: Getting all incomplete tasks from the API
       | unsuccessful_evaluate_event |
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [3,5,7,9,11,2]
+    And the JSON should be [3,7,9,5,11]
 
   Scenario: Listing all tasks with successful produce and mixed success evaluate events
     Given the database fixtures:
@@ -61,4 +61,4 @@ Feature: Getting all incomplete tasks from the API
       | successful_evaluate_event   |
     When I get the url "/tasks/show.json"
     Then the returned HTTP status code should be "200"
-    And the JSON should be [3,5,7,9,11]
+    And the JSON should be [3,7,9,5,11]

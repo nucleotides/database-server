@@ -1,21 +1,39 @@
 (ns helper.http-response
   (:require [clojure.test       :refer :all]
             [helper.validation  :refer :all]
+            [clojure.core.match :refer [match]]
 
+            [clojure.data.csv   :as csv]
             [clojure.data.json  :as json]
             [helper.database    :as db]
             [helper.event       :as evt]
             [helper.fixture     :as fix]))
 
+(defn parse-csv [raw-csv]
+  (let [[header & rows] (csv/read-csv raw-csv)]
+    (map #(zipmap header %) rows)))
+
+(defn parse-response-body
+  "Converts the body to a clojure object depending on the `Content-Type` header"
+  [response]
+  (let [response-body  (:body response)
+        content-type   (->> (get-in response [:headers "Content-Type"])
+                            (re-find #"\w+\/(json|csv)")
+                            (last))]
+
+    (match [(class response-body) content-type]
+           [String "json"] (clojure.walk/keywordize-keys (json/read-str response-body))
+           [String "csv"]  (parse-csv response-body)
+           :else           response-body)))
+
+
 (defn dispatch-response-body-test
   "Given a http response, executes the given function `f` on the content
-  at the specified `path` within the returned body of the response."
+  at the specified `path` within the parsed body of the returned response."
   ([f path response]
-   (let [body     (if (isa? (class (:body response)) String)
-                    (clojure.walk/keywordize-keys (json/read-str (:body response)))
-                    (:body response))
-         content  (get-in body path)]
-     (is (not (nil? content)) (str "No content found for " path " in: \n" body))
+   (let [parsed-body (parse-response-body response)
+         content (get-in parsed-body path)]
+     (is (not (nil? content)) (str "No content found for " path " in: \n" parsed-body))
      (f content)))
   ([f response]
    (dispatch-response-body-test f [] response)))
@@ -41,9 +59,12 @@
 (defn is-length-at?
   "Creates a function which given a http response ensures the collection
   at the specified path contains the expected number of entires"
-  [path length]
-  (let [f #(is (= length (count %)))]
-    (partial dispatch-response-body-test f path)))
+  ([length]
+   (is-length-at? [] length))
+  ([path length]
+   (let [f #(is (= length (count %))
+                (str "Length should be " length ": " %))]
+     (partial dispatch-response-body-test f path))))
 
 
 (defn contains-event-entries [path entries]
@@ -57,22 +78,25 @@
 (defn is-client-error-response [response]
   (is (contains? #{404 422} (:status response))))
 
-(defn has-header [response header value]
-  (let [hdrs (:headers response)]
-    (is (contains? hdrs header))
-    (is (= value (hdrs header)))))
+(defn has-header [header value]
+  (fn [{:keys [headers]}]
+    (is (contains? headers header))
+    (is (= value (headers header)))))
 
 (defn has-body [body]
   #(is (= body (:body %))))
 
 (defn is-empty-body [response]
-  (is (empty? (json/read-str (:body response)))))
+  (partial dispatch-response-body-test #(is (empty? %))))
 
 (defn is-not-empty-body [response]
-  (is (not (empty? (json/read-str (:body response))))))
+  (partial dispatch-response-body-test #(is (not (empty? %)))))
 
 (defn is-complete? [state]
   (partial dispatch-response-body-test #(is (= % state)) [:complete]))
+
+(defn is-successful? [state]
+  (partial dispatch-response-body-test #(is (= % state)) [:success]))
 
 (defn file-entry [entry]
   (into {} (map vector [:type :url :sha256] entry)))

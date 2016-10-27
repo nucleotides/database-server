@@ -7,10 +7,11 @@
   (match [event_type state]
 
          [:produce :failure]  {:task     1
-                               :success  "false"
-                               :files    [{:url     "s3://url"
-                                           :sha256  "log_file"
-                                           :type    "container_log"}]}
+                               :success  false
+                               :files    [{:url     "s3://log_file"
+                                           :sha256  "42ae5"
+                                           :type    "container_log"}]
+                               :metrics  {}}
 
          [:produce :success]  {:task     1
                                :success  true

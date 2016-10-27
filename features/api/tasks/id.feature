@@ -28,6 +28,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 1                                  |
       | complete        | false                              |
+      | success         | false                              |
       | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "produce"                          |
       | image/task      | "default"                          |
@@ -52,6 +53,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id                      | 1                                  |
       | complete                | true                               |
+      | success                 | true                               |
       | benchmark               | "2f221a18eb86380369570b2ed147d8b4" |
       | type                    | "produce"                          |
       | image/task              | "default"                          |
@@ -75,7 +77,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON response should have "events/0/created_at"
 
 
-  Scenario: Getting an incomplete produce task with failed event by ID
+  Scenario: Getting failed produce task
     Given the database fixtures:
       | fixture                    |
       | unsuccessful_product_event |
@@ -83,7 +85,8 @@ Feature: Getting benchmarking tasks by ID
     Then the returned HTTP status code should be "200"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
-      | complete            | false |
+      | complete            | true  |
+      | success             | false |
       | events/0/id         | 1     |
       | events/0/success    | false |
 
@@ -95,6 +98,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
+      | success         | false                              |
       | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
@@ -117,6 +121,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
+      | success         | false                              |
       | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
@@ -140,6 +145,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
+      | success         | false                              |
       | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
@@ -167,6 +173,7 @@ Feature: Getting benchmarking tasks by ID
     And the JSON should have the following:
       | id              | 2                                  |
       | complete        | false                              |
+      | success         | false                              |
       | benchmark       | "2f221a18eb86380369570b2ed147d8b4" |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
@@ -193,8 +200,24 @@ Feature: Getting benchmarking tasks by ID
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | complete                | true            |
+      | success                 | true            |
       | events/0/success        | true            |
       | events/0/files/0/type   | "container_log" |
       | events/0/files/0/sha256 | "f6b8e"         |
       | events/0/files/0/url    | "s3://log_file" |
+    And the JSON response should have "events/0/created_at"
+
+
+  Scenario: Getting an evaluate task with a successful product and a failed evaluate event
+    Given the database fixtures:
+      | fixture                     |
+      | successful_product_event    |
+      | unsuccessful_evaluate_event |
+    When I get the url "/tasks/2"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | complete                | true            |
+      | success                 | false           |
+      | events/0/success        | false           |
     And the JSON response should have "events/0/created_at"

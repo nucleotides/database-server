@@ -20,6 +20,7 @@ Feature: Getting benchmarks from the API by their ID
     Then the returned HTTP status code should be "404"
     And the returned body should equal "Benchmark not found: unknown"
 
+
   Scenario: Getting a benchmark with no completed tasks
     When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
     Then the returned HTTP status code should be "200"
@@ -27,6 +28,7 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON should have the following:
       | id       | "2f221a18eb86380369570b2ed147d8b4"    |
       | complete | false                                 |
+      | success  | false                                 |
       | type     | "illumina_isolate_reference_assembly" |
     And the JSON should not have "task_id"
     And the JSON at "tasks/0" should have the following:
@@ -50,6 +52,7 @@ Feature: Getting benchmarks from the API by their ID
       | inputs/0/sha256 | "d421a4"                        |
       | inputs/0/type   | "reference_fasta"               |
 
+
   Scenario: Getting a benchmark with a completed produce task
     Given the database fixtures:
       | fixture                  |
@@ -60,6 +63,7 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON should have the following:
       | id       | "2f221a18eb86380369570b2ed147d8b4"    |
       | complete | false                                 |
+      | success  | false                                 |
       | type     | "illumina_isolate_reference_assembly" |
     And the JSON should not have "task_id"
     And the JSON at "tasks/0" should have the following:
@@ -91,10 +95,36 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON response should not have "benchmark_instance_id"
     And the JSON response should not have "task/1/inputs/2"
 
+
+  Scenario: Getting a benchmark with a failed produce task
+    Given the database fixtures:
+      | fixture                    |
+      | unsuccessful_product_event |
+    When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | complete | true   |
+      | success  | false  |
+
+
+  Scenario: Getting a benchmark with a failed evaluate task
+    Given the database fixtures:
+      | fixture                     |
+      | successful_product_event    |
+      | unsuccessful_evaluate_event |
+    When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
+    Then the returned HTTP status code should be "200"
+    And the returned body should be a valid JSON document
+    And the JSON should have the following:
+      | complete | true   |
+      | success  | false  |
+
+
   Scenario: Getting a benchmark with all completed tasks
     Given the database fixtures:
-      | fixture                  |
-      | successful_product_event |
+      | fixture                   |
+      | successful_product_event  |
       | successful_evaluate_event |
     When I get the url "/benchmarks/2f221a18eb86380369570b2ed147d8b4"
     Then the returned HTTP status code should be "200"
@@ -102,11 +132,13 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON should have the following:
       | id       | "2f221a18eb86380369570b2ed147d8b4"    |
       | complete | true                                  |
+      | success  | true                                  |
       | type     | "illumina_isolate_reference_assembly" |
     And the JSON should not have "task_id"
     And the JSON at "tasks/0" should have the following:
       | id              | 1                                  |
       | complete        | true                               |
+      | success         | true                               |
       | type            | "produce"                          |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/velvet"                  |
@@ -119,6 +151,7 @@ Feature: Getting benchmarks from the API by their ID
     And the JSON at "tasks/1" should have the following:
       | id              | 2                                  |
       | complete        | true                               |
+      | success         | true                               |
       | type            | "evaluate"                         |
       | image/task      | "default"                          |
       | image/name      | "bioboxes/quast"                   |

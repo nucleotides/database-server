@@ -36,7 +36,7 @@
 (defn create
   "Creates a new event from the given parameters"
   [db-client body]
-  (let [id (-> body (create-event<! db-client) (:id))]
+  (let [id (-> body (create-event<! db-client) (:event_id))]
     (files/create-event-files db-client id (:files body))
     (create-metrics db-client id body)
     id))
@@ -44,14 +44,14 @@
 (defn lookup
   "Finds an event by ID"
   [db-client id _]
-  (let [id     {:id id}
+  (let [id      {:id id}
         files   (future (files/get-event-file-instance id db-client))
         metrics (->> (metrics-by-event-id id db-client)
                      (long->wide)
                      (future))]
     (-> (get-event id db-client)
         (first)
-        (clojure.set/rename-keys {:task_id :task})
+        (clojure.set/rename-keys {:task_id :task, :event_id :id})
         (assoc :files @files)
         (assoc :metrics @metrics))))
 
