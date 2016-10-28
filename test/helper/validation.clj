@@ -37,7 +37,7 @@
   ;; Summary keys
   (validate-fields [:n_files_generated :n_metrics_collected :total_cpu_time_in_days
                     :total_wall_clock_time_in_days :length_of_all_contigs_generated_in_gb
-                    :n_contigs_generated]
+                    :n_millions_of_contigs_generated]
                    (:summary status))
   ;; Task and benchmark keys
   (validate-fields [:all :produce :evaluate] (:tasks status))

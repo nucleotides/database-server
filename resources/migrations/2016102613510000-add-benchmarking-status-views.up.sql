@@ -62,10 +62,10 @@ SELECT
        FROM metric_type
  INNER JOIN metric_instance USING (metric_type_id)
       WHERE name = 'max_cpu_usage')::numeric, 2) AS total_cpu_time_in_days,
-    (SELECT COALESCE(SUM(value), 0)
+    round((SELECT COALESCE(SUM(value), 0) * 10e-6
        FROM metric_type
  INNER JOIN metric_instance USING (metric_type_id)
-      WHERE name = 'n_contigs_gt_0') AS n_contigs_generated,
+      WHERE name = 'n_contigs_gt_0')::numeric, 2) AS n_millions_of_contigs_generated,
     round((SELECT COALESCE(SUM(value), 0) * 10e-9
        FROM metric_type
  INNER JOIN metric_instance USING (metric_type_id)

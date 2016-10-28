@@ -19,7 +19,7 @@ Feature: Getting the current status of the benchmarking
       | total_cpu_time_in_days                | 0.0 |
       | total_wall_clock_time_in_days         | 0.0 |
       | length_of_all_contigs_generated_in_gb | 0.0 |
-      | n_contigs_generated                   | 0.0 |
+      | n_millions_of_contigs_generated       | 0.0 |
     And the JSON at "tasks/all" should have the following:
       | n                   | 18    |
       | date_of_most_recent | null  |
@@ -99,7 +99,7 @@ Feature: Getting the current status of the benchmarking
       | total_cpu_time_in_days                | 11574.07 |
       | total_wall_clock_time_in_days         | 11574.07 |
       | length_of_all_contigs_generated_in_gb | 0.0      |
-      | n_contigs_generated                   | 0.0      |
+      | n_millions_of_contigs_generated       | 0.0      |
     And the JSON at "tasks/all" should have the following:
       | n                   | 18    |
       | n_successful        | 3     |
@@ -168,11 +168,11 @@ Feature: Getting the current status of the benchmarking
     And the returned body should be a valid JSON document
     And the JSON at "summary" should have the following:
       | n_files_generated                     | 4        |
-      | n_metrics_collected                   | 12       |
+      | n_metrics_collected                   | 16       |
       | total_cpu_time_in_days                | 46296.30 |
       | total_wall_clock_time_in_days         | 46296.30 |
       | length_of_all_contigs_generated_in_gb | 40.0     |
-      | n_contigs_generated                   | 0.0      |
+      | n_millions_of_contigs_generated       | 40000.0  |
     And the JSON at "tasks/all" should have the following:
       | n                   | 18    |
       | n_successful        | 12    |
