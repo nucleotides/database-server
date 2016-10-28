@@ -67,7 +67,9 @@
   :allowed-methods        [:get]
   :handle-ok              (fn [request]
                             (let [response-format (keyword (get-in request [:request :params :format] :json))
-                                  response        {:headers {"Content-Type" (content-types response-format)}
+                                  disposition     (str "inline; filename=\"nucleotides_benchmark_metrics." (name response-format) "\"")
+                                  response        {:headers {"Content-Type" (content-types response-format)
+                                                             "Content-Disposition" disposition}
                                                    :body    (results/complete db response-format)}]
                               (ring-response response))))
 

@@ -356,6 +356,7 @@
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
                            (resp/has-header "Content-Type" (app/content-types (keyword resp-format)))
+                           (resp/has-header "Content-Disposition" (str "inline; filename=\"nucleotides_benchmark_metrics." resp-format "\""))
                            (resp/is-length-at? entries)]}))
 
 

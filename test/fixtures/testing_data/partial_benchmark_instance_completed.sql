@@ -8,11 +8,11 @@ WITH events_ AS (
   	  AND benchmark_instance.input_data_file_id = 2
     RETURNING task_id, event_id
 ),
-metrics_ AS(
+metrics_ AS (
   SELECT metric_type_id,
          1e9 AS value
     FROM metric_type
-   WHERE name IN ('total_wall_clock_time_in_seconds', 'max_cpu_usage')
+   WHERE name IN ('total_wall_clock_time_in_seconds', 'total_cpu_usage_in_seconds')
 )
 INSERT INTO metric_instance (event_id, metric_type_id, value)
      SELECT event_id,

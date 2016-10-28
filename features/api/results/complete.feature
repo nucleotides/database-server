@@ -10,8 +10,9 @@ Feature: Getting the results for completed benchmarks
     When I get the url "/results/complete?format=<name>"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
-      | header       | value          |
-      | Content-Type | <content-type> |
+      | header               | value                                                   |
+      | Content-Type         | <content-type>                                          |
+      | Content-Disposition  | inline; filename="nucleotides_benchmark_metrics.<name>" |
     And the returned body should be a valid <format> document
     And the returned document should be empty
 
@@ -29,8 +30,9 @@ Feature: Getting the results for completed benchmarks
     When I get the url "/results/complete?format=<name>"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
-      | header       | value          |
-      | Content-Type | <content-type> |
+      | header               | value                                                   |
+      | Content-Type         | <content-type>                                          |
+      | Content-Disposition  | inline; filename="nucleotides_benchmark_metrics.<name>" |
     And the returned body should be a valid <format> document
     And the returned document should contain <n> entries
 
@@ -60,4 +62,3 @@ Feature: Getting the results for completed benchmarks
     And the JSON should have the following:
       | 0/biological_sources/0/file_sets/0/files/0/images/0/versions/0/image_tasks/0/metrics/0/value | 1.0 |
       | 0/biological_sources/0/file_sets/0/files/1/images/0/versions/0/image_tasks/0/metrics/0/value | 1.0 |
-

@@ -12,7 +12,7 @@ INSERT INTO metric_instance (event_id, metric_type_id, value)
        JOIN task USING (task_id)
  CROSS JOIN metric_type
       WHERE task_type = 'produce'
-        AND metric_type.name IN ('total_wall_clock_time_in_seconds', 'max_cpu_usage');
+        AND metric_type.name IN ('total_wall_clock_time_in_seconds', 'total_cpu_usage_in_seconds');
 
 INSERT INTO metric_instance (event_id, metric_type_id, value)
      SELECT event_id,
@@ -22,7 +22,7 @@ INSERT INTO metric_instance (event_id, metric_type_id, value)
        JOIN task USING (task_id)
  CROSS JOIN metric_type
       WHERE task.image_task_id = 4
-        AND metric_type.name = 'total_length_gt_0';
+        AND metric_type.name IN ('total_length_gt_0', 'n_contigs_gt_0');
 
 INSERT INTO file_instance (file_type_id, sha256, url)
      SELECT file_type_id,
