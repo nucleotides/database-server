@@ -15,6 +15,10 @@ project adheres to [Semantic Versioning](http://semver.org/).
   * `/status.json` returns contig count in millions as
     `n_millions_of_contigs_generated` instead of `n_contigs_generated`.
 
+### Fixed
+
+  * `cpu_time_in_days` now correctly returned in `/status.json`
+
 ## v0.9.0 - 2016-10-27
 
 ### Added
