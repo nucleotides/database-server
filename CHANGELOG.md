@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.9.2 - DATE
+
+### Changed
+
+  * Set `Content-Disposition` header in `/results/complete` returned response
+    to `attachment` instead of `inline`. This ensures the results are
+    downloaded instead of diplayed in the browser. The file is very large so
+    displaying in the browser may cause problems.
+
 ## v0.9.1 - 2016-10-28
 
 ### Added
