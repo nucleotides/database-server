@@ -12,6 +12,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
     downloaded instead of diplayed in the browser. The file is very large so
     displaying in the browser may cause problems.
 
+### Fixed
+
+  * Fix memory issues where large CSV files were being created by
+    `/results/complete?format=csv`.
+
 ## v0.9.1 - 2016-10-28
 
 ### Added
