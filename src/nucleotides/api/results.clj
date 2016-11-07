@@ -1,6 +1,7 @@
 (ns nucleotides.api.results
   (:require [clojure.data.csv      :as csv]
             [yesql.core            :refer [defqueries]]
+            [nucleotides.database.connection  :as con]
             [nucleotides.api.util  :as util]))
 
 (defqueries "nucleotides/api/results.sql")
@@ -14,7 +15,7 @@
    [:image_version           :image_tasks]
    [:image_task              :metrics             [:benchmark_id :benchmark_name]]])
 
-(defn group-fields [fields data]
+(defn json-grouped-output [fields data]
   (if (empty? fields)
     data
     (let [[parent-key child-key associated-keys] (first fields)]
@@ -24,17 +25,23 @@
                {parent-key  parent
                 child-key   (->> child
                                  (map #(apply dissoc % parent-key associated-keys))
-                                 (group-fields (drop 1 fields)))}))
+                                 (json-grouped-output (drop 1 fields)))}))
            (group-by parent-key data)))))
+
+
+(defn csv-output [data-seq]
+  (let [header (map name (keys (first data-seq)))
+        out    (java.io.StringWriter.)
+        write  #(csv/write-csv out (list %))]
+    (write header)
+    (dorun (map (comp write vals) data-seq))
+    (.toString out)))
+
 
 (defn complete
   "Returns metrics for each completed benchmark instance"
   [db-client response-format]
   (let [benchmarks  (completed-benchmark-metrics {} db-client)]
     (case response-format
-      :json  (group-fields field-mappings benchmarks)
-      :csv   (let [out (java.io.StringWriter.)
-                   rows (cons (map name (keys (first benchmarks)))
-                              (map vals benchmarks))]
-               (csv/write-csv out rows)
-               (.toString out)))))
+      :json  (json-grouped-output field-mappings benchmarks)
+      :csv   (csv-output benchmarks))))
