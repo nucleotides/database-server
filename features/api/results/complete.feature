@@ -10,9 +10,9 @@ Feature: Getting the results for completed benchmarks
     When I get the url "/results/complete?format=<name>"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
-      | header               | value                                                   |
-      | Content-Type         | <content-type>                                          |
-      | Content-Disposition  | inline; filename="nucleotides_benchmark_metrics.<name>" |
+      | header               | value                                                       |
+      | Content-Type         | <content-type>                                              |
+      | Content-Disposition  | attachment; filename="nucleotides_benchmark_metrics.<name>" |
     And the returned body should be a valid <format> document
     And the returned document should be empty
 
@@ -30,9 +30,9 @@ Feature: Getting the results for completed benchmarks
     When I get the url "/results/complete?format=<name>"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
-      | header               | value                                                   |
-      | Content-Type         | <content-type>                                          |
-      | Content-Disposition  | inline; filename="nucleotides_benchmark_metrics.<name>" |
+      | header               | value                                                       |
+      | Content-Type         | <content-type>                                              |
+      | Content-Disposition  | attachment; filename="nucleotides_benchmark_metrics.<name>" |
     And the returned body should be a valid <format> document
     And the returned document should contain <n> entries
 
