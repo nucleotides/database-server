@@ -79,20 +79,24 @@ help:
 ################################################
 
 # Kill database container then restart it
-restart: kill .rdm_container
+restart: kill_api_container kill_rdb_container .rdm_container
 
-kill:
+
+kill_api_container:
 	$(call STATUS_MSG,Stopping any running API containers)
 	@docker kill $(TESTING_API_CONTAINER_NAME) &> /dev/null; true
 	@docker rm $(TESTING_API_CONTAINER_NAME) &> /dev/null; true
 	$(OK)
+	@rm -f .api_container
+
+kill_rdb_container:
 	$(call STATUS_MSG,Stopping any running database containers)
 	@docker kill $(TESTING_DB_CONTAINER_NAME) &> /dev/null; true
 	@docker rm $(TESTING_DB_CONTAINER_NAME) &> /dev/null; true
 	$(OK)
-	@rm -f .*_container
+	@rm -f .rdm_container
 
-clean: kill
+clean: kill_api_container kill_rdb_container
 	$(call STATUS_MSG,Removing all intermediate files)
 	@rm -rf $(bootrapped_objects) tmp
 	$(OK)
@@ -151,8 +155,10 @@ deploy: .api_image
 hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
 error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
 
+# Extra redundancy using 'trap' to ensure API container is killed tests
 feature: Gemfile.lock .api_container test/fixtures/testing_data/initial_state.sql
-	@$(db_params) bundle exec cucumber $(ARGS) --require features
+	@bash -c "trap 'make kill_api_container' EXIT; \
+		 $(db_params) bundle exec cucumber $(ARGS) --require features"
 
 test: test/fixtures/testing_data/initial_state.sql
 	@if [ ! -z "$(hard_coded_ids)" ]; then echo $(error_msg) >&1; exit 1; fi
@@ -161,12 +167,17 @@ test: test/fixtures/testing_data/initial_state.sql
 autotest:
 	@$(db_params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
-.api_container: .rdm_container .api_image
+# Dependency on 'kill_api_container' ensures any existing containers are removed first
+.api_container: kill_api_container .rdm_container .api_image
+	$(call STATUS_MSG,Starting API container)
 	$(docker_db) \
-	  --publish 80:80 \
-	  --detach=true \
-	  $(name) \
-	  server > $@
+		--publish 80:80 \
+		--detach=true \
+		--name $(TESTING_API_CONTAINER_NAME) \
+		$(name) \
+		server > $@
+	@sleep 7 # Allow API to start up up
+	$(OK)
 
 
 ################################################
@@ -213,7 +224,7 @@ vendor/maven:
 	$(OK)
 
 .base_image: Dockerfile
-	$(call STATUS_MSG,Fetch base Docker image for API image)
+	$(call STATUS_MSG,Fetching base Docker image for API Docker image)
 	@docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ') &> logs/fetch_base_image.txt
 	@touch $@
 	$(OK)
