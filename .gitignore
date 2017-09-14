@@ -17,3 +17,5 @@ vendor
 .bundle
 .gems
 tmp
+
+logs
