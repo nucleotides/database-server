@@ -1,6 +1,26 @@
-name        := nucleotides-api
+################################################
+#
+# Docker configuration
+#
+################################################
 
+DOCKER_ERROR     := $(shell docker info 2>&1 | grep "Cannot connect")
+DOCKER_ERROR_MSG := Docker does not appear to be running.
+
+# Exit early if Docker is not running or available
+ifdef DOCKER_ERROR
+    $(error Docker does not appear to be running.)
+endif
+
+# Checks for the cases where Docker is running on a remote machine
 docker_host := $(shell echo ${DOCKER_HOST} | egrep -o "\d+.\d+.\d+.\d+")
+
+
+################################################
+#
+# Database image configuration
+#
+################################################
 
 db_user := PGUSER=postgres
 db_pass := PGPASSWORD=pass
@@ -13,9 +33,7 @@ else
        db_host  := PGHOST=localhost
 endif
 
-params := $(db_user) $(db_pass) $(db_name) $(db_host) $(db_port)
-
-jar := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
+db_params := $(db_user) $(db_pass) $(db_name) $(db_host) $(db_port)
 
 docker_db := @docker run \
 	--env="$(db_user)" \
@@ -28,27 +46,67 @@ docker_db := @docker run \
 
 ################################################
 #
+# Build targets
+#
+################################################
+
+
+name  := nucleotides-api
+jar   := target/nucleotides-api-$(shell cat VERSION)-standalone.jar
+
+help:
+	@echo
+	@echo "make deploy		Pushes built Docker image of API to Docker registry."
+	@echo "make feature		Runs feature tests against a Docker container running the API."
+	@echo "make test		Runs unit tests."
+	@echo "make build		Creates a jar file for the API."
+	@echo "make bootstrap		Creates required files and containers for testing and building."
+	@echo "make clean		Clean up all containers and intermediate files"
+	@echo
+
+.PHONY: deploy feature test build bootstrap clean restart kill
+
+################################################
+#
+# Clean up
+#
+################################################
+
+# Kill all containers then restart them
+restart: bootstrap kill
+
+kill:
+	@docker kill $(shell cat .rdm_container 2> /dev/null) 2> /dev/null; true
+	@docker kill $(shell cat .api_container 2> /dev/null) 2> /dev/null; true
+	@rm -f .*_container
+
+clean: kill
+	@rm -rf $(bootrapped_objects) tmp
+
+
+################################################
+#
 # Consoles
 #
 ################################################
 
 
 repl:
-	@$(params) lein repl
+	@$(db_params) lein repl
 
 irb:
-	@$(params) bundle exec ./script/irb
+	@$(db_params) bundle exec ./script/irb
 
 db_logs:
 	docker logs $(shell cat .rdm_container) 2>&1 | less
 
 ssh: .rdm_container .api_image
 	$(docker_db) \
-	  --tty \
-	  --interactive \
-	  --link $(shell cat $<):postgres \
-	  $(name) \
-	  /bin/bash
+		--tty \
+		--interactive \
+		--link $(shell cat $<):postgres \
+		$(name) \
+		/bin/bash
 
 ################################################
 #
@@ -56,10 +114,12 @@ ssh: .rdm_container .api_image
 #
 ################################################
 
+
 deploy: .api_image
 	docker login --username=$$DOCKER_USER --password=$$DOCKER_PASS --email=$$DOCKER_EMAIL
 	docker tag $(name) nucleotides/api:staging
 	docker push nucleotides/api:staging
+
 
 ################################################
 #
@@ -67,18 +127,19 @@ deploy: .api_image
 #
 ################################################
 
+
 hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
 error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
 
 feature: Gemfile.lock .api_container test/fixtures/testing_data/initial_state.sql
-	@$(params) bundle exec cucumber $(ARGS) --require features
+	@$(db_params) bundle exec cucumber $(ARGS) --require features
 
 test: test/fixtures/testing_data/initial_state.sql
 	@if [ ! -z "$(hard_coded_ids)" ]; then echo $(error_msg) >&1; exit 1; fi
-	@$(params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
+	@$(db_params) lein trampoline test $(ARGS) 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 autotest:
-	@$(params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
+	@$(db_params) lein test-refresh 2>&1 | egrep -v 'INFO|clojure.tools.logging'
 
 .api_container: .rdm_container .api_image
 	$(docker_db) \
@@ -87,15 +148,13 @@ autotest:
 	  $(name) \
 	  server > $@
 
-kill:
-	docker kill $(shell cat .api_container)
-	rm -f .api_container
 
 ################################################
 #
 # Build the project
 #
 ################################################
+
 
 build: $(jar)
 
@@ -106,19 +165,23 @@ build: $(jar)
 $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.clj' -o -name '*.sql')
 	lein uberjar
 
+
 ################################################
 #
 # Bootstrap required project resources
 #
 ################################################
 
-bootstrap: \
-	Gemfile.lock \
-	.rdm_container \
-	tmp/input_data \
-	tmp/prod_nucleotides_data \
-	test/fixtures/testing_data/initial_state.sql \
-	.base_image
+
+bootrapped_objects = .rdm_container \
+		     Gemfile.lock \
+		     tmp/input_data \
+		     tmp/prod_nucleotides_data \
+		     test/fixtures/testing_data/initial_state.sql \
+		     .base_image \
+		     .api_image
+
+bootstrap: $(bootrapped_objects)
 	lein deps
 
 .base_image: Dockerfile
@@ -151,7 +214,7 @@ tmp/input_data:
 	cp ./data/pseudo_real/* ./$@/inputs
 
 .rdm_container: .rdm_image
-	@export $(params) && \
+	@export $(db_params) && \
 		docker run \
 		--env=POSTGRES_PASSWORD="$${PGPASSWORD}" \
 		--env=POSTGRES_USER="$${PGUSER}" \
@@ -166,10 +229,3 @@ tmp/input_data:
 
 Gemfile.lock: Gemfile
 	bundle install --path vendor/bundle
-
-clean:
-	@docker kill $(shell cat .rdm_container 2> /dev/null) 2> /dev/null; true
-	@docker kill $(shell cat .api_container 2> /dev/null) 2> /dev/null; true
-	@rm -f .*_container test/fixtures/testing_data/initial_state.sql
-
-.PHONY: test
