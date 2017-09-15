@@ -84,15 +84,15 @@ restart: kill_api_container kill_rdb_container .rdm_container
 
 kill_api_container:
 	$(call STATUS_MSG,Stopping any running API containers)
-	@docker kill $(TESTING_API_CONTAINER_NAME) &> /dev/null; true
-	@docker rm $(TESTING_API_CONTAINER_NAME) &> /dev/null; true
+	@docker kill $(TESTING_API_CONTAINER_NAME) > /dev/null 2>&1; true
+	@docker rm $(TESTING_API_CONTAINER_NAME) > /dev/null 2>&1; true
 	$(OK)
 	@rm -f .api_container
 
 kill_rdb_container:
 	$(call STATUS_MSG,Stopping any running database containers)
-	@docker kill $(TESTING_DB_CONTAINER_NAME) &> /dev/null; true
-	@docker rm $(TESTING_DB_CONTAINER_NAME) &> /dev/null; true
+	@docker kill $(TESTING_DB_CONTAINER_NAME) > /dev/null 2>&1; true
+	@docker rm $(TESTING_DB_CONTAINER_NAME) > /dev/null 2>&1; true
 	$(OK)
 	@rm -f .rdm_container
 
@@ -191,13 +191,13 @@ build: $(jar)
 
 .api_image: $(shell find image src resources/migrations bin) $(jar)
 	$(call STATUS_MSG,Building Docker image of API)
-	@docker build --tag=$(name) . &> logs/build_api_image.txt
+	@docker build --tag=$(name) . > logs/build_api_image.txt 2>&1
 	@touch $@
 	$(OK)
 
 $(jar): project.clj VERSION $(shell find resources) $(shell find src -name '*.clj' -o -name '*.sql')
 	$(call STATUS_MSG,Building jar file of API)
-	@lein uberjar > logs/build_jar.txt
+	@lein uberjar > logs/build_jar.txt 2>&1
 	$(OK)
 
 
@@ -220,12 +220,12 @@ bootstrap: vendor/maven $(bootrapped_objects)
 
 vendor/maven:
 	$(call STATUS_MSG,Fetching clojure dependencies)
-	@lein deps &> logs/fetch_clojure_dependencies.txt
+	@lein deps > logs/fetch_clojure_dependencies.txt 2>&1
 	$(OK)
 
 .base_image: Dockerfile
 	$(call STATUS_MSG,Fetching base Docker image for API Docker image)
-	@docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ') &> logs/fetch_base_image.txt
+	@docker pull $(shell head -n 1 Dockerfile | cut -f 2 -d ' ') > logs/fetch_base_image.txt 2>&1
 	@touch $@
 	$(OK)
 
@@ -235,14 +235,14 @@ test/fixtures/testing_data/initial_state.sql: .rdm_container .api_image $(shell 
 		--entrypoint=psql \
 		kiasaki/alpine-postgres:9.5 \
 		--command="drop schema public cascade; create schema public;" \
-		&> logs/database_migration.txt
+		> logs/database_migration.txt 2>&1
 	$(OK)
 	$(call STATUS_MSG,Migrating test database to latest state of nucleotides data)
 	$(docker_db) \
 		--volume=$(abspath data/testing):/data:ro \
 		$(name) \
 		migrate \
-		&> logs/database_migration.txt
+		> logs/database_migration.txt 2>&1
 	$(OK)
 	$(call STATUS_MSG,Exporting test database state to SQL file)
 	$(docker_db) \
@@ -254,13 +254,13 @@ test/fixtures/testing_data/initial_state.sql: .rdm_container .api_image $(shell 
 
 tmp/prod_nucleotides_data:
 	@mkdir -p $(dir $@)
-	@git clone https://github.com/nucleotides/nucleotides-data.git $@ &> /dev/null
+	@git clone https://github.com/nucleotides/nucleotides-data.git $@ > /dev/null 2>&1
 
 tmp/input_data:
 	$(call STATUS_MSG,Fetching nucleotides input data sets)
 	@mkdir -p $(dir $@)
-	@git clone https://github.com/nucleotides/nucleotides-data.git $@ &> logs/fetch_nucleotides_data.txt
-	@cd ./$@ && git reset --hard d08f40d &> /dev/null
+	@git clone https://github.com/nucleotides/nucleotides-data.git $@ > logs/fetch_nucleotides_data.txt 2>&1
+	@cd ./$@ && git reset --hard d08f40d > /dev/null 2>&1
 	@find ./$@/inputs/data -type f ! -name 'amycolatopsis*' -delete
 	@cp ./data/pseudo_real/* ./$@/inputs
 	$(OK)
@@ -275,20 +275,20 @@ tmp/input_data:
 		--detach=true \
 		--name=$(TESTING_DB_CONTAINER_NAME) \
 		kiasaki/alpine-postgres:9.5 \
-		&> logs/database_start_up.txt
+		> logs/database_start_up.txt 2>&1
 	@touch $@
 	@sleep 5
 	$(OK)
 
 .rdm_image:
 	$(call STATUS_MSG,Fetching alpline postgres image)
-	@docker pull kiasaki/alpine-postgres:9.5 &> logs/fetch_database_container_image.txt
+	@docker pull kiasaki/alpine-postgres:9.5 > logs/fetch_database_container_image.txt 2>&1
 	@touch $@
 	$(OK)
 
 Gemfile.lock: Gemfile
 	$(call STATUS_MSG,Fetching ruby dependencies)
-	@bundle install --path vendor/bundle &> logs/fetch_ruby_dependencies.txt
+	@bundle install --path vendor/bundle > logs/fetch_ruby_dependencies.txt 2>&1
 	$(OK)
 
 
