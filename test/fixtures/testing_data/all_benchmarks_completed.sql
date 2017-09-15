@@ -12,5 +12,5 @@ INSERT INTO metric_instance (event_id, metric_type_id, value)
        JOIN task USING (task_id)
  CROSS JOIN (SELECT metric_type_id
 	       FROM metric_type
-	      WHERE name = 'metric_1') AS m
+	      WHERE name = 'a_produce_task_metric') AS m
       WHERE task_type = 'produce'
