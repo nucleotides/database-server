@@ -4,7 +4,7 @@ WITH events_ AS (
 	       FROM task
 	       JOIN benchmark_instance USING (benchmark_instance_id)
 	       JOIN image_task ON image_task.image_task_id = product_image_task_id
-	      WHERE image_task.name = 'image_1_task_1'
+	      WHERE image_task.name = 'eat_cow'
 	        AND benchmark_instance.input_data_file_id = 2
           RETURNING task_id, event_id
 )
@@ -23,7 +23,7 @@ WITH events_ AS (
 	       FROM task
 	       JOIN benchmark_instance USING (benchmark_instance_id)
 	       JOIN image_task ON image_task.image_task_id = product_image_task_id
-	      WHERE image_task.name = 'image_1_task_1'
+	      WHERE image_task.name = 'eat_cow'
           RETURNING task_id, event_id
 )
 INSERT INTO metric_instance (event_id, metric_type_id, value)

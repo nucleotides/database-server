@@ -1,5 +1,23 @@
 ---
-- name: a_produce_task_metric
+- name: metric_1
+  desc: Random metric
+
+- name: produce_task_metric_1
   desc: Metric collected from a produce task
-- name: an_evaluate_task_metric
+- name: produce_task_metric_2
   desc: Metric collected from a produce task
+
+- name: evaluate_task_metric_1
+  desc: Metric collected from a produce task
+- name: evaluate_task_metric_2
+  desc: Metric collected from a produce task
+
+# These metrics are used to generate a summary of the nucleotides state
+- name: total_cpu_usage_in_seconds
+  desc: Total CPU time in seconds
+- name: total_wall_clock_time_in_seconds
+  desc: Actual time taken from starting the Docker container until it completes
+- name: total_length_gt_0
+  desc: Number of contigs
+- name: n_contigs_gt_0
+  desc: Number of contigs

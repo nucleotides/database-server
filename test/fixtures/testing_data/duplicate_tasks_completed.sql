@@ -4,7 +4,7 @@ WITH events_ AS (
                FROM (SELECT * FROM task UNION ALL SELECT * FROM task) as t
 	       JOIN benchmark_instance USING (benchmark_instance_id)
 	       JOIN image_task ON image_task.image_task_id = product_image_task_id
-	      WHERE image_task.name = 'image_1_task_1'
+	      WHERE image_task.name = 'eat_cow'
            ORDER BY task_id ASC
           RETURNING task_id, event_id
 )

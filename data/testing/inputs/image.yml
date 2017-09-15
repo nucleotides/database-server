@@ -1,28 +1,28 @@
 ---
-- image_type: image_type_1
-  name: image_1
+- image_type: feline
+  name: tiger
   versions:
     - sha256: image_1_digest_1
-      tasks:  ["image_1_task_1"]
-      name: "v1.1"
+      tasks:  ["eat_cow"]
+      name: siberian
     - sha256: image_1_digest_2
-      tasks:  ["image_1_task_2"]
-      name: "v1.2"
-- image_type: image_type_3
-  name: image_2
-  versions:
-    - sha256: image_2_digest
-      tasks:  ["image_2_task"]
-      name: "v2"
-- image_type: image_type_2
-  name: image_3
+      tasks:  ["eat_pig"]
+      name: bengal
+- image_type: canine
+  name: collie
   versions:
     - sha256: image_3_digest
-      tasks: ["image_3_task_1", "image_3_task_2"]
-      name: "v3"
-- image_type: image_type_3
-  name: image_4
+      tasks: ["chase_sheep", "sleep"]
+      name: shaggy
+- image_type: ursine
+  name: grizzly
+  versions:
+    - sha256: image_2_digest
+      tasks:  ["scare_hikers"]
+      name: yosemite
+- image_type: ursine
+  name: polar
   versions:
     - sha256: image_4_digest
-      tasks: ["image_4_task"]
-      name: "v4"
+      tasks: ["eat_penguin"] # Penguins and polar bears don't actually share the same habitat
+      name: arctic
