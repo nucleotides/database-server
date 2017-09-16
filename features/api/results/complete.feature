@@ -40,6 +40,8 @@ Feature: Getting the results for completed benchmarks
       | name | format | content-type                   | n | fix                                                |
       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | partial_benchmark_instance_completed               |
       | json | JSON   | application/json;charset=UTF-8 | 0 | partial_benchmark_instance_completed               |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_benchmark_completed                            |
+      | json | JSON   | application/json;charset=UTF-8 | 1 | one_benchmark_completed                            |
       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_benchmark_instances_failed                     |
       | json | JSON   | application/json;charset=UTF-8 | 0 | two_benchmark_instances_failed                     |
       | csv  | CSV    | text/csv;charset=UTF-8         | 2 | two_benchmark_instances_completed                  |
@@ -48,8 +50,6 @@ Feature: Getting the results for completed benchmarks
       | json | JSON   | application/json;charset=UTF-8 | 1 | duplicate_tasks_completed                          |
       | csv  | CSV    | text/csv;charset=UTF-8         | 2 | benchmark_instances_completed_with_initial_failure |
       | json | JSON   | application/json;charset=UTF-8 | 1 | benchmark_instances_completed_with_initial_failure |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 6 | all_benchmarks_completed                           |
-      | json | JSON   | application/json;charset=UTF-8 | 2 | all_benchmarks_completed                           |
 
 
 
