@@ -156,7 +156,7 @@ hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
 error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
 
 # Extra redundancy using 'trap' to ensure API container is killed tests
-feature: Gemfile.lock .api_container test/fixtures/testing_data/initial_state.sql
+feature: Gemfile.lock test/fixtures/testing_data/initial_state.sql .api_container
 	@bash -c "trap 'make kill_api_container' EXIT; \
 		 $(db_params) bundle exec cucumber $(ARGS) --require features"
 
