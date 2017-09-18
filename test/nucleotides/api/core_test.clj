@@ -34,7 +34,7 @@
                          (apply fix/load-fixture (concat fix/base-fixtures fixtures)))
          [false  true] (do
                          (db/drop-tables)
-                         (apply fix/load-fixture (cons "testing_data/initial_state" fixtures)))
+                         (apply fix/load-fixture (cons "initial_state" fixtures)))
          [true  false] (do)) ;; do nothing to database when `:keep-db?` given
   (let [response (http-request m)]
     (dorun
@@ -370,7 +370,7 @@
       (test-get-results
         {:resp-format "json"
          :entries     1
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]}))
+         :fixtures    ["benchmark_instance/two_completed"]}))
 
     (testing "getting CSV results when no benchmarks have been completed"
       (test-get-results
@@ -380,8 +380,8 @@
     (testing "getting CSV results when a set of benchmarks for an image task has been completed"
       (test-get-results
         {:resp-format "csv"
-         :entries     2
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]})))
+         :entries     6
+         :fixtures    ["benchmark_instance/two_completed"]})))
 
 
 

@@ -9,7 +9,7 @@ pom.xml.asc
 /.lein-*
 /.nrepl-port
 
-test/fixtures/testing_data/initial_state.sql
+test/fixtures/initial_state.sql
 .aws_credentials
 .*image
 .*_container
@@ -17,3 +17,5 @@ vendor
 .bundle
 .gems
 tmp
+
+logs
