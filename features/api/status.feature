@@ -85,8 +85,8 @@ Feature: Getting the current status of the benchmarking
 
   Scenario: Getting the current status when some tasks have been completed
     Given the database fixtures:
-      | fixture                                                 |
-      | testing_data/benchmark_instance/one_partially_completed |
+      | fixture                                    |
+      | benchmark_instance/one_partially_completed |
     When I get the url "/status.json"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:

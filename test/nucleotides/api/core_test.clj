@@ -370,7 +370,7 @@
       (test-get-results
         {:resp-format "json"
          :entries     1
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]}))
+         :fixtures    ["benchmark_instance/two_completed"]}))
 
     (testing "getting CSV results when no benchmarks have been completed"
       (test-get-results
@@ -380,8 +380,8 @@
     (testing "getting CSV results when a set of benchmarks for an image task has been completed"
       (test-get-results
         {:resp-format "csv"
-         :entries     2
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]})))
+         :entries     6
+         :fixtures    ["benchmark_instance/two_completed"]})))
 
 
 

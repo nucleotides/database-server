@@ -25,8 +25,8 @@ Feature: Getting the results for completed benchmarks
 
   Scenario Outline: Getting results in different states of task completion
     Given the database fixtures:
-      | fixture            |
-      | testing_data/<fix> |
+      | fixture |
+      | benchmark_instance/<fix>   |
     When I get the url "/results/complete?format=<name>"
     Then the returned HTTP status code should be "200"
     And the returned HTTP headers should include:
@@ -37,28 +37,27 @@ Feature: Getting the results for completed benchmarks
     And the returned document should contain <n> entries
 
     Examples:
-      | name | format | content-type                   | n | fix                                                |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 0 | benchmark_instance/one_partially_completed         |
-      | json | JSON   | application/json;charset=UTF-8 | 0 | benchmark_instance/one_partially_completed         |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | benchmark_instance/one_completed                   |
-      | json | JSON   | application/json;charset=UTF-8 | 1 | benchmark_instance/one_completed                   |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | benchmark_instance/one_completed_twice             |
-      | json | JSON   | application/json;charset=UTF-8 | 1 | benchmark_instance/one_completed_twice             |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 6 | benchmark_instance/two_completed                   |
-      | json | JSON   | application/json;charset=UTF-8 | 1 | benchmark_instance/two_completed                   |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_benchmark_instances_failed                     |
-      | json | JSON   | application/json;charset=UTF-8 | 0 | two_benchmark_instances_failed                     |
-      | csv  | CSV    | text/csv;charset=UTF-8         | 2 | benchmark_instances_completed_with_initial_failure |
-      | json | JSON   | application/json;charset=UTF-8 | 1 | benchmark_instances_completed_with_initial_failure |
+       | name | format | content-type                   | n | fix                                |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | one_partially_completed            |
+       | json | JSON   | application/json;charset=UTF-8 | 0 | one_partially_completed            |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed                      |
+       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed                      |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_twice                |
+       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed_twice                |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 6 | two_completed                      |
+       | json | JSON   | application/json;charset=UTF-8 | 1 | two_completed                      |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_failed                         |
+       | json | JSON   | application/json;charset=UTF-8 | 0 | two_failed                         |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_with_initial_failure |
+       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed_with_initial_failure |
 
 
 
   Scenario: Getting results when some tasks have failed
     Given the database fixtures:
-      | fixture                                                         |
-      | testing_data/benchmark_instances_completed_with_initial_failure |
+      | fixture                                               |
+      | benchmark_instance/one_completed_with_initial_failure |
     When I get the url "/results/complete?format=json"
     And the returned body should be a valid JSON document
     And the JSON should have the following:
       | 0/biological_sources/0/file_sets/0/files/0/images/0/versions/0/image_tasks/0/metrics/0/value | 1.0 |
-      | 0/biological_sources/0/file_sets/0/files/1/images/0/versions/0/image_tasks/0/metrics/0/value | 1.0 |
