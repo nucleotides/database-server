@@ -3,8 +3,8 @@ Feature: Getting the current status of the benchmarking
   Background:
     Given an empty database without any tables
     And the database fixtures:
-      | fixture                    |
-      | testing_data/initial_state |
+      | fixture       |
+      | initial_state |
 
   Scenario: Getting the current status when no tasks have been completed
     When I get the url "/status.json"

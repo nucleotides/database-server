@@ -3,8 +3,8 @@ Feature: Getting the results for completed benchmarks
   Background:
     Given an empty database without any tables
     And the database fixtures:
-      | fixture                    |
-      | testing_data/initial_state |
+      | fixture       |
+      | initial_state |
 
   Scenario Outline: Getting the benchmark results when none have been completed
     When I get the url "/results/complete?format=<name>"

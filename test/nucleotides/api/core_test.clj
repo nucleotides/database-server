@@ -34,7 +34,7 @@
                          (apply fix/load-fixture (concat fix/base-fixtures fixtures)))
          [false  true] (do
                          (db/drop-tables)
-                         (apply fix/load-fixture (cons "testing_data/initial_state" fixtures)))
+                         (apply fix/load-fixture (cons "initial_state" fixtures)))
          [true  false] (do)) ;; do nothing to database when `:keep-db?` given
   (let [response (http-request m)]
     (dorun
