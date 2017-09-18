@@ -232,7 +232,7 @@ vendor/maven:
 	@touch $@
 	$(OK)
 
-test/fixtures/initial_state.sql: .rdm_container .api_image $(shell find src data/testing resources)
+test/fixtures/initial_state.sql: kill_api_container .rdm_container .api_image $(shell find src data/testing resources)
 	$(call STATUS_MSG,Dropping existing test database contents)
 	$(docker_db) \
 		--entrypoint=psql \
