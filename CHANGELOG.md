@@ -13,6 +13,11 @@ project adheres to [Semantic Versioning](http://semver.org/).
     completed. This is regardless of whether other benchmarking instances for
     the same image task have failed.
 
+  * When accessing /results/complete?format=csv the results are returned as a
+    streaming download, rather than a large single generated string. This
+    should solve the OutOfMemory errors which were occurring when responding
+    with very large CSV files.
+
 ## v0.9.2 - 2016-11-07
 
 ### Changed
