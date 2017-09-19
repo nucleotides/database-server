@@ -1,8 +1,10 @@
 (ns nucleotides.api.results
-  (:require [clojure.data.csv      :as csv]
-            [yesql.core            :refer [defqueries]]
+  (:require [clojure.java.io                  :as io]
+            [clojure.data.csv                 :as csv]
+            [yesql.core                       :refer [defqueries]]
+            [ring.util.io                     :refer [piped-input-stream]]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.util  :as util]))
+            [nucleotides.api.util             :as util]))
 
 (defqueries "nucleotides/api/results.sql")
 
@@ -30,12 +32,11 @@
 
 
 (defn csv-output [data-seq]
-  (let [header (map name (keys (first data-seq)))
-        out    (java.io.StringWriter.)
-        write  #(csv/write-csv out (list %))]
-    (write header)
-    (dorun (map (comp write vals) data-seq))
-    (.toString out)))
+  (let [headers     (map name (keys (first data-seq)))
+        rows        (map vals data-seq)
+        stream-csv  (fn [out] (csv/write-csv out (cons headers rows))
+                              (.flush out))]
+    (piped-input-stream #(stream-csv (io/make-writer % {})))))
 
 
 (defn complete
