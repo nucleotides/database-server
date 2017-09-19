@@ -19,10 +19,10 @@
   "Converts a response body to a clojure object depending on the specified content-type"
   (if (instance? PipedInputStream response-body)
       (deserialise-response (slurp response-body) content-type)
-      (match [(class response-body) content-type]
-             [String "json"]       (clojure.walk/keywordize-keys (json/read-str response-body))
-             [String "csv"]        (parse-csv response-body)
-             :else                 response-body)))
+      (condp = content-type
+        "json" (clojure.walk/keywordize-keys (json/read-str response-body))
+        "csv"  (parse-csv response-body)
+               response-body)))
 
 
 (defn parse-response-body
