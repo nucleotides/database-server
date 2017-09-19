@@ -38,18 +38,15 @@ Feature: Getting the results for completed benchmarks
 
     Examples:
        | name | format | content-type                   | n | fix                                |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | one_partially_completed            |
        | json | JSON   | application/json;charset=UTF-8 | 0 | one_partially_completed            |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed                      |
-       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed                      |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_twice                |
-       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed_twice                |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 6 | two_completed                      |
        | json | JSON   | application/json;charset=UTF-8 | 1 | two_completed                      |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | one_partially_completed            |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed                      |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_twice                |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 6 | two_completed                      |
        | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_failed                         |
-       | json | JSON   | application/json;charset=UTF-8 | 0 | two_failed                         |
        | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_with_initial_failure |
-       | json | JSON   | application/json;charset=UTF-8 | 1 | one_completed_with_initial_failure |
+       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_and_one_failed       |
 
 
 

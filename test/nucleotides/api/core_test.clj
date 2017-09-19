@@ -359,29 +359,43 @@
                            (resp/has-header "Content-Disposition" (str "attachment; filename=\"nucleotides_benchmark_metrics." resp-format "\""))
                            (resp/is-length-at? entries)]}))
 
+    (testing "getting JSON results"
 
+      (testing "when no benchmarks have been completed"
+        (test-get-results
+          {:resp-format "json"
+           :entries     0}))
 
-    (testing "getting JSON results when no benchmarks have been completed"
-      (test-get-results
-        {:resp-format "json"
-         :entries     0}))
+      (testing "results when a set of benchmarks for an image task has been completed"
+        (test-get-results
+          {:resp-format "json"
+           :entries     1
+           :fixtures    ["benchmark_instance/two_completed"]})))
 
-    (testing "getting JSON results when a set of benchmarks for an image task has been completed"
-      (test-get-results
-        {:resp-format "json"
-         :entries     1
-         :fixtures    ["benchmark_instance/two_completed"]}))
+    (testing "getting CSV results"
 
-    (testing "getting CSV results when no benchmarks have been completed"
-      (test-get-results
-        {:resp-format "csv"
-         :entries     0}))
+      (testing "when no benchmarks have been completed"
+        (test-get-results
+          {:resp-format "csv"
+           :entries     0}))
 
-    (testing "getting CSV results when a set of benchmarks for an image task has been completed"
-      (test-get-results
-        {:resp-format "csv"
-         :entries     6
-         :fixtures    ["benchmark_instance/two_completed"]})))
+      (testing "results when a set of benchmarks for an image task has been completed"
+        (test-get-results
+          {:resp-format "csv"
+           :entries     6
+           :fixtures    ["benchmark_instance/two_completed"]}))
+
+      (testing "results when a set of benchmarks for an image task has been partially completed"
+        (test-get-results
+          {:resp-format "csv"
+           :entries     0
+           :fixtures    ["benchmark_instance/one_partially_completed"]}))
+
+      (testing "results for an image task when one set has failed and another is successful"
+        (test-get-results
+          {:resp-format "csv"
+           :entries     3
+           :fixtures    ["benchmark_instance/one_completed_and_one_failed"]}))))
 
 
 
