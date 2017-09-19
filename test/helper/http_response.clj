@@ -1,4 +1,5 @@
 (ns helper.http-response
+  (:import  [java.io PipedInputStream])
   (:require [clojure.test       :refer :all]
             [helper.validation  :refer :all]
             [clojure.core.match :refer [match]]
@@ -13,18 +14,24 @@
   (let [[header & rows] (csv/read-csv raw-csv)]
     (map #(zipmap header %) rows)))
 
+
+(defn deserialise-response [response-body content-type]
+  "Converts a response body to a clojure object depending on the specified content-type"
+  (if (instance? PipedInputStream response-body)
+      (deserialise-response (slurp response-body) content-type)
+      (match [(class response-body) content-type]
+             [String "json"]       (clojure.walk/keywordize-keys (json/read-str response-body))
+             [String "csv"]        (parse-csv response-body)
+             :else                 response-body)))
+
+
 (defn parse-response-body
-  "Converts the body to a clojure object depending on the `Content-Type` header"
   [response]
   (let [response-body  (:body response)
         content-type   (->> (get-in response [:headers "Content-Type"])
                             (re-find #"\w+\/(json|csv)")
                             (last))]
-
-    (match [(class response-body) content-type]
-           [String "json"] (clojure.walk/keywordize-keys (json/read-str response-body))
-           [String "csv"]  (parse-csv response-body)
-           :else           response-body)))
+    (deserialise-response response-body content-type)))
 
 
 (defn dispatch-response-body-test
@@ -58,7 +65,7 @@
 
 (defn is-length-at?
   "Creates a function which given a http response ensures the collection
-  at the specified path contains the expected number of entires"
+  at the specified path contains the expected number of entries"
   ([length]
    (is-length-at? [] length))
   ([path length]
