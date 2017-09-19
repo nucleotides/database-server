@@ -37,17 +37,40 @@ Feature: Getting the results for completed benchmarks
     And the returned document should contain <n> entries
 
     Examples:
-       | name | format | content-type                   | n | fix                                |
-       | json | JSON   | application/json;charset=UTF-8 | 0 | one_partially_completed            |
-       | json | JSON   | application/json;charset=UTF-8 | 1 | two_completed                      |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | one_partially_completed            |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed                      |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_twice                |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 6 | two_completed                      |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_failed                         |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_with_initial_failure |
-       | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_and_one_failed       |
+      | name | format | content-type                   | n | fix                                              |
+      | json | JSON   | application/json;charset=UTF-8 | 0 | one_partially_completed                          |
+      | json | JSON   | application/json;charset=UTF-8 | 2 | two_completed_from_two_different_benchmark_types |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 0 | one_partially_completed                          |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed                                    |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_twice                              |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 0 | two_failed                                       |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_with_initial_failure               |
+      | csv  | CSV    | text/csv;charset=UTF-8         | 3 | one_completed_and_one_failed                     |
 
+
+  Scenario Outline: Getting subsets of metrics using URL parameters
+    Given the database fixtures:
+      | fixture                                                             |
+      | benchmark_instance/two_completed_from_two_different_benchmark_types |
+    When I get the url "/results/complete?format=csv<params>"
+    Then the returned HTTP status code should be "200"
+    And the returned HTTP headers should include:
+      | header               | value                                                    |
+      | Content-Type         | text/csv;charset=UTF-8                                   |
+      | Content-Disposition  | attachment; filename="nucleotides_benchmark_metrics.csv" |
+    And the returned body should be a valid CSV document
+    And the returned document should contain <n> entries
+
+    Examples:
+      | n | params                                                               |
+      | 6 |                                                                      |
+      | 3 | &benchmark_type[]=benchmark_1                                        |
+      | 3 | &benchmark_type[]=benchmark_1&benchmark_type[]=benchmark_2           |
+      | 0 | &benchmark_type[]=no_data_sets                                       |
+      | 2 | &variable[]=produce_task_metric_1                                    |
+      | 2 | &variable[]=produce_task_metric_1&variable[]=produce_task_metric_1   |
+      | 4 | &variable[]=evaluate_task_metric_1&variable[]=evaluate_task_metric_2 |
+      | 1 | &benchmark_type[]=benchmark_1&variable[]=produce_task_metric_1       |
 
 
   Scenario: Getting results when some tasks have failed
