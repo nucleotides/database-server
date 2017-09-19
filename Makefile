@@ -221,7 +221,7 @@ bootrapped_objects = Gemfile.lock \
 		     test/fixtures/initial_state.sql \
 		     .api_image
 
-bootstrap: vendor/maven $(bootrapped_objects)
+bootstrap: kill_rdb_container vendor/maven $(bootrapped_objects)
 
 vendor/maven:
 	$(call STATUS_MSG,Fetching clojure dependencies)
