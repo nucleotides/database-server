@@ -67,3 +67,21 @@ CREATE VIEW completed_benchmark_metrics AS
        JOIN metric_type                                    USING (metric_type_id)
       WHERE state.instance_successful = true
         AND state.instance_finished   = true;
+
+--;;
+--;; Function rebuild all benchmark instances and tasks
+--;;
+CREATE OR REPLACE FUNCTION rebuild_benchmarks () RETURNS void AS $$
+BEGIN
+REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
+REFRESH MATERIALIZED VIEW image_expanded_fields;
+PERFORM populate_benchmark_instance();
+PERFORM populate_task();
+REFRESH MATERIALIZED VIEW tasks_per_image_by_benchmark_type;
+REFRESH MATERIALIZED VIEW tasks_per_benchmark_instance_by_benchmark_type;
+
+REINDEX TABLE benchmark_instance;
+REINDEX TABLE task;
+REINDEX TABLE tasks_per_image_by_benchmark_type;
+END; $$
+LANGUAGE PLPGSQL;
