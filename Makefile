@@ -223,7 +223,7 @@ bootrapped_objects = Gemfile.lock \
 
 bootstrap: kill_rdb_container vendor/maven $(bootrapped_objects)
 
-vendor/maven:
+vendor/maven: project.clj
 	$(call STATUS_MSG,Fetching clojure dependencies)
 	@lein deps > logs/fetch_clojure_dependencies.txt 2>&1
 	$(OK)
