@@ -41,7 +41,7 @@
 
 (defn complete
   "Returns metrics for each completed benchmark instance"
-  [db-client response-format]
+  [db-client response-format params]
   (let [benchmarks  (completed-benchmark-metrics {} db-client)]
     (case response-format
       :json  (json-grouped-output field-mappings benchmarks)

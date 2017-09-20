@@ -66,11 +66,12 @@
   :available-media-types  ["application/json" "text/csv"]
   :allowed-methods        [:get]
   :handle-ok              (fn [request]
-                            (let [response-format (keyword (get-in request [:request :params :format] :json))
+                            (let [params          (get-in request [:request :params])
+                                  response-format (keyword (:format params))
                                   disposition     (str "attachment; filename=\"nucleotides_benchmark_metrics." (name response-format) "\"")
                                   response        {:headers {"Content-Type" (content-types response-format)
                                                              "Content-Disposition" disposition}
-                                                   :body    (results/complete db response-format)}]
+                                                   :body    (results/complete db response-format params)}]
                               (ring-response response))))
 
 (defresource status-show [db]

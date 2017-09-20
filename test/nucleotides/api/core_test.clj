@@ -2,6 +2,7 @@
   (:require [clojure.test       :refer :all]
             [helper.validation  :refer :all]
             [clojure.core.match :refer [match]]
+            [cemerick.url       :refer [url url-encode]]
 
             [ring.mock.request  :as mock]
 
@@ -348,54 +349,55 @@
 
   (testing "GET /results/complete"
 
-    (defn test-get-results [{:keys [fixtures resp-format entries]}]
+    (defn test-get-results [{:keys [fixtures params entries]}]
       (test-app-response
         {:method          :get
-         :url             (str "/results/complete?format=" resp-format)
+         :url             (str "/results/complete?" (ring.util.codec/form-encode params))
          :testing-data    true
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
-                           (resp/has-header "Content-Type" (app/content-types (keyword resp-format)))
-                           (resp/has-header "Content-Disposition" (str "attachment; filename=\"nucleotides_benchmark_metrics." resp-format "\""))
+                           (resp/has-header "Content-Type" (app/content-types (keyword (:format params))))
+                           (resp/has-header "Content-Disposition" (str "attachment; filename=\"nucleotides_benchmark_metrics." (:format params) "\""))
                            (resp/is-length-at? entries)]}))
+
 
     (testing "getting JSON results"
 
       (testing "when no benchmarks have been completed"
         (test-get-results
-          {:resp-format "json"
-           :entries     0}))
+          {:params   {:format "json"}
+           :entries  0}))
 
       (testing "results when a set of benchmarks for an image task has been completed"
         (test-get-results
-          {:resp-format "json"
-           :entries     1
-           :fixtures    ["benchmark_instance/two_completed"]})))
+          {:params    {:format "json"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]})))
 
     (testing "getting CSV results"
 
       (testing "when no benchmarks have been completed"
         (test-get-results
-          {:resp-format "csv"
-           :entries     0}))
+          {:params   {:format "csv"}
+           :entries  0}))
 
       (testing "results when a set of benchmarks for an image task has been completed"
         (test-get-results
-          {:resp-format "csv"
-           :entries     6
-           :fixtures    ["benchmark_instance/two_completed"]}))
+          {:params    {:format "csv"}
+           :entries   6
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
 
       (testing "results when a set of benchmarks for an image task has been partially completed"
         (test-get-results
-          {:resp-format "csv"
-           :entries     0
-           :fixtures    ["benchmark_instance/one_partially_completed"]}))
+          {:params    {:format "csv"}
+           :entries   0
+           :fixtures  ["benchmark_instance/one_partially_completed"]}))
 
       (testing "results for an image task when one set has failed and another is successful"
         (test-get-results
-          {:resp-format "csv"
-           :entries     3
-           :fixtures    ["benchmark_instance/one_completed_and_one_failed"]}))))
+          {:params    {:format "csv"}
+           :entries   3
+           :fixtures  ["benchmark_instance/one_completed_and_one_failed"]}))))
 
 
 
