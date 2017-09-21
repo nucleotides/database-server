@@ -41,8 +41,16 @@
 
 (defn complete
   "Returns metrics for each completed benchmark instance"
-  [db-client response-format]
-  (let [benchmarks  (completed-benchmark-metrics {} db-client)]
-    (case response-format
-      :json  (json-grouped-output field-mappings benchmarks)
-      :csv   (csv-output benchmarks))))
+  [db-client {:keys [format variable benchmark_type]}]
+  (let [benchmarks  (case [(empty? variable) (empty? benchmark_type)]
+                        [false false] (metrics-by-variable-and-benchmark-name
+                                        {:variable variable :benchmark_type benchmark_type} db-client)
+                        [true  false] (metrics-by-benchmark-type
+                                        {:benchmark_type benchmark_type} db-client)
+                        [false  true] (metrics-by-variable-name
+                                        {:variable variable} db-client)
+                                      (metrics {} db-client))]
+    (case format
+      "csv" (csv-output benchmarks)
+            (json-grouped-output field-mappings benchmarks)))) ;; Default to JSON output
+

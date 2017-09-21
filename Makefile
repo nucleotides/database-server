@@ -65,6 +65,7 @@ help:
 	@echo "make $(call BLUE,"test")		Run unit tests."
 	@echo "make $(call BLUE,"build")		Creates a jar file for the API."
 	@echo "make $(call BLUE,"db_logs")		Show the current logs of the testing database."
+	@echo "make $(call BLUE,"api_logs")		Show the current logs of the testing API."
 	@echo "make $(call BLUE,"bootstrap")		Creates required files and containers for testing and building."
 	@echo "make $(call BLUE,"clean")		Clean up all containers and temporary files"
 	@echo "make $(call BLUE,"clean_all")		Clean up all containers, temporary files, and dependencies."
@@ -123,6 +124,9 @@ repl:
 irb:
 	@$(db_params) bundle exec ./script/irb
 
+api_logs:
+	docker logs $(TESTING_API_CONTAINER_NAME) 2>&1 | less
+
 db_logs:
 	docker logs $(TESTING_DB_CONTAINER_NAME) 2>&1 | less
 
@@ -158,10 +162,8 @@ deploy: .api_image
 hard_coded_ids = $(shell egrep "id = \d+" src/nucleotides/api/*.sql)
 error_msg      = "ERROR: hardcoded database IDs found in .sql files.\n"
 
-# Extra redundancy using 'trap' to ensure API container is killed tests
 feature: Gemfile.lock test/fixtures/initial_state.sql .api_container
-	@bash -c "trap 'make kill_api_container' EXIT; \
-		 $(db_params) bundle exec cucumber $(ARGS) --require features"
+	@$(db_params) bundle exec cucumber $(ARGS) --require features
 
 test: test/fixtures/initial_state.sql
 	@if [ ! -z "$(hard_coded_ids)" ]; then echo $(error_msg) >&1; exit 1; fi
@@ -219,9 +221,9 @@ bootrapped_objects = Gemfile.lock \
 		     test/fixtures/initial_state.sql \
 		     .api_image
 
-bootstrap: vendor/maven $(bootrapped_objects)
+bootstrap: kill_rdb_container vendor/maven $(bootrapped_objects)
 
-vendor/maven:
+vendor/maven: project.clj
 	$(call STATUS_MSG,Fetching clojure dependencies)
 	@lein deps > logs/fetch_clojure_dependencies.txt 2>&1
 	$(OK)
