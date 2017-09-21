@@ -2,7 +2,6 @@
   (:require [clojure.test       :refer :all]
             [helper.validation  :refer :all]
             [clojure.core.match :refer [match]]
-            [cemerick.url       :refer [url url-encode]]
 
             [ring.mock.request  :as mock]
 
@@ -368,11 +367,28 @@
           {:params   {:format "json"}
            :entries  0}))
 
-      (testing "results when a set of benchmarks for an image task has been completed"
+      (testing "using the benchmark URL parameter when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "json" :benchmark_type ["benchmark_1"]}
+           :entries  0}))
+
+      (testing "using the variable URL parameter when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "json" :variable ["produce_task_metric_1"]}
+           :entries  0}))
+
+      (testing "when a set of benchmarks for an image task have been completed"
         (test-get-results
           {:params    {:format "json"}
            :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using URL parameters to subset for one completed benchmark"
+        (test-get-results
+          {:params    {:format "json" :benchmark_type ["benchmark_1"]}
+           :entries   1
            :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]})))
+
 
     (testing "getting CSV results"
 
@@ -381,19 +397,43 @@
           {:params   {:format "csv"}
            :entries  0}))
 
-      (testing "results when a set of benchmarks for an image task has been completed"
+      (testing "when a set of benchmarks for an image task has been completed"
         (test-get-results
           {:params    {:format "csv"}
            :entries   6
            :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
 
-      (testing "results when a set of benchmarks for an image task has been partially completed"
+      (testing "using the URL variable parameter to subset for a single metric"
+        (test-get-results
+          {:params    {:format "csv" :variable "produce_task_metric_1"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL variable parameter to subset for a multiple metrics"
+        (test-get-results
+          {:params    {:format "csv" :variable ["evaluate_task_metric_1" "evaluate_task_metric_2"] :benchmark_type "benchmark_1"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL parameters to subset for a multiple metrics and benchmarks"
+        (test-get-results
+          {:params    {:format "csv" :variable ["evaluate_task_metric_1" "evaluate_task_metric_2"]}
+           :entries   4
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL variable parameter to subset for a specific metric"
+        (test-get-results
+          {:params    {:format "csv" :benchmark_type "benchmark_1"}
+           :entries   3
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "when a set of benchmarks for an image task has been partially completed"
         (test-get-results
           {:params    {:format "csv"}
            :entries   0
            :fixtures  ["benchmark_instance/one_partially_completed"]}))
 
-      (testing "results for an image task when one set has failed and another is successful"
+      (testing "for an image task when one set has failed and another is successful"
         (test-get-results
           {:params    {:format "csv"}
            :entries   3

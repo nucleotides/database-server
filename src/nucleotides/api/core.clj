@@ -71,7 +71,7 @@
                                   disposition     (str "attachment; filename=\"nucleotides_benchmark_metrics." (name response-format) "\"")
                                   response        {:headers {"Content-Type" (content-types response-format)
                                                              "Content-Disposition" disposition}
-                                                   :body    (results/complete db response-format params)}]
+                                                   :body    (results/complete db params)}]
                               (ring-response response))))
 
 (defresource status-show [db]
