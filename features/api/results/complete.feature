@@ -62,15 +62,15 @@ Feature: Getting the results for completed benchmarks
     And the returned document should contain <n> entries
 
     Examples:
-      | n | params                                                               |
-      | 6 |                                                                      |
-      | 3 | &benchmark_type[]=benchmark_1                                        |
-      | 3 | &benchmark_type[]=benchmark_1&benchmark_type[]=benchmark_2           |
-      | 0 | &benchmark_type[]=no_data_sets                                       |
-      | 2 | &variable[]=produce_task_metric_1                                    |
-      | 2 | &variable[]=produce_task_metric_1&variable[]=produce_task_metric_1   |
-      | 4 | &variable[]=evaluate_task_metric_1&variable[]=evaluate_task_metric_2 |
-      | 1 | &benchmark_type[]=benchmark_1&variable[]=produce_task_metric_1       |
+      | n | params                                                           |
+      | 6 |                                                                  |
+      | 3 | &benchmark_type=benchmark_1                                      |
+      | 6 | &benchmark_type=benchmark_1&benchmark_type=benchmark_2           |
+      | 0 | &benchmark_type=no_data_sets                                     |
+      | 2 | &variable=produce_task_metric_1                                  |
+      | 2 | &variable=produce_task_metric_1&variable=produce_task_metric_1   |
+      | 4 | &variable=evaluate_task_metric_1&variable=evaluate_task_metric_2 |
+      | 1 | &benchmark_type=benchmark_1&variable=produce_task_metric_1       |
 
 
   Scenario: Getting results when some tasks have failed
