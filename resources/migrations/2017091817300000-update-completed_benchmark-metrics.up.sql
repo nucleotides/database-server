@@ -68,9 +68,31 @@ CREATE VIEW completed_benchmark_metrics AS
       WHERE state.instance_successful = true
         AND state.instance_finished   = true;
 
---;;
---;; Function rebuild all benchmark instances and tasks
---;;
+
+-- Add partial index to speed up selecting only the successful events
+CREATE INDEX successful_events ON event(success) WHERE success IS TRUE;
+
+-- Index events in the metric instance table.
+CREATE INDEX metric_instance_event_idx ON metric_instance(event_id ASC);
+
+--
+-- Single events per task prioritised by the successful over the failed and
+-- oldest first. This is an improvement over the previous version of this view
+-- because it sorts by the primary key, rather than the created date. The primary
+-- key is a sequence and so these two fields should be directly correlated. I.e.
+-- numerically lower primary keys should be created earlier than numerically
+-- higher primary keys.
+--
+CREATE OR REPLACE VIEW events_prioritised_by_successful AS
+    SELECT DISTINCT ON (task_id)
+                       event_id
+                  FROM event
+                 WHERE success = TRUE
+              ORDER BY task_id, success DESC, event_id ASC;
+
+--
+-- Function rebuild all benchmark instances and tasks
+--
 CREATE OR REPLACE FUNCTION rebuild_benchmarks () RETURNS void AS $$
 BEGIN
 REFRESH MATERIALIZED VIEW input_data_file_expanded_fields;
@@ -83,5 +105,11 @@ REFRESH MATERIALIZED VIEW tasks_per_benchmark_instance_by_benchmark_type;
 REINDEX TABLE benchmark_instance;
 REINDEX TABLE task;
 REINDEX TABLE tasks_per_image_by_benchmark_type;
+REINDEX TABLE event;
+REINDEX TABLE metric_instance;
+
+-- Physically reorder metric instances by their event_id. The merge join between
+-- these two columns is the slowest part of the completed benchmarks query.
+CLUSTER metric_instance USING metric_instance_event_idx;
 END; $$
 LANGUAGE PLPGSQL;
