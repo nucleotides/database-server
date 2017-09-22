@@ -84,8 +84,7 @@ CREATE INDEX metric_instance_event_idx ON metric_instance(event_id ASC);
 -- higher primary keys.
 --
 CREATE OR REPLACE VIEW events_prioritised_by_successful AS
-    SELECT DISTINCT ON (task_id)
-                       event_id
+    SELECT DISTINCT ON (task_id) *
                   FROM event
                  WHERE success = TRUE
               ORDER BY task_id, success DESC, event_id ASC;
