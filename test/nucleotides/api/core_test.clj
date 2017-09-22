@@ -34,7 +34,7 @@
                          (apply fix/load-fixture (concat fix/base-fixtures fixtures)))
          [false  true] (do
                          (db/drop-tables)
-                         (apply fix/load-fixture (cons "testing_data/initial_state" fixtures)))
+                         (apply fix/load-fixture (cons "initial_state" fixtures)))
          [true  false] (do)) ;; do nothing to database when `:keep-db?` given
   (let [response (http-request m)]
     (dorun
@@ -348,40 +348,96 @@
 
   (testing "GET /results/complete"
 
-    (defn test-get-results [{:keys [fixtures resp-format entries]}]
+    (defn test-get-results [{:keys [fixtures params entries]}]
       (test-app-response
         {:method          :get
-         :url             (str "/results/complete?format=" resp-format)
+         :url             (str "/results/complete?" (ring.util.codec/form-encode params))
          :testing-data    true
          :fixtures        fixtures
          :response-tests  [resp/is-ok-response
-                           (resp/has-header "Content-Type" (app/content-types (keyword resp-format)))
-                           (resp/has-header "Content-Disposition" (str "attachment; filename=\"nucleotides_benchmark_metrics." resp-format "\""))
+                           (resp/has-header "Content-Type" (app/content-types (keyword (:format params))))
+                           (resp/has-header "Content-Disposition" (str "attachment; filename=\"nucleotides_benchmark_metrics." (:format params) "\""))
                            (resp/is-length-at? entries)]}))
 
 
+    (testing "getting JSON results"
 
-    (testing "getting JSON results when no benchmarks have been completed"
-      (test-get-results
-        {:resp-format "json"
-         :entries     0}))
+      (testing "when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "json"}
+           :entries  0}))
 
-    (testing "getting JSON results when a set of benchmarks for an image task has been completed"
-      (test-get-results
-        {:resp-format "json"
-         :entries     1
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]}))
+      (testing "using the benchmark URL parameter when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "json" :benchmark_type ["benchmark_1"]}
+           :entries  0}))
 
-    (testing "getting CSV results when no benchmarks have been completed"
-      (test-get-results
-        {:resp-format "csv"
-         :entries     0}))
+      (testing "using the variable URL parameter when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "json" :variable ["produce_task_metric_1"]}
+           :entries  0}))
 
-    (testing "getting CSV results when a set of benchmarks for an image task has been completed"
-      (test-get-results
-        {:resp-format "csv"
-         :entries     2
-         :fixtures    ["testing_data/two_benchmark_instances_completed"]})))
+      (testing "when a set of benchmarks for an image task have been completed"
+        (test-get-results
+          {:params    {:format "json"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using URL parameters to subset for one completed benchmark"
+        (test-get-results
+          {:params    {:format "json" :benchmark_type ["benchmark_1"]}
+           :entries   1
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]})))
+
+
+    (testing "getting CSV results"
+
+      (testing "when no benchmarks have been completed"
+        (test-get-results
+          {:params   {:format "csv"}
+           :entries  0}))
+
+      (testing "when a set of benchmarks for an image task has been completed"
+        (test-get-results
+          {:params    {:format "csv"}
+           :entries   6
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL variable parameter to subset for a single metric"
+        (test-get-results
+          {:params    {:format "csv" :variable "produce_task_metric_1"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL variable parameter to subset for a multiple metrics"
+        (test-get-results
+          {:params    {:format "csv" :variable ["evaluate_task_metric_1" "evaluate_task_metric_2"] :benchmark_type "benchmark_1"}
+           :entries   2
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL parameters to subset for a multiple metrics and benchmarks"
+        (test-get-results
+          {:params    {:format "csv" :variable ["evaluate_task_metric_1" "evaluate_task_metric_2"]}
+           :entries   4
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "using the URL variable parameter to subset for a specific metric"
+        (test-get-results
+          {:params    {:format "csv" :benchmark_type "benchmark_1"}
+           :entries   3
+           :fixtures  ["benchmark_instance/two_completed_from_two_different_benchmark_types"]}))
+
+      (testing "when a set of benchmarks for an image task has been partially completed"
+        (test-get-results
+          {:params    {:format "csv"}
+           :entries   0
+           :fixtures  ["benchmark_instance/one_partially_completed"]}))
+
+      (testing "for an image task when one set has failed and another is successful"
+        (test-get-results
+          {:params    {:format "csv"}
+           :entries   3
+           :fixtures  ["benchmark_instance/one_completed_and_one_failed"]}))))
 
 
 

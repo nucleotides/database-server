@@ -1,8 +1,10 @@
 (ns nucleotides.api.results
-  (:require [clojure.data.csv      :as csv]
-            [yesql.core            :refer [defqueries]]
+  (:require [clojure.java.io                  :as io]
+            [clojure.data.csv                 :as csv]
+            [yesql.core                       :refer [defqueries]]
+            [ring.util.io                     :refer [piped-input-stream]]
             [nucleotides.database.connection  :as con]
-            [nucleotides.api.util  :as util]))
+            [nucleotides.api.util             :as util]))
 
 (defqueries "nucleotides/api/results.sql")
 
@@ -30,18 +32,25 @@
 
 
 (defn csv-output [data-seq]
-  (let [header (map name (keys (first data-seq)))
-        out    (java.io.StringWriter.)
-        write  #(csv/write-csv out (list %))]
-    (write header)
-    (dorun (map (comp write vals) data-seq))
-    (.toString out)))
+  (let [headers     (map name (keys (first data-seq)))
+        rows        (map vals data-seq)
+        stream-csv  (fn [out] (csv/write-csv out (cons headers rows))
+                              (.flush out))]
+    (piped-input-stream #(stream-csv (io/make-writer % {})))))
 
 
 (defn complete
   "Returns metrics for each completed benchmark instance"
-  [db-client response-format]
-  (let [benchmarks  (completed-benchmark-metrics {} db-client)]
-    (case response-format
-      :json  (json-grouped-output field-mappings benchmarks)
-      :csv   (csv-output benchmarks))))
+  [db-client {:keys [format variable benchmark_type]}]
+  (let [benchmarks  (case [(empty? variable) (empty? benchmark_type)]
+                        [false false] (metrics-by-variable-and-benchmark-name
+                                        {:variable variable :benchmark_type benchmark_type} db-client)
+                        [true  false] (metrics-by-benchmark-type
+                                        {:benchmark_type benchmark_type} db-client)
+                        [false  true] (metrics-by-variable-name
+                                        {:variable variable} db-client)
+                                      (metrics {} db-client))]
+    (case format
+      "csv" (csv-output benchmarks)
+            (json-grouped-output field-mappings benchmarks)))) ;; Default to JSON output
+

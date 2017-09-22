@@ -3,13 +3,32 @@
 All notable changes to this project will be documented in this file. This
 project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.10.0 - DATE
+
+### Changed
+
+  * Rather than requiring all benchmark instances for a given image task be
+    completed before returning any metrics, the `/results/complete` URL now
+    returns all metrics for each benchmark instance that was successful and
+    completed. This is regardless of whether other benchmarking instances for
+    the same image task have failed.
+
+  * When accessing `/results/complete?format=csv` the results are returned as a
+    streaming download, rather than a large single generated string. This
+    should solve the OutOfMemory errors which were occurring when responding
+    with very large CSV files.
+
+  * The URL `/results/complete` now supports the parameters `benchmark_type`
+    and `variable`. These can be used to subset and get only the specific
+    benchmarks and variables of interest for analysis.
+
 ## v0.9.2 - 2016-11-07
 
 ### Changed
 
   * Set `Content-Disposition` header in `/results/complete` returned response
     to `attachment` instead of `inline`. This ensures the results are
-    downloaded instead of diplayed in the browser. The file is very large so
+    downloaded instead of displayed in the browser. The file is very large so
     displaying in the browser may cause problems.
 
 ### Fixed
@@ -98,7 +117,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
     possible.
 
   * Tasks returned in `/tasks/:id`, and benchmarks returned in
-    `/benchmarks/:id` now have `success` boolean field. This indicates if the
+    `/benchmarks/:id` now have `success` Boolean field. This indicates if the
     task or benchmark was successfully completed. The `complete` field denotes
     whether the task or benchmark was completed at all. A task or benchmark
     will appear as completed if the tasks were attempted but unsuccessful.
@@ -110,7 +129,7 @@ project adheres to [Semantic Versioning](http://semver.org/).
     error.
 
   * Fixed bug in population of benchmarking tasks where Docker image tables
-    were accidently joined on the wrong columns.
+    were accidentally joined on the wrong columns.
 
 ## v0.8.2 - 2016-09-29
 

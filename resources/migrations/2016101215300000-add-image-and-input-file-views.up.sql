@@ -99,7 +99,7 @@ CREATE UNIQUE INDEX ON image_expanded_fields (image_type_id, image_instance_id, 
 
 
 --;;
---;; View of numbers of tasks per benchmark type
+--;; View of numbers of tasks per image task by benchmark type
 --;;
 CREATE MATERIALIZED VIEW tasks_per_image_by_benchmark_type AS
 SELECT DISTINCT benchmark_type_id,
